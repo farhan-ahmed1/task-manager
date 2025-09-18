@@ -1,0 +1,95 @@
+### Node ###
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+package-lock.json
+pnpm-lock.yaml
+yarn.lock
+
+### TypeScript / Build ###
+dist/
+build/
+out/
+.turbo/
+.next/
+/.cache/
+coverage/
+/*.tsbuildinfo
+
+### Environment files ###
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+.env.*.local
+
+### Logs ###
+.log
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+
+### OS generated files ###
+.DS_Store
+Thumbs.db
+
+### Editors ###
+.vscode/
+/.idea/
+*.sublime-workspace
+*.sublime-project
+
+### Docker ###
+docker-compose.override.yml
+Dockerfile.dev
+**/docker-compose.*.yml
+**/docker-compose.*.yaml
+
+### Kubernetes / manifests / local clusters ###
+.kube/
+kustomize/
+.minikube/
+kind-config.yaml
+
+### Secrets / keys ###
+*.pem
+*.key
+secrets/
+
+### Database ###
+pgdata/
+*.sqlite
+*.db
+
+### Containers and build artifacts ###
+/.parcel-cache
+.cache-loader
+
+### Test output ###
+jest-cache/
+jest-report.json
+
+### Misc ###
+coverage/
+*.tgz
+.package-lock.json
+
+### Logs and local tooling ###
+.pnp.cjs
+.pnp.js
+
+# Tailwind / postcss caches
+.cache/
+
+# Mac system files
+Icon\r
+
+# Local envs for Docker secrets used in CI
+.env.local.*
+
+# GitHub Copilot config
+.github/copilot/*
