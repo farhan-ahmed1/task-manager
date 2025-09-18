@@ -22,10 +22,10 @@ CREATE TABLE IF NOT EXISTS projects (
 
 CREATE TABLE IF NOT EXISTS tasks (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  project_id UUID NOT NULL REFERENCES projects(id) ON DELETE CASCADE,
+  project_id UUID REFERENCES projects(id) ON DELETE CASCADE,
   title TEXT NOT NULL,
   description TEXT,
-  status TEXT NOT NULL DEFAULT 'TODO',
+  status TEXT NOT NULL DEFAULT 'PENDING',
   priority TEXT NOT NULL DEFAULT 'MEDIUM',
   due_date DATE,
   created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
