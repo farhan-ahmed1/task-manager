@@ -1,9 +1,8 @@
 {
   "compilerOptions": {
     "target": "ES2022",
-    "module": "Node16",
-    "moduleResolution": "node16",
-    "ignoreDeprecations": "6.0",
+  "module": "Node16",
+  "moduleResolution": "node16",
     "outDir": "dist",
     "rootDir": "src",
     "strict": true,
@@ -14,6 +13,6 @@
     "noImplicitAny": true,
     "types": ["node", "jest"]
   },
-  "include": ["src/**/*"],
+  "include": ["src/**/*", "types/**/*"],
   "exclude": ["node_modules", "dist"]
 }
