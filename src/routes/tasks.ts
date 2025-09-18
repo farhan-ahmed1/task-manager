@@ -22,7 +22,8 @@ router.post('/', requireAuth, async (req: AuthedRequest, res: Response, next: Ne
 router.get('/', requireAuth, async (req: AuthedRequest, res: Response, next: NextFunction) => {
   try {
     const userId = req.userId!;
-    const tasks = await taskRepo.getTasks(userId);
+    const projectId = typeof req.query.project_id === 'string' ? req.query.project_id : undefined;
+    const tasks = await taskRepo.getTasksByFilter(userId, projectId);
     res.json({ data: tasks });
   } catch (err) {
     next(err);

@@ -56,7 +56,7 @@ export const updateTask = async (
   const fields = [];
   const values = [];
   let idx = 1;
-  
+
   for (const [key, value] of Object.entries(updates)) {
     if (value !== undefined) {
       fields.push(`${key} = $${idx}`);
@@ -64,18 +64,18 @@ export const updateTask = async (
       idx++;
     }
   }
-  
+
   if (fields.length === 0) return null;
-  
+
   // Add updated_at
   fields.push(`updated_at = $${idx}`);
   values.push(new Date());
   idx++;
-  
+
   // Add parameters for WHERE clause
   values.push(taskId); // $idx (for WHERE id = ...)
   values.push(userId); // $idx+1 (for user verification)
-  
+
   const setClause = fields.join(', ');
   const res = await pool.query(
     `UPDATE tasks SET ${setClause}
@@ -136,4 +136,99 @@ export const createProject = async (ownerId: string, name: string, description?:
     [ownerId, name, description],
   );
   return res.rows[0];
+};
+
+export const getProjectsForOwner = async (ownerId: string) => {
+  const res = await pool.query(
+    `SELECT * FROM projects WHERE owner_id = $1 ORDER BY created_at DESC`,
+    [ownerId],
+  );
+  return res.rows;
+};
+
+export const getProjectById = async (ownerId: string, projectId: string) => {
+  const res = await pool.query(`SELECT * FROM projects WHERE id = $1 AND owner_id = $2`, [
+    projectId,
+    ownerId,
+  ]);
+  return res.rows[0] || null;
+};
+
+export const updateProject = async (
+  ownerId: string,
+  projectId: string,
+  updates: { name?: string; description?: string },
+) => {
+  const fields: string[] = [];
+  const values: (string | Date)[] = [];
+  let idx = 1;
+
+  for (const [key, value] of Object.entries(updates)) {
+    if (value !== undefined) {
+      fields.push(`${key} = $${idx}`);
+      values.push(value);
+      idx++;
+    }
+  }
+
+  if (fields.length === 0) return null;
+
+  // updated_at
+  fields.push(`updated_at = $${idx}`);
+  values.push(new Date());
+  idx++;
+
+  // where params
+  values.push(projectId);
+  values.push(ownerId);
+
+  const setClause = fields.join(', ');
+  const res = await pool.query(
+    `UPDATE projects SET ${setClause} WHERE id = $${idx} AND owner_id = $${idx + 1} RETURNING *`,
+    values,
+  );
+  return res.rows[0] || null;
+};
+
+export const deleteProject = async (ownerId: string, projectId: string) => {
+  const res = await pool.query(
+    `DELETE FROM projects WHERE id = $1 AND owner_id = $2 RETURNING id`,
+    [projectId, ownerId],
+  );
+  return res.rowCount > 0;
+};
+
+// Return counts grouped by status for a given project (only owner can view)
+export const getProjectStats = async (ownerId: string, projectId: string) => {
+  const res = await pool.query(
+    `SELECT t.status, COUNT(*)::int AS count
+     FROM tasks t
+     JOIN projects p ON p.id = t.project_id
+     WHERE p.id = $1 AND p.owner_id = $2
+     GROUP BY t.status`,
+    [projectId, ownerId],
+  );
+
+  // Normalize to object with statuses
+  const stats: Record<string, number> = { PENDING: 0, IN_PROGRESS: 0, COMPLETED: 0 };
+  for (const row of res.rows) {
+    stats[row.status] = Number(row.count);
+  }
+  return stats;
+};
+
+// Update getTasks to accept optional project filter
+export const getTasksByFilter = async (userId: string, projectId?: string) => {
+  if (projectId) {
+    const res = await pool.query(
+      `SELECT t.* FROM tasks t
+       JOIN task_assignments ta ON ta.task_id = t.id
+       WHERE ta.user_id = $1 AND t.project_id = $2
+       ORDER BY t.created_at DESC`,
+      [userId, projectId],
+    );
+    return res.rows;
+  }
+
+  return getTasks(userId);
 };

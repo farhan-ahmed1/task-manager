@@ -2,6 +2,7 @@ import express from 'express';
 import dotenv from 'dotenv';
 import authRouter from './routes/auth';
 import tasksRouter from './routes/tasks';
+import projectsRouter from './routes/projects';
 
 dotenv.config();
 
@@ -9,6 +10,7 @@ const app = express();
 app.use(express.json());
 app.use('/auth', authRouter);
 app.use('/api/tasks', tasksRouter);
+app.use('/api/projects', projectsRouter);
 
 app.get('/health', (_req, res) => {
   res.json({ status: 'ok' });
@@ -30,7 +32,13 @@ type AppError = Error & { status?: number; code?: string };
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 app.use((err: AppError, req: Request, res: Response, next: NextFunction) => {
   const status =
-    err.name === 'TaskNotFoundError' ? 404 : err.name === 'ZodError' ? 400 : err.status || 500;
+    err.name === 'TaskNotFoundError'
+      ? 404
+      : err.name === 'ProjectNotFoundError'
+        ? 404
+        : err.name === 'ZodError'
+          ? 400
+          : err.status || 500;
   const code = err.code || err.name || 'INTERNAL_ERROR';
   const message = err.message || 'An unexpected error occurred';
   // Optionally log error here

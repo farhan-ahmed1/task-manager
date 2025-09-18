@@ -32,3 +32,12 @@ export interface UpdateTaskDto {
   priority?: TaskPriority;
   due_date?: Date;
 }
+
+export interface Project {
+  id: string;
+  owner_id: string;
+  name: string;
+  description?: string;
+  created_at: Date;
+  updated_at: Date;
+}

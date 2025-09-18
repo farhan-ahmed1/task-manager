@@ -20,9 +20,16 @@ Create a new task for the authenticated user.
 ## GET /api/tasks
 List all tasks assigned to the authenticated user.
 
+**Query Parameters:**
+- `project_id` (UUID string, optional) - Filter tasks by project ID
+
 **Response:**
 - 200 OK
 - `{ data: Task[] }`
+
+**Examples:**
+- Get all tasks: `GET /api/tasks`
+- Get tasks for a specific project: `GET /api/tasks?project_id=123e4567-e89b-12d3-a456-426614174000`
 
 ---
 
@@ -114,5 +121,11 @@ curl -X POST /api/tasks \
 ### Get All Tasks
 ```bash
 curl -X GET /api/tasks \
+  -H "Authorization: Bearer <token>"
+```
+
+### Get Tasks Filtered by Project
+```bash
+curl -X GET "/api/tasks?project_id=123e4567-e89b-12d3-a456-426614174000" \
   -H "Authorization: Bearer <token>"
 ```

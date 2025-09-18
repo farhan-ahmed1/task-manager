@@ -39,3 +39,13 @@ export class DatabaseError extends Error {
     this.name = 'DatabaseError';
   }
 }
+
+export class ProjectNotFoundError extends Error {
+  public status = 404;
+  public code = 'PROJECT_NOT_FOUND';
+
+  constructor(projectId: string) {
+    super(`Project with ID ${projectId} not found`);
+    this.name = 'ProjectNotFoundError';
+  }
+}
