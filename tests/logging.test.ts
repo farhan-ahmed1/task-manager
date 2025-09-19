@@ -104,6 +104,8 @@ describe('Logging Middleware', () => {
 
       // Route that throws an error
       app.get('/error', (req: Request, res: Response) => {
+        void req;
+        void res;
         throw new Error('Test error message');
       });
 
@@ -111,10 +113,13 @@ describe('Logging Middleware', () => {
       app.get(
         '/auth-error',
         (req: Request, res: Response, next: NextFunction) => {
-          (req as any).user = { id: 'user123' };
+          void res;
+          (req as Request & { user?: { id: string } }).user = { id: 'user123' };
           next();
         },
         (req: Request, res: Response) => {
+          void req;
+          void res;
           throw new Error('Authenticated user error');
         },
       );
@@ -123,6 +128,7 @@ describe('Logging Middleware', () => {
 
       // Error handler
       app.use((err: Error, req: Request, res: Response, next: NextFunction) => {
+        void next;
         res.status(500).json({ error: err.message });
       });
     });
@@ -174,12 +180,16 @@ describe('Logging Middleware', () => {
       testApp.use(express.json());
       testApp.use(addRequestMetadata);
 
-      testApp.post('/post-error', (_req: Request, _res: Response) => {
+      testApp.post('/post-error', (req: Request, res: Response) => {
+        void req;
+        void res;
         throw new Error('POST error');
       });
 
       testApp.use(errorLogger);
-      testApp.use((err: Error, _req: Request, res: Response, _next: NextFunction) => {
+      testApp.use((err: Error, req: Request, res: Response, next: NextFunction) => {
+        void req;
+        void next;
         res.status(500).json({ error: err.message });
       });
 
@@ -215,12 +225,16 @@ describe('Logging Middleware', () => {
       const testApp = express();
       testApp.use(addRequestMetadata);
 
-      testApp.get('/error', (_req: Request, _res: Response) => {
+      testApp.get('/error', (req: Request, res: Response) => {
+        void req;
+        void res;
         throw new Error('Test error');
       });
 
       testApp.use(errorLogger);
-      testApp.use((err: Error, _req: Request, res: Response, _next: NextFunction) => {
+      testApp.use((err: Error, req: Request, res: Response, next: NextFunction) => {
+        void req;
+        void next;
         errorHandlerCalled = true;
         res.status(500).json({ error: 'Custom error handler' });
       });
@@ -303,7 +317,8 @@ describe('Logging Middleware', () => {
       app.get(
         '/auth-perf',
         (req: Request, res: Response, next: NextFunction) => {
-          (req as any).user = { id: 'user456' };
+          void res;
+          (req as Request & { user?: { id: string } }).user = { id: 'user456' };
           next();
         },
         async (req: Request, res: Response) => {
@@ -414,6 +429,7 @@ describe('Logging Middleware', () => {
       process.env.NODE_ENV = 'production';
 
       // Re-import to test environment-specific behavior
+      // eslint-disable-next-line @typescript-eslint/no-var-requires
       const { logger: prodLogger } = require('../src/middleware/logging');
 
       expect(prodLogger).toBeDefined();
@@ -428,6 +444,7 @@ describe('Logging Middleware', () => {
       // Test with different log levels
       ['error', 'warn', 'info', 'debug'].forEach((level) => {
         process.env.LOG_LEVEL = level;
+        // eslint-disable-next-line @typescript-eslint/no-var-requires
         const { logger: levelLogger } = require('../src/middleware/logging');
         expect(levelLogger).toBeDefined();
       });
@@ -456,7 +473,8 @@ describe('Logging Middleware', () => {
       app.get(
         '/with-user',
         (req: Request, res: Response, next: NextFunction) => {
-          (req as any).user = { id: 'user789' };
+          void res;
+          (req as Request & { user?: { id: string } }).user = { id: 'user789' };
           next();
         },
         (req: Request, res: Response) => {
@@ -537,6 +555,8 @@ describe('Logging Middleware', () => {
       app.use(addRequestMetadata);
 
       app.get('/error-no-props', (req: Request, res: Response) => {
+        void req;
+        void res;
         const error = Object.create(Error.prototype);
         error.message = 'Custom error';
         throw error;
@@ -544,6 +564,8 @@ describe('Logging Middleware', () => {
 
       app.use(errorLogger);
       app.use((err: Error, req: Request, res: Response, next: NextFunction) => {
+        void req;
+        void next;
         res.status(500).json({ error: 'Error handled' });
       });
 
@@ -556,15 +578,19 @@ describe('Logging Middleware', () => {
       app.use(addRequestMetadata);
 
       app.post('/malformed', (req: Request, res: Response) => {
+        void req;
+        void res;
         throw new Error('Malformed data error');
       });
 
       app.use(errorLogger);
       app.use((err: Error, req: Request, res: Response, next: NextFunction) => {
+        void req;
+        void next;
         res.status(400).json({ error: 'Bad request' });
       });
 
-      const response = await request(app).post('/malformed').send('invalid-json');
+      await request(app).post('/malformed').send('invalid-json');
 
       expect(mockLogger.error).toHaveBeenCalled();
     });
