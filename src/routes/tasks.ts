@@ -23,7 +23,8 @@ router.get('/', requireAuth, async (req: AuthedRequest, res: Response, next: Nex
   try {
     const userId = req.userId!;
     const projectId = typeof req.query.project_id === 'string' ? req.query.project_id : undefined;
-    const tasks = await taskRepo.getTasksByFilter(userId, projectId);
+    const status = typeof req.query.status === 'string' ? req.query.status : undefined;
+    const tasks = await taskRepo.getTasksByFilter(userId, projectId, status);
     res.json({ data: tasks });
   } catch (err) {
     next(err);

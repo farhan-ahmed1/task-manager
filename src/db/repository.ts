@@ -217,18 +217,32 @@ export const getProjectStats = async (ownerId: string, projectId: string) => {
   return stats;
 };
 
-// Update getTasks to accept optional project filter
-export const getTasksByFilter = async (userId: string, projectId?: string) => {
+// Update getTasks to accept optional project filter and status filter
+export const getTasksByFilter = async (userId: string, projectId?: string, status?: string) => {
+  const conditions = ['ta.user_id = $1'];
+  const params = [userId];
+  let paramIndex = 2;
+
   if (projectId) {
-    const res = await pool.query(
-      `SELECT t.* FROM tasks t
-       JOIN task_assignments ta ON ta.task_id = t.id
-       WHERE ta.user_id = $1 AND t.project_id = $2
-       ORDER BY t.created_at DESC`,
-      [userId, projectId],
-    );
-    return res.rows;
+    conditions.push(`t.project_id = $${paramIndex}`);
+    params.push(projectId);
+    paramIndex++;
   }
 
-  return getTasks(userId);
+  if (status) {
+    conditions.push(`t.status = $${paramIndex}`);
+    params.push(status);
+    paramIndex++;
+  }
+
+  const whereClause = conditions.join(' AND ');
+
+  const res = await pool.query(
+    `SELECT t.* FROM tasks t
+     JOIN task_assignments ta ON ta.task_id = t.id
+     WHERE ${whereClause}
+     ORDER BY t.created_at DESC`,
+    params,
+  );
+  return res.rows;
 };

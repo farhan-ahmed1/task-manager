@@ -1,0 +1,183 @@
+config:
+  target: 'http://localhost:3000'
+  phases:
+    # Warm-up phase
+    - duration: 60
+      arrivalRate: 1
+      name: "Warm up"
+    # Ramp up phase
+    - duration: 120
+      arrivalRate: 1
+      rampTo: 10
+      name: "Ramp up load"
+    # Sustained load phase
+    - duration: 180
+      arrivalRate: 10
+      name: "Sustained load"
+    # Spike test phase
+    - duration: 60
+      arrivalRate: 20
+      name: "Spike test"
+  payload:
+    path: "test-data.csv"
+    fields:
+      - email
+      - password
+      - taskTitle
+      - projectName
+  variables:
+    testUserEmail: "loadtest@example.com"
+    testUserPassword: "password123"
+  
+scenarios:
+  - name: "Health Check"
+    weight: 10
+    flow:
+      - get:
+          url: "/health"
+          expect:
+            - statusCode: 200
+            - hasProperty: "status"
+
+  - name: "User Registration and Login"
+    weight: 20
+    flow:
+      - post:
+          url: "/auth/register"
+          json:
+            email: "{{ email }}"
+            password: "{{ password }}"
+            name: "Load Test User"
+          expect:
+            - statusCode: [201, 409] # 409 if user already exists
+      - post:
+          url: "/auth/login"
+          json:
+            email: "{{ email }}"
+            password: "{{ password }}"
+          capture:
+            - json: "$.data.token"
+              as: "authToken"
+          expect:
+            - statusCode: 200
+            - hasProperty: "data.token"
+
+  - name: "Authenticated Task Operations"
+    weight: 40
+    flow:
+      # Login first
+      - post:
+          url: "/auth/login"
+          json:
+            email: "{{ testUserEmail }}"
+            password: "{{ testUserPassword }}"
+          capture:
+            - json: "$.data.token"
+              as: "authToken"
+      # Create a task
+      - post:
+          url: "/api/tasks"
+          headers:
+            Authorization: "Bearer {{ authToken }}"
+          json:
+            title: "{{ taskTitle }}"
+            description: "Load test task"
+            priority: "MEDIUM"
+            status: "TODO"
+          capture:
+            - json: "$.data.id"
+              as: "taskId"
+          expect:
+            - statusCode: 201
+      # Get all tasks
+      - get:
+          url: "/api/tasks"
+          headers:
+            Authorization: "Bearer {{ authToken }}"
+          expect:
+            - statusCode: 200
+      # Get specific task
+      - get:
+          url: "/api/tasks/{{ taskId }}"
+          headers:
+            Authorization: "Bearer {{ authToken }}"
+          expect:
+            - statusCode: 200
+      # Update task
+      - put:
+          url: "/api/tasks/{{ taskId }}"
+          headers:
+            Authorization: "Bearer {{ authToken }}"
+          json:
+            status: "IN_PROGRESS"
+          expect:
+            - statusCode: 200
+      # Delete task
+      - delete:
+          url: "/api/tasks/{{ taskId }}"
+          headers:
+            Authorization: "Bearer {{ authToken }}"
+          expect:
+            - statusCode: 204
+
+  - name: "Project Operations"
+    weight: 30
+    flow:
+      # Login first
+      - post:
+          url: "/auth/login"
+          json:
+            email: "{{ testUserEmail }}"
+            password: "{{ testUserPassword }}"
+          capture:
+            - json: "$.data.token"
+              as: "authToken"
+      # Create a project
+      - post:
+          url: "/api/projects"
+          headers:
+            Authorization: "Bearer {{ authToken }}"
+          json:
+            name: "{{ projectName }}"
+            description: "Load test project"
+          capture:
+            - json: "$.data.id"
+              as: "projectId"
+          expect:
+            - statusCode: 201
+      # Get all projects
+      - get:
+          url: "/api/projects"
+          headers:
+            Authorization: "Bearer {{ authToken }}"
+          expect:
+            - statusCode: 200
+      # Get specific project
+      - get:
+          url: "/api/projects/{{ projectId }}"
+          headers:
+            Authorization: "Bearer {{ authToken }}"
+          expect:
+            - statusCode: 200
+      # Update project
+      - put:
+          url: "/api/projects/{{ projectId }}"
+          headers:
+            Authorization: "Bearer {{ authToken }}"
+          json:
+            description: "Updated load test project"
+          expect:
+            - statusCode: 200
+
+plugins:
+  expect: {}
+  metrics-by-endpoint: {}
+
+# Performance benchmarks and SLA expectations
+expect:
+  thresholds:
+    - http.response_time.p95: 500    # 95% of requests should be under 500ms
+    - http.response_time.p99: 1000   # 99% of requests should be under 1000ms
+    - http.response_time.max: 2000   # No request should take more than 2 seconds
+    - http.request_rate: 100         # Should handle at least 100 requests per second
+    - vusers.session_length.p95: 60  # Sessions should complete within 60 seconds
