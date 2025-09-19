@@ -43,8 +43,8 @@ class AuthService {
     
     const response = await fetch(url, {
       headers: {
-        'Content-Type': 'application/json',
         ...options.headers,
+        'Content-Type': 'application/json', // Ensure this comes last to not be overridden
       },
       ...options,
     });

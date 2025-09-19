@@ -55,8 +55,14 @@ app.use(addRequestMetadata);
 app.use(requestLogger);
 app.use(performanceLogger);
 
-// Body parsing middleware
-app.use(express.json({ limit: '10mb' }));
+// Body parsing middleware with workaround for browser Content-Type issues
+app.use(
+  express.json({
+    limit: '10mb',
+    type: ['application/json', 'text/plain'], // Accept both content types
+  }),
+);
+
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 
 // Rate limiting (disabled in test environment)
