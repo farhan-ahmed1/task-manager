@@ -37,7 +37,22 @@ router.post('/register', validateBody(RegisterSchema), async (req, res, next) =>
 
     const passwordHash = await hashPassword(password);
     const user = await createUser(email, passwordHash, name);
-    res.status(201).json({ data: user });
+
+    // Generate token for immediate login after registration
+    const token = jwt.sign(
+      { sub: String(user.id) },
+      JWT_SECRET as jwt.Secret,
+      { expiresIn: JWT_EXPIRES } as jwt.SignOptions,
+    );
+
+    res.status(201).json({
+      user: {
+        id: user.id,
+        email: user.email,
+        name: user.name,
+      },
+      token,
+    });
   } catch (err) {
     next(err);
   }
@@ -60,7 +75,15 @@ router.post('/login', validateBody(LoginSchema), async (req, res, next) => {
       JWT_SECRET as jwt.Secret,
       { expiresIn: JWT_EXPIRES } as jwt.SignOptions,
     );
-    res.json({ token });
+
+    res.json({
+      user: {
+        id: user.id,
+        email: user.email,
+        name: user.name,
+      },
+      token,
+    });
   } catch (err) {
     next(err);
   }

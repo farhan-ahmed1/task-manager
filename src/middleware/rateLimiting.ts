@@ -197,8 +197,8 @@ export const authRateLimitHandler = (req: Request, res: Response): void => {
 
 // Strict rate limiter for authentication endpoints
 export const authRateLimit: RateLimitRequestHandler = rateLimit({
-  windowMs: 15 * 60 * 1000, // 15 minutes
-  max: 5, // Limit each IP to 5 requests per windowMs
+  windowMs: process.env.NODE_ENV === 'development' ? 1 * 60 * 1000 : 15 * 60 * 1000, // 1 minute in dev, 15 minutes in prod
+  max: process.env.NODE_ENV === 'development' ? 100 : 5, // 100 requests in dev, 5 in prod
   keyGenerator: authKeyGenerator,
   handler: authRateLimitHandler,
   standardHeaders: true,

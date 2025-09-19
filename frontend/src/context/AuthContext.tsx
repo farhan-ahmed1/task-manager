@@ -29,16 +29,21 @@ const initialState: AuthState = {
 };
 
 const authReducer = (state: AuthState, action: AuthAction): AuthState => {
+  console.log('🟢 AuthReducer: Action dispatched:', action.type);
+  
   switch (action.type) {
     case 'LOGIN':
-    case 'RESTORE_SESSION':
-      return {
+    case 'RESTORE_SESSION': {
+      const newState = {
         ...state,
         user: action.payload.user,
         token: action.payload.token,
         isAuthenticated: true,
         isLoading: false,
       };
+      console.log('🟢 AuthReducer: New authenticated state:', { isAuthenticated: newState.isAuthenticated, userId: newState.user?.id });
+      return newState;
+    }
     case 'LOGOUT':
       return {
         ...state,
@@ -87,9 +92,11 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   }, []);
 
   const login = (user: User, token: string) => {
+    console.log('🟢 AuthContext: Login function called with:', { user, hasToken: !!token });
     localStorage.setItem('authToken', token);
     localStorage.setItem('authUser', JSON.stringify(user));
     dispatch({ type: 'LOGIN', payload: { user, token } });
+    console.log('🟢 AuthContext: Login dispatch completed');
   };
 
   const logout = () => {
@@ -112,6 +119,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 };
 
+// eslint-disable-next-line react-refresh/only-export-components
 export const useAuth = (): AuthContextType => {
   const context = useContext(AuthContext);
   if (context === undefined) {
