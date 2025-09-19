@@ -1,7 +1,7 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { Loader2 } from 'lucide-react';
+import { Loader2, FolderOpen } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -22,7 +22,8 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog';
 import { createTaskSchema, updateTaskSchema, type CreateTaskFormData, type UpdateTaskFormData } from '@/validation/task';
-import type { Task } from '@/types/api';
+import type { Task, Project } from '@/types/api';
+import { projectService } from '@/services/projects';
 
 interface TaskFormProps {
   open: boolean;
@@ -30,6 +31,8 @@ interface TaskFormProps {
   task?: Task; // If provided, form is in edit mode
   onSubmit: (data: CreateTaskFormData) => Promise<void>;
   loading?: boolean;
+  defaultProjectId?: string; // Pre-select a project when creating tasks
+  showProjectSelector?: boolean; // Whether to show project selection field
 }
 
 const TaskForm: React.FC<TaskFormProps> = ({
@@ -37,10 +40,14 @@ const TaskForm: React.FC<TaskFormProps> = ({
   onOpenChange,
   task,
   onSubmit,
-  loading = false
+  loading = false,
+  defaultProjectId,
+  showProjectSelector = true
 }) => {
   const isEditMode = !!task;
   const schema = isEditMode ? updateTaskSchema : createTaskSchema;
+  const [projects, setProjects] = useState<Project[]>([]);
+  const [projectsLoading, setProjectsLoading] = useState(false);
   
   const {
     register,
@@ -64,12 +71,34 @@ const TaskForm: React.FC<TaskFormProps> = ({
       status: 'PENDING',
       priority: 'MEDIUM',
       due_date: '',
-      project_id: ''
+      project_id: defaultProjectId || ''
     }
   });
 
   const status = watch('status');
   const priority = watch('priority');
+  const project_id = watch('project_id');
+
+  // Load projects when form opens (only if showing project selector)
+  useEffect(() => {
+    if (open && showProjectSelector) {
+      const loadProjects = async () => {
+        setProjectsLoading(true);
+        try {
+          const result = await projectService.getProjects();
+          if (result.success) {
+            setProjects(result.data);
+          }
+        } catch (error) {
+          console.error('Failed to load projects:', error);
+        } finally {
+          setProjectsLoading(false);
+        }
+      };
+
+      loadProjects();
+    }
+  }, [open, showProjectSelector]);
 
   const handleFormSubmit = async (data: CreateTaskFormData | UpdateTaskFormData) => {
     try {
@@ -143,6 +172,40 @@ const TaskForm: React.FC<TaskFormProps> = ({
               <p className="text-sm text-red-500">{errors.description.message}</p>
             )}
           </div>
+
+          {/* Project Selection */}
+          {showProjectSelector && (
+            <div className="space-y-2">
+              <Label htmlFor="project_id" className="text-gray-700 font-medium">
+                <FolderOpen className="h-4 w-4 inline mr-1" />
+                Project
+              </Label>
+              <Select
+                value={project_id || ''}
+                onValueChange={(value: string) => setValue('project_id', value === 'none' ? '' : value)}
+                disabled={projectsLoading}
+              >
+                <SelectTrigger className="bg-white border-gray-300 text-gray-900">
+                  <SelectValue 
+                    placeholder={projectsLoading ? "Loading projects..." : "Select a project (optional)"} 
+                  />
+                </SelectTrigger>
+                <SelectContent className="bg-white border-gray-300">
+                  <SelectItem value="none" className="text-gray-900">
+                    <span className="text-gray-500">No project</span>
+                  </SelectItem>
+                  {projects.map((project) => (
+                    <SelectItem key={project.id} value={project.id} className="text-gray-900">
+                      {project.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              {errors.project_id && (
+                <p className="text-sm text-red-500">{errors.project_id.message}</p>
+              )}
+            </div>
+          )}
 
           {/* Status and Priority Row */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">

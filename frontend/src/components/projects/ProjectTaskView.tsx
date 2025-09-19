@@ -13,6 +13,7 @@ interface ProjectTaskViewProps {
   onCreateTask?: () => void;
   onEditTask?: (task: Task) => void;
   className?: string;
+  refreshTrigger?: number; // Used to trigger a refresh when tasks are created/updated
 }
 
 const ProjectTaskView: React.FC<ProjectTaskViewProps> = ({
@@ -20,6 +21,7 @@ const ProjectTaskView: React.FC<ProjectTaskViewProps> = ({
   onCreateTask,
   onEditTask,
   className = '',
+  refreshTrigger = 0,
 }) => {
   const [tasks, setTasks] = useState<Task[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -46,7 +48,7 @@ const ProjectTaskView: React.FC<ProjectTaskViewProps> = ({
     };
 
     loadTasks();
-  }, [project.id]);
+  }, [project.id, refreshTrigger]);
 
   const getTasksByStatus = (status?: TaskStatus) => {
     if (!status) return tasks;
@@ -149,7 +151,11 @@ const ProjectTaskView: React.FC<ProjectTaskViewProps> = ({
       <h3 className="text-lg font-medium text-gray-900 mb-2">{title}</h3>
       <p className="text-muted-foreground mb-4">{description}</p>
       {onCreateTask && (
-        <Button onClick={onCreateTask} size="sm">
+        <Button 
+          onClick={onCreateTask} 
+          size="sm"
+          className="bg-blue-600 hover:bg-blue-700 text-white"
+        >
           <Plus className="h-4 w-4 mr-2" />
           Create Task
         </Button>
@@ -199,7 +205,11 @@ const ProjectTaskView: React.FC<ProjectTaskViewProps> = ({
             </CardDescription>
           </div>
           {onCreateTask && (
-            <Button onClick={onCreateTask} size="sm">
+            <Button 
+              onClick={onCreateTask} 
+              size="sm"
+              className="bg-blue-600 hover:bg-blue-700 text-white"
+            >
               <Plus className="h-4 w-4 mr-2" />
               Add Task
             </Button>

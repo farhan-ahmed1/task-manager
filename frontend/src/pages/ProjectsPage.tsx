@@ -4,11 +4,14 @@ import { Card, CardContent, CardDescription, CardTitle } from '@/components/ui/c
 import { Alert } from '@/components/ui/alert';
 import ConfirmDialog from '@/components/ui/ConfirmDialog';
 import { ProjectCard, ProjectForm, ProjectStats, ProjectTaskView } from '@/components/projects';
+import TaskForm from '@/components/tasks/TaskForm';
 import { Plus, AlertCircle, Loader2, BarChart3, FolderOpen } from 'lucide-react';
-import { useProjectStore } from '@/store/useStore';
+import { useProjectStore, useTaskStore } from '@/store/useStore';
 import { projectService } from '@/services/projects';
-import type { Project, CreateProjectRequest, UpdateProjectRequest, Task } from '@/types/api';
+import { taskService } from '@/services/tasks';
+import type { Project, CreateProjectRequest, UpdateProjectRequest, Task, CreateTaskRequest } from '@/types/api';
 import type { ProjectStats as ProjectStatsType } from '@/services/projects';
+import type { CreateTaskFormData } from '@/validation/task';
 
 type ViewMode = 'dashboard' | 'stats' | 'tasks';
 
@@ -27,6 +30,8 @@ const ProjectsPage: React.FC = () => {
     setError,
   } = useProjectStore();
 
+  const { addTask: addTaskToStore, updateTask: updateTaskInStore } = useTaskStore();
+
   const [projectStats, setProjectStats] = useState<Record<string, ProjectStatsType>>({});
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [editingProject, setEditingProject] = useState<Project | null>(null);
@@ -38,6 +43,31 @@ const ProjectsPage: React.FC = () => {
   });
   const [isDeleting, setIsDeleting] = useState(false);
   const [viewMode, setViewMode] = useState<ViewMode>('dashboard');
+
+  // Task management state
+  const [isTaskFormOpen, setIsTaskFormOpen] = useState(false);
+  const [editingTask, setEditingTask] = useState<Task | null>(null);
+  const [taskFormProjectId, setTaskFormProjectId] = useState<string | undefined>();
+  const [isTaskFormSubmitting, setIsTaskFormSubmitting] = useState(false);
+  const [taskFormError, setTaskFormError] = useState<string | null>(null);
+  const [taskRefreshTrigger, setTaskRefreshTrigger] = useState(0);
+
+
+
+  // Helper function to load stats for a single project
+  const loadProjectStats = async (projectId: string) => {
+    try {
+      const result = await projectService.getProjectStats(projectId);
+      if (result.success) {
+        setProjectStats(prev => ({
+          ...prev,
+          [projectId]: result.data
+        }));
+      }
+    } catch (error) {
+      console.error('Failed to load project stats:', error);
+    }
+  };
 
   // Load projects on mount
   useEffect(() => {
@@ -61,7 +91,8 @@ const ProjectsPage: React.FC = () => {
     };
 
     loadInitialData();
-  }, [setLoading, setError, setProjects]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []); // Empty dependency array - only run on mount (Zustand setters are stable)
 
   // Load project stats when projects change
   useEffect(() => {
@@ -193,6 +224,92 @@ const ProjectsPage: React.FC = () => {
     }
   };
 
+  // Task management functions
+  const handleCreateTask = (projectId?: string) => {
+    setEditingTask(null);
+    setTaskFormProjectId(projectId);
+    setTaskFormError(null);
+    setIsTaskFormOpen(true);
+  };
+
+  const handleEditTask = (task: Task) => {
+    setEditingTask(task);
+    setTaskFormProjectId(task.project_id);
+    setTaskFormError(null);
+    setIsTaskFormOpen(true);
+  };
+
+  const handleTaskFormSubmit = async (data: CreateTaskFormData) => {
+    setIsTaskFormSubmitting(true);
+    setTaskFormError(null);
+
+    try {
+      if (editingTask) {
+        // Update existing task
+        const result = await taskService.updateTask(editingTask.id, {
+          title: data.title,
+          description: data.description || undefined,
+          status: data.status,
+          priority: data.priority,
+          due_date: data.due_date || undefined,
+          project_id: data.project_id || undefined,
+        });
+
+        if (result.success) {
+          updateTaskInStore(editingTask.id, result.data);
+          setIsTaskFormOpen(false);
+          setEditingTask(null);
+          setTaskRefreshTrigger(prev => prev + 1);
+          
+          // Refresh project stats if task was in a project
+          if (result.data.project_id) {
+            await loadProjectStats(result.data.project_id);
+          }
+        } else {
+          setTaskFormError(result.error.message);
+        }
+      } else {
+        // Create new task
+        const taskData: CreateTaskRequest = {
+          title: data.title,
+          description: data.description || undefined,
+          status: data.status || 'PENDING',
+          priority: data.priority || 'MEDIUM',
+          due_date: data.due_date || undefined,
+          project_id: data.project_id || undefined,
+        };
+
+        const result = await taskService.createTask(taskData);
+
+        if (result.success) {
+          addTaskToStore(result.data);
+          setIsTaskFormOpen(false);
+          setTaskFormProjectId(undefined);
+          setTaskRefreshTrigger(prev => prev + 1);
+          
+          // Refresh project stats if task was assigned to a project
+          if (result.data.project_id) {
+            await loadProjectStats(result.data.project_id);
+          }
+        } else {
+          setTaskFormError(result.error.message);
+        }
+      }
+    } catch (error) {
+      console.error('Task operation failed:', error);
+      setTaskFormError('An unexpected error occurred. Please try again.');
+    } finally {
+      setIsTaskFormSubmitting(false);
+    }
+  };
+
+  const handleTaskFormClose = () => {
+    setIsTaskFormOpen(false);
+    setEditingTask(null);
+    setTaskFormProjectId(undefined);
+    setTaskFormError(null);
+  };
+
   const EmptyState = () => (
     <Card className="text-center py-12">
       <CardContent>
@@ -286,15 +403,29 @@ const ProjectsPage: React.FC = () => {
 
         <ProjectTaskView
           project={selectedProject}
-          onCreateTask={() => {
-            // TODO: Implement task creation with project pre-selected
-            console.log('Create task for project:', selectedProject.id);
-          }}
-          onEditTask={(task: Task) => {
-            // TODO: Implement task editing
-            console.log('Edit task:', task.id);
-          }}
+          onCreateTask={() => handleCreateTask(selectedProject.id)}
+          onEditTask={handleEditTask}
+          refreshTrigger={taskRefreshTrigger}
         />
+
+        {/* Task Form Dialog for Tasks View */}
+        <TaskForm
+          open={isTaskFormOpen}
+          onOpenChange={handleTaskFormClose}
+          task={editingTask || undefined}
+          onSubmit={handleTaskFormSubmit}
+          loading={isTaskFormSubmitting}
+          defaultProjectId={taskFormProjectId}
+          showProjectSelector={true}
+        />
+
+        {/* Task Form Error for Tasks View */}
+        {taskFormError && isTaskFormOpen && (
+          <Alert className="mt-4">
+            <AlertCircle className="h-4 w-4" />
+            <p>{taskFormError}</p>
+          </Alert>
+        )}
       </div>
     );
   }
@@ -378,6 +509,25 @@ const ProjectsPage: React.FC = () => {
         destructive={true}
         loading={isDeleting}
       />
+
+      {/* Task Form Dialog */}
+      <TaskForm
+        open={isTaskFormOpen}
+        onOpenChange={handleTaskFormClose}
+        task={editingTask || undefined}
+        onSubmit={handleTaskFormSubmit}
+        loading={isTaskFormSubmitting}
+        defaultProjectId={taskFormProjectId}
+        showProjectSelector={true}
+      />
+
+      {/* Task Form Error */}
+      {taskFormError && isTaskFormOpen && (
+        <Alert className="mt-4">
+          <AlertCircle className="h-4 w-4" />
+          <p>{taskFormError}</p>
+        </Alert>
+      )}
     </div>
   );
 };
