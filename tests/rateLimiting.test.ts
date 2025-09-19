@@ -545,11 +545,18 @@ describe('Rate Limiting Middleware', () => {
       }
     });
 
-    it('should handle Redis client creation errors', () => {
+    it('should handle Redis client creation errors', async () => {
       process.env.REDIS_URL = 'redis://invalid-url:12345';
       process.env.NODE_ENV = 'production';
 
       const consoleSpy = jest.spyOn(console, 'error').mockImplementation();
+
+      // Temporarily mock createRedisClient to throw an error
+      const createRedisClientSpy = jest
+        .spyOn(await import('../src/middleware/rateLimiting'), 'createRedisClient')
+        .mockImplementation(() => {
+          throw new Error('Failed to connect to Redis');
+        });
 
       // Test the error path when Redis client creation fails
       const client = initializeRedis();
@@ -558,9 +565,11 @@ describe('Rate Limiting Middleware', () => {
       expect(consoleSpy).toHaveBeenCalled();
 
       consoleSpy.mockRestore();
+      createRedisClientSpy.mockRestore();
     });
 
-    it('should handle Redis connection error events', () => {
+    it('should handle Redis connection error events', async () => {
+      // Create a mock Redis client with all required methods
       const mockRedisClient = {
         on: jest.fn(),
         get: jest.fn(),
@@ -570,18 +579,21 @@ describe('Rate Limiting Middleware', () => {
         del: jest.fn(),
         pipeline: jest.fn(),
         quit: jest.fn(),
+        ping: jest.fn(),
+        decr: jest.fn(),
       } as unknown as RedisClientInterface;
 
-      // Mock createRedisClient to return our mock client
-      const originalCreateRedisClient = createRedisClient;
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      (global as any).createRedisClient = jest.fn().mockReturnValue(mockRedisClient);
+      // Spy on the createRedisClient function and mock its return value
+      const createRedisClientSpy = jest
+        .spyOn(await import('../src/middleware/rateLimiting'), 'createRedisClient')
+        .mockReturnValue(mockRedisClient);
 
       process.env.REDIS_URL = 'redis://localhost:6379';
       process.env.NODE_ENV = 'production';
 
       const consoleSpy = jest.spyOn(console, 'error').mockImplementation();
 
+      // Call initializeRedis which should now use our mocked createRedisClient
       initializeRedis();
 
       // Verify the error handler was registered
@@ -593,9 +605,9 @@ describe('Rate Limiting Middleware', () => {
 
       expect(consoleSpy).toHaveBeenCalledWith('Redis connection error:', expect.any(Error));
 
+      // Cleanup
       consoleSpy.mockRestore();
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      (global as any).createRedisClient = originalCreateRedisClient;
+      createRedisClientSpy.mockRestore();
     });
   });
 });

@@ -18,6 +18,17 @@ jest.setTimeout(30000);
 
 // Mock Redis for testing
 jest.mock('ioredis', () => {
+  const mockPipeline = {
+    incr: jest.fn().mockReturnThis(),
+    expire: jest.fn().mockReturnThis(),
+    exec: jest.fn(() =>
+      Promise.resolve([
+        [null, 1],
+        [null, 1],
+      ]),
+    ),
+  };
+
   const mockRedis = {
     get: jest.fn(),
     set: jest.fn(),
@@ -26,6 +37,11 @@ jest.mock('ioredis', () => {
     incr: jest.fn(),
     expire: jest.fn(),
     quit: jest.fn(),
+    pipeline: jest.fn(() => mockPipeline),
+    on: jest.fn(),
+    ping: jest.fn(() => Promise.resolve('PONG')),
+    decr: jest.fn(),
+    keys: jest.fn(() => Promise.resolve([])),
   };
   return jest.fn(() => mockRedis);
 });
