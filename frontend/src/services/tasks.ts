@@ -7,7 +7,7 @@ import type {
   TaskStatus 
 } from '@/types/api';
 
-const API_BASE_URL = 'http://localhost:3001';
+const API_BASE_URL = 'http://localhost:3000';
 
 // Custom error class for task operations
 export class TaskServiceError extends Error {
