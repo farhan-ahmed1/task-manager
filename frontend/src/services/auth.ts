@@ -13,6 +13,16 @@ export interface RegisterRequest {
   name?: string;
 }
 
+export interface ProfileUpdateRequest {
+  name: string;
+  email: string;
+}
+
+export interface PasswordChangeRequest {
+  currentPassword: string;
+  newPassword: string;
+}
+
 export interface AuthResponse {
   user: User;
   token: string;
@@ -42,20 +52,21 @@ class AuthService {
     const data = await response.json();
 
     if (!response.ok) {
-      throw new Error(data.error || `HTTP error! status: ${response.status}`);
+      // Log error details for debugging
+      console.error(`HTTP ${response.status} error:`, data);
+      // Extract the most specific error message available
+      const errorMessage = data.error || data.message || `HTTP error! status: ${response.status}`;
+      throw new Error(errorMessage);
     }
 
     return data;
   }
 
   async login(credentials: LoginRequest): Promise<AuthResponse> {
-    console.log('🔵 AuthService: Attempting login with:', { email: credentials.email });
-    const response = await this.makeRequest<AuthResponse>('/auth/login', {
+    return this.makeRequest<AuthResponse>('/auth/login', {
       method: 'POST',
       body: JSON.stringify(credentials),
     });
-    console.log('🟢 AuthService: Login successful:', { user: response.user, hasToken: !!response.token });
-    return response;
   }
 
   async register(userData: RegisterRequest): Promise<AuthResponse> {
@@ -74,12 +85,32 @@ class AuthService {
     });
   }
 
-  async getCurrentUser(token: string): Promise<User> {
-    return this.makeRequest<User>('/auth/me', {
+  async getCurrentUser(token: string): Promise<{ data: User }> {
+    return this.makeRequest<{ data: User }>('/auth/me', {
       method: 'GET',
       headers: {
         Authorization: `Bearer ${token}`,
       },
+    });
+  }
+
+  async updateProfile(profileData: ProfileUpdateRequest, token: string): Promise<User> {
+    return this.makeRequest<User>('/auth/profile', {
+      method: 'PUT',
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify(profileData),
+    });
+  }
+
+  async changePassword(passwordData: PasswordChangeRequest, token: string): Promise<{ message: string }> {
+    return this.makeRequest<{ message: string }>('/auth/change-password', {
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify(passwordData),
     });
   }
 }

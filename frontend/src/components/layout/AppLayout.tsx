@@ -8,6 +8,7 @@ const navigation = [
   { name: 'Dashboard', href: '/dashboard', icon: '📊' },
   { name: 'Tasks', href: '/tasks', icon: '✅' },
   { name: 'Projects', href: '/projects', icon: '📁' },
+  { name: 'Profile', href: '/profile', icon: '👤' },
 ];
 
 const AppLayout: React.FC = () => {

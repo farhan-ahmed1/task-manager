@@ -1,20 +1,23 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate, useLocation } from 'react-router-dom';
+import { useNavigate, useLocation, Link } from 'react-router-dom';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
 import { User, Mail, Lock, UserPlus, AlertCircle } from 'lucide-react';
-import { authService, type RegisterRequest } from '@/services/auth';
+import { authService } from '@/services/auth';
 import { useAuth } from '@/context/AuthContext';
+import { RegisterSchema, type RegisterFormData } from '@/validation/auth';
 
 const RegisterPage: React.FC = () => {
-  const [formData, setFormData] = useState<RegisterRequest>({
+  const [formData, setFormData] = useState<RegisterFormData>({
     name: '',
     email: '',
     password: '',
+    confirmPassword: '',
   });
-  const [error, setError] = useState<string>('');
+  const [errors, setErrors] = useState<Partial<RegisterFormData>>({});
+  const [generalError, setGeneralError] = useState<string>('');
   const [isLoading, setIsLoading] = useState(false);
   const { login, isAuthenticated } = useAuth();
   const navigate = useNavigate();
@@ -31,29 +34,50 @@ const RegisterPage: React.FC = () => {
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
-    setFormData(prev => ({
+    setFormData((prev: RegisterFormData) => ({
       ...prev,
       [name]: value,
     }));
-    // Clear error when user starts typing
-    if (error) setError('');
+    // Clear field-specific error when user starts typing
+    if (errors[name as keyof RegisterFormData]) {
+      setErrors((prev) => ({
+        ...prev,
+        [name]: undefined,
+      }));
+    }
+    // Clear general error
+    if (generalError) setGeneralError('');
+  };
+
+  const validateForm = (): boolean => {
+    try {
+      RegisterSchema.parse(formData);
+      setErrors({});
+      return true;
+    } catch (error) {
+      if (error && typeof error === 'object' && 'issues' in error) {
+        const zodError = error as { issues: Array<{ path: string[]; message: string }> };
+        const fieldErrors: Partial<RegisterFormData> = {};
+        zodError.issues.forEach((issue) => {
+          const field = issue.path[0] as keyof RegisterFormData;
+          fieldErrors[field] = issue.message;
+        });
+        setErrors(fieldErrors);
+      }
+      return false;
+    }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (!formData.email || !formData.password) {
-      setError('Email and password are required');
-      return;
-    }
-
-    if (formData.password.length < 8) {
-      setError('Password must be at least 8 characters long');
+    // Validate form data
+    if (!validateForm()) {
       return;
     }
 
     setIsLoading(true);
-    setError('');
+    setGeneralError('');
 
     try {
       const response = await authService.register({
@@ -67,7 +91,7 @@ const RegisterPage: React.FC = () => {
       
       // Redirect will be handled by the AuthContext/ProtectedRoute
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Registration failed');
+      setGeneralError(err instanceof Error ? err.message : 'Registration failed');
     } finally {
       setIsLoading(false);
     }
@@ -94,27 +118,34 @@ const RegisterPage: React.FC = () => {
           </CardHeader>
           <CardContent className="space-y-6 p-8">
             <form onSubmit={handleSubmit} className="space-y-6">
-              {error && (
+              {generalError && (
                 <div className="flex items-center gap-2 p-3 text-sm text-red-600 bg-red-50 border border-red-200 rounded-md">
                   <AlertCircle className="w-4 h-4" />
-                  {error}
+                  {generalError}
                 </div>
               )}
               
               <div className="space-y-3">
                 <Label htmlFor="name" className="flex items-center gap-2 text-sm font-medium">
                   <User className="w-4 h-4 text-primary" />
-                  Full Name (Optional)
+                  Full Name
                 </Label>
                 <Input
                   id="name"
                   name="name"
                   type="text"
                   placeholder="Enter your full name"
-                  className="h-12 text-base"
+                  className={`h-12 text-base ${errors.name ? 'border-red-500 focus:border-red-500' : ''}`}
                   value={formData.name}
                   onChange={handleInputChange}
+                  required
                 />
+                {errors.name && (
+                  <p className="text-sm text-red-600 flex items-center gap-1">
+                    <AlertCircle className="w-3 h-3" />
+                    {errors.name}
+                  </p>
+                )}
               </div>
               
               <div className="space-y-3">
@@ -127,11 +158,17 @@ const RegisterPage: React.FC = () => {
                   name="email"
                   type="email"
                   placeholder="Enter your email address"
-                  className="h-12 text-base"
+                  className={`h-12 text-base ${errors.email ? 'border-red-500 focus:border-red-500' : ''}`}
                   value={formData.email}
                   onChange={handleInputChange}
                   required
                 />
+                {errors.email && (
+                  <p className="text-sm text-red-600 flex items-center gap-1">
+                    <AlertCircle className="w-3 h-3" />
+                    {errors.email}
+                  </p>
+                )}
               </div>
               
               <div className="space-y-3">
@@ -144,11 +181,40 @@ const RegisterPage: React.FC = () => {
                   name="password"
                   type="password"
                   placeholder="Create a secure password (min 8 characters)"
-                  className="h-12 text-base"
+                  className={`h-12 text-base ${errors.password ? 'border-red-500 focus:border-red-500' : ''}`}
                   value={formData.password}
                   onChange={handleInputChange}
                   required
                 />
+                {errors.password && (
+                  <p className="text-sm text-red-600 flex items-center gap-1">
+                    <AlertCircle className="w-3 h-3" />
+                    {errors.password}
+                  </p>
+                )}
+              </div>
+              
+              <div className="space-y-3">
+                <Label htmlFor="confirmPassword" className="flex items-center gap-2 text-sm font-medium">
+                  <Lock className="w-4 h-4 text-primary" />
+                  Confirm Password
+                </Label>
+                <Input
+                  id="confirmPassword"
+                  name="confirmPassword"
+                  type="password"
+                  placeholder="Confirm your password"
+                  className={`h-12 text-base ${errors.confirmPassword ? 'border-red-500 focus:border-red-500' : ''}`}
+                  value={formData.confirmPassword}
+                  onChange={handleInputChange}
+                  required
+                />
+                {errors.confirmPassword && (
+                  <p className="text-sm text-red-600 flex items-center gap-1">
+                    <AlertCircle className="w-3 h-3" />
+                    {errors.confirmPassword}
+                  </p>
+                )}
               </div>
               
               <div className="space-y-4">
@@ -171,9 +237,9 @@ const RegisterPage: React.FC = () => {
                 </Button>
                 
                 <div className="text-center">
-                  <a href="/login" className="text-sm text-primary hover:underline font-medium">
+                  <Link to="/login" className="text-sm text-primary hover:underline font-medium">
                     Already have an account? Sign in here
-                  </a>
+                  </Link>
                 </div>
               </div>
             </form>

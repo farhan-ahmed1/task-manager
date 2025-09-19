@@ -130,6 +130,28 @@ export const getUserById = async (id: string) => {
   return res.rows[0] as User | null;
 };
 
+export const getUserByIdWithPassword = async (id: string) => {
+  const res = await pool.query(`SELECT id, email, name, password_hash FROM users WHERE id = $1`, [
+    id,
+  ]);
+  return res.rows[0] as (User & { password_hash?: string }) | null;
+};
+
+export const updateUserProfile = async (id: string, name: string, email: string): Promise<User> => {
+  const res = await pool.query(
+    `UPDATE users SET name = $1, email = $2, updated_at = now() WHERE id = $3 RETURNING id, email, name, created_at, updated_at`,
+    [name, email, id],
+  );
+  return res.rows[0] as User;
+};
+
+export const updateUserPassword = async (id: string, passwordHash: string): Promise<void> => {
+  await pool.query(`UPDATE users SET password_hash = $1, updated_at = now() WHERE id = $2`, [
+    passwordHash,
+    id,
+  ]);
+};
+
 export const createProject = async (ownerId: string, name: string, description?: string) => {
   const res = await pool.query(
     `INSERT INTO projects (owner_id, name, description) VALUES ($1, $2, $3) RETURNING *`,

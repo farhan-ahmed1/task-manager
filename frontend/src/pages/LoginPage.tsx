@@ -1,19 +1,21 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate, useLocation } from 'react-router-dom';
+import { useNavigate, useLocation, Link } from 'react-router-dom';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
 import { Mail, Lock, LogIn, AlertCircle } from 'lucide-react';
-import { authService, type LoginRequest } from '@/services/auth';
+import { authService } from '@/services/auth';
 import { useAuth } from '@/context/AuthContext';
+import { LoginSchema, type LoginFormData } from '@/validation/auth';
 
 const LoginPage: React.FC = () => {
-  const [formData, setFormData] = useState<LoginRequest>({
+  const [formData, setFormData] = useState<LoginFormData>({
     email: '',
     password: '',
   });
-  const [error, setError] = useState<string>('');
+  const [errors, setErrors] = useState<Partial<LoginFormData>>({});
+  const [generalError, setGeneralError] = useState<string>('');
   const [isLoading, setIsLoading] = useState(false);
   const { login, isAuthenticated } = useAuth();
   const navigate = useNavigate();
@@ -30,24 +32,50 @@ const LoginPage: React.FC = () => {
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
-    setFormData(prev => ({
+    setFormData((prev: LoginFormData) => ({
       ...prev,
       [name]: value,
     }));
-    // Clear error when user starts typing
-    if (error) setError('');
+    // Clear field-specific error when user starts typing
+    if (errors[name as keyof LoginFormData]) {
+      setErrors((prev) => ({
+        ...prev,
+        [name]: undefined,
+      }));
+    }
+    // Clear general error
+    if (generalError) setGeneralError('');
+  };
+
+  const validateForm = (): boolean => {
+    try {
+      LoginSchema.parse(formData);
+      setErrors({});
+      return true;
+    } catch (error) {
+      if (error && typeof error === 'object' && 'issues' in error) {
+        const zodError = error as { issues: Array<{ path: string[]; message: string }> };
+        const fieldErrors: Partial<LoginFormData> = {};
+        zodError.issues.forEach((issue) => {
+          const field = issue.path[0] as keyof LoginFormData;
+          fieldErrors[field] = issue.message;
+        });
+        setErrors(fieldErrors);
+      }
+      return false;
+    }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (!formData.email || !formData.password) {
-      setError('Email and password are required');
+    // Validate form data
+    if (!validateForm()) {
       return;
     }
 
     setIsLoading(true);
-    setError('');
+    setGeneralError('');
 
     try {
       console.log('🔵 LoginPage: Starting login process');
@@ -60,7 +88,7 @@ const LoginPage: React.FC = () => {
       // Redirect will be handled by the AuthContext/ProtectedRoute
     } catch (err) {
       console.error('🔴 LoginPage: Login error:', err);
-      setError(err instanceof Error ? err.message : 'Login failed');
+      setGeneralError(err instanceof Error ? err.message : 'Login failed');
     } finally {
       setIsLoading(false);
     }
@@ -87,10 +115,10 @@ const LoginPage: React.FC = () => {
           </CardHeader>
           <CardContent className="space-y-6 p-8">
             <form onSubmit={handleSubmit} className="space-y-6">
-              {error && (
+              {generalError && (
                 <div className="flex items-center gap-2 p-3 text-sm text-red-600 bg-red-50 border border-red-200 rounded-md">
                   <AlertCircle className="w-4 h-4" />
-                  {error}
+                  {generalError}
                 </div>
               )}
               
@@ -104,11 +132,17 @@ const LoginPage: React.FC = () => {
                   name="email"
                   type="email"
                   placeholder="Enter your email address"
-                  className="h-12 text-base"
+                  className={`h-12 text-base ${errors.email ? 'border-red-500 focus:border-red-500' : ''}`}
                   value={formData.email}
                   onChange={handleInputChange}
                   required
                 />
+                {errors.email && (
+                  <p className="text-sm text-red-600 flex items-center gap-1">
+                    <AlertCircle className="w-3 h-3" />
+                    {errors.email}
+                  </p>
+                )}
               </div>
               
               <div className="space-y-3">
@@ -121,11 +155,17 @@ const LoginPage: React.FC = () => {
                   name="password"
                   type="password"
                   placeholder="Enter your password"
-                  className="h-12 text-base"
+                  className={`h-12 text-base ${errors.password ? 'border-red-500 focus:border-red-500' : ''}`}
                   value={formData.password}
                   onChange={handleInputChange}
                   required
                 />
+                {errors.password && (
+                  <p className="text-sm text-red-600 flex items-center gap-1">
+                    <AlertCircle className="w-3 h-3" />
+                    {errors.password}
+                  </p>
+                )}
               </div>
               
               <div className="space-y-4">
@@ -148,9 +188,9 @@ const LoginPage: React.FC = () => {
                 </Button>
                 
                 <div className="text-center">
-                  <a href="/register" className="text-sm text-primary hover:underline font-medium">
+                  <Link to="/register" className="text-sm text-primary hover:underline font-medium">
                     Don't have an account? Create one here
-                  </a>
+                  </Link>
                 </div>
               </div>
             </form>

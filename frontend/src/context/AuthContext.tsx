@@ -12,6 +12,7 @@ interface AuthState {
 interface AuthContextType extends AuthState {
   login: (user: User, token: string) => void;
   logout: () => void;
+  updateUser: (user: User) => void;
   setLoading: (loading: boolean) => void;
 }
 
@@ -19,7 +20,8 @@ type AuthAction =
   | { type: 'LOGIN'; payload: { user: User; token: string } }
   | { type: 'LOGOUT' }
   | { type: 'SET_LOADING'; payload: boolean }
-  | { type: 'RESTORE_SESSION'; payload: { user: User; token: string } };
+  | { type: 'RESTORE_SESSION'; payload: { user: User; token: string } }
+  | { type: 'UPDATE_USER'; payload: User };
 
 const initialState: AuthState = {
   user: null,
@@ -57,6 +59,11 @@ const authReducer = (state: AuthState, action: AuthAction): AuthState => {
         ...state,
         isLoading: action.payload,
       };
+    case 'UPDATE_USER':
+      return {
+        ...state,
+        user: action.payload,
+      };
     default:
       return state;
   }
@@ -71,24 +78,45 @@ interface AuthProviderProps {
 export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const [state, dispatch] = useReducer(authReducer, initialState);
 
-  // Restore session from localStorage on app start
+  // Restore session from localStorage on app start and validate token
   useEffect(() => {
-    const storedToken = localStorage.getItem('authToken');
-    const storedUser = localStorage.getItem('authUser');
+    const restoreSession = async () => {
+      const storedToken = localStorage.getItem('authToken');
+      const storedUser = localStorage.getItem('authUser');
 
-    if (storedToken && storedUser) {
-      try {
-        const user = JSON.parse(storedUser) as User;
-        dispatch({ type: 'RESTORE_SESSION', payload: { user, token: storedToken } });
-      } catch (error) {
-        console.error('Failed to restore session:', error);
-        localStorage.removeItem('authToken');
-        localStorage.removeItem('authUser');
+      if (storedToken && storedUser) {
+        try {
+          // Validate token by making a request to /auth/me
+          try {
+            const { authService } = await import('@/services/auth');
+            const currentUserResponse = await authService.getCurrentUser(storedToken);
+            
+            // If the token is valid, restore the session with fresh user data
+            dispatch({ 
+              type: 'RESTORE_SESSION', 
+              payload: { user: currentUserResponse.data, token: storedToken } 
+            });
+            
+            // Update stored user data if it's different
+            localStorage.setItem('authUser', JSON.stringify(currentUserResponse.data));
+          } catch (tokenValidationError) {
+            console.warn('Token validation failed, clearing session:', tokenValidationError);
+            localStorage.removeItem('authToken');
+            localStorage.removeItem('authUser');
+            dispatch({ type: 'SET_LOADING', payload: false });
+          }
+        } catch (error) {
+          console.error('Failed to restore session:', error);
+          localStorage.removeItem('authToken');
+          localStorage.removeItem('authUser');
+          dispatch({ type: 'SET_LOADING', payload: false });
+        }
+      } else {
         dispatch({ type: 'SET_LOADING', payload: false });
       }
-    } else {
-      dispatch({ type: 'SET_LOADING', payload: false });
-    }
+    };
+
+    restoreSession();
   }, []);
 
   const login = (user: User, token: string) => {
@@ -109,10 +137,16 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     dispatch({ type: 'SET_LOADING', payload: loading });
   };
 
+  const updateUser = (user: User) => {
+    localStorage.setItem('authUser', JSON.stringify(user));
+    dispatch({ type: 'UPDATE_USER', payload: user });
+  };
+
   const value: AuthContextType = {
     ...state,
     login,
     logout,
+    updateUser,
     setLoading,
   };
 
