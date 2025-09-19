@@ -144,4 +144,48 @@ describe('Projects API', () => {
       .set('Authorization', `Bearer ${token}`)
       .expect(404);
   });
+
+  describe('Error Handling', () => {
+    beforeAll(() => {
+      // Mock repository functions to test error scenarios
+      jest.doMock('../src/db/repository', () => ({
+        ...jest.requireActual('../src/db/repository'),
+        getProjectsForOwner: jest.fn(),
+        getProjectById: jest.fn(),
+        getProjectStats: jest.fn(),
+      }));
+    });
+
+    it('should handle database errors when listing projects', async () => {
+      const repo = await import('../src/db/repository');
+      const mockGetProjectsForOwner = repo.getProjectsForOwner as jest.Mock;
+
+      mockGetProjectsForOwner.mockRejectedValueOnce(new Error('Database connection failed'));
+
+      const response = await request(app)
+        .get('/api/projects')
+        .set('Authorization', `Bearer ${token}`);
+
+      expect(response.status).toBe(500);
+      mockGetProjectsForOwner.mockRestore();
+    });
+
+    it('should handle database errors when getting project stats', async () => {
+      const repo = await import('../src/db/repository');
+      const mockGetProjectById = repo.getProjectById as jest.Mock;
+      const mockGetProjectStats = repo.getProjectStats as jest.Mock;
+
+      // Mock project exists but stats query fails
+      mockGetProjectById.mockResolvedValueOnce({ id: 'test-id', name: 'Test' });
+      mockGetProjectStats.mockRejectedValueOnce(new Error('Stats query failed'));
+
+      const response = await request(app)
+        .get('/api/projects/test-id/stats')
+        .set('Authorization', `Bearer ${token}`);
+
+      expect(response.status).toBe(500);
+      mockGetProjectById.mockRestore();
+      mockGetProjectStats.mockRestore();
+    });
+  });
 });

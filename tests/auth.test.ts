@@ -304,5 +304,19 @@ describe('Authentication API', () => {
       expect(response.status).toBe(500);
       expect(mockGetUserById).toHaveBeenCalledWith(mockUser.id);
     });
+
+    it('should return 404 when user is not found in database', async () => {
+      const mockUser = testUtils.createMockUser();
+      const token = testUtils.createAuthToken(mockUser.id);
+
+      // Mock getUserById to return null (user not found)
+      mockGetUserById.mockResolvedValue(null);
+
+      const response = await request(app).get('/auth/me').set('Authorization', `Bearer ${token}`);
+
+      expect(response.status).toBe(404);
+      expect(response.body).toEqual({ error: 'User not found' });
+      expect(mockGetUserById).toHaveBeenCalledWith(mockUser.id);
+    });
   });
 });

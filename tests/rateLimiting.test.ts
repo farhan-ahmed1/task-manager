@@ -460,5 +460,142 @@ describe('Rate Limiting Middleware', () => {
         }),
       );
     });
+
+    it('should handle Redis client creation properly', () => {
+      // Test that createRedisClient returns a valid client
+      const client = createRedisClient('redis://localhost:6379');
+      expect(client).toBeDefined();
+      // The client should have the expected Redis interface methods
+      expect(client).toHaveProperty('pipeline');
+      expect(client).toHaveProperty('on');
+      expect(client).toHaveProperty('ping');
+    });
+  });
+
+  describe('RedisStore Error Handling', () => {
+    it('should handle Redis decrement errors gracefully', async () => {
+      const consoleSpy = jest.spyOn(console, 'error').mockImplementation();
+
+      const mockRedis = new TestMockRedisClient();
+      mockRedis.setError(true);
+
+      const store = new RedisStore(mockRedis);
+
+      // Should not throw, just log error
+      await expect(store.decrement('test-key')).resolves.not.toThrow();
+      expect(consoleSpy).toHaveBeenCalledWith('Redis decrement error:', expect.any(Error));
+
+      consoleSpy.mockRestore();
+    });
+
+    it('should handle Redis reset key errors gracefully', async () => {
+      const consoleSpy = jest.spyOn(console, 'error').mockImplementation();
+
+      const mockRedis = new TestMockRedisClient();
+      mockRedis.setError(true);
+
+      const store = new RedisStore(mockRedis);
+
+      // Should not throw, just log error
+      await expect(store.resetKey('test-key')).resolves.not.toThrow();
+      expect(consoleSpy).toHaveBeenCalledWith('Redis reset error:', expect.any(Error));
+
+      consoleSpy.mockRestore();
+    });
+
+    it('should handle keys() returning empty array', async () => {
+      const mockRedis = new TestMockRedisClient();
+      mockRedis.clearData(); // Ensure no keys exist
+
+      const store = new RedisStore(mockRedis);
+
+      // Should not throw when no keys to delete
+      await expect(store.resetKey('non-existent-key')).resolves.not.toThrow();
+    });
+  });
+
+  describe('Rate Limit Health Check', () => {
+    it('should return health status', async () => {
+      const health = await rateLimitHealthCheck();
+
+      expect(health.status).toBe('ok');
+      expect(typeof health.redis).toBe('boolean');
+    });
+  });
+
+  describe('Redis Error Scenarios', () => {
+    let originalRedisUrl: string | undefined;
+    let originalNodeEnv: string | undefined;
+
+    beforeEach(() => {
+      originalRedisUrl = process.env.REDIS_URL;
+      originalNodeEnv = process.env.NODE_ENV;
+    });
+
+    afterEach(() => {
+      if (originalRedisUrl) {
+        process.env.REDIS_URL = originalRedisUrl;
+      } else {
+        delete process.env.REDIS_URL;
+      }
+      if (originalNodeEnv) {
+        process.env.NODE_ENV = originalNodeEnv;
+      } else {
+        delete process.env.NODE_ENV;
+      }
+    });
+
+    it('should handle Redis client creation errors', () => {
+      process.env.REDIS_URL = 'redis://invalid-url:12345';
+      process.env.NODE_ENV = 'production';
+
+      const consoleSpy = jest.spyOn(console, 'error').mockImplementation();
+
+      // Test the error path when Redis client creation fails
+      const client = initializeRedis();
+
+      expect(client).toBeNull();
+      expect(consoleSpy).toHaveBeenCalled();
+
+      consoleSpy.mockRestore();
+    });
+
+    it('should handle Redis connection error events', () => {
+      const mockRedisClient = {
+        on: jest.fn(),
+        get: jest.fn(),
+        incr: jest.fn(),
+        expire: jest.fn(),
+        keys: jest.fn(),
+        del: jest.fn(),
+        pipeline: jest.fn(),
+        quit: jest.fn(),
+      } as unknown as RedisClientInterface;
+
+      // Mock createRedisClient to return our mock client
+      const originalCreateRedisClient = createRedisClient;
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      (global as any).createRedisClient = jest.fn().mockReturnValue(mockRedisClient);
+
+      process.env.REDIS_URL = 'redis://localhost:6379';
+      process.env.NODE_ENV = 'production';
+
+      const consoleSpy = jest.spyOn(console, 'error').mockImplementation();
+
+      initializeRedis();
+
+      // Verify the error handler was registered
+      expect(mockRedisClient.on).toHaveBeenCalledWith('error', expect.any(Function));
+
+      // Simulate an error event
+      const errorHandler = (mockRedisClient.on as jest.Mock).mock.calls[0][1];
+      errorHandler(new Error('Connection lost'));
+
+      expect(consoleSpy).toHaveBeenCalledWith('Redis connection error:', expect.any(Error));
+
+      consoleSpy.mockRestore();
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      (global as any).createRedisClient = originalCreateRedisClient;
+    });
   });
 });
