@@ -63,7 +63,7 @@ function createQueryResult<R>(rows: R[], rowCount?: number): QueryResult<R> {
   return { rows, rowCount: rowCount ?? rows.length };
 }
 
-describe('Repository', () => {
+describe('Repository Unit Tests', () => {
   beforeAll(async () => {
     // Import the repository after the mock is set up
     repo = await import('../src/db/repository');
