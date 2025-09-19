@@ -3,6 +3,9 @@
  * Configures global test environment and utilities
  */
 
+import type { CreateTaskDto, UpdateTaskDto } from '../types/task';
+import type { UpdateProjectDto } from '../src/validation/project';
+
 // Set test environment variables
 process.env.NODE_ENV = 'test';
 process.env.JWT_SECRET = process.env.JWT_SECRET || 'test-jwt-secret-key-for-testing';
@@ -150,15 +153,15 @@ jest.mock('../src/db/repository', () => {
     }),
 
     // Task functions
-    createTask: jest.fn((userId: string, taskData: any) => {
+    createTask: jest.fn((userId: string, taskData: CreateTaskDto) => {
       const task = {
         id: generateUUID(),
         title: taskData.title,
-        description: taskData.description || null,
+        description: taskData.description || undefined,
         status: taskData.status || 'PENDING',
         priority: taskData.priority || 'MEDIUM',
-        due_date: taskData.due_date || null,
-        project_id: taskData.project_id || null,
+        due_date: taskData.due_date ? taskData.due_date.toISOString() : undefined,
+        project_id: taskData.project_id || undefined,
         created_at: new Date().toISOString(),
         updated_at: new Date().toISOString(),
       };
@@ -184,7 +187,7 @@ jest.mock('../src/db/repository', () => {
       return Promise.resolve(task || null);
     }),
 
-    updateTask: jest.fn((userId: string, taskId: string, updates: any) => {
+    updateTask: jest.fn((userId: string, taskId: string, updates: UpdateTaskDto) => {
       const assignment = mockTaskAssignments.find(
         (ta) => ta.user_id === userId && ta.task_id === taskId,
       );
@@ -193,9 +196,13 @@ jest.mock('../src/db/repository', () => {
       const taskIndex = mockTasks.findIndex((t) => t.id === taskId);
       if (taskIndex === -1) return Promise.resolve(null);
 
+      const processedUpdates = {
+        ...updates,
+        due_date: updates.due_date ? updates.due_date.toISOString() : updates.due_date,
+      };
       mockTasks[taskIndex] = {
         ...mockTasks[taskIndex],
-        ...updates,
+        ...processedUpdates,
         updated_at: new Date().toISOString(),
       };
       return Promise.resolve(mockTasks[taskIndex]);
@@ -239,7 +246,7 @@ jest.mock('../src/db/repository', () => {
       return Promise.resolve(project || null);
     }),
 
-    updateProject: jest.fn((ownerId: string, projectId: string, updates: any) => {
+    updateProject: jest.fn((ownerId: string, projectId: string, updates: UpdateProjectDto) => {
       const projectIndex = mockProjects.findIndex(
         (p) => p.id === projectId && p.owner_id === ownerId,
       );
