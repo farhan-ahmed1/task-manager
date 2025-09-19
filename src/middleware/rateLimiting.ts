@@ -2,34 +2,71 @@ import rateLimit, { RateLimitRequestHandler } from 'express-rate-limit';
 import Redis from 'ioredis';
 import { Request, Response } from 'express';
 
-// Redis client for distributed rate limiting
-let redisClient: Redis | null = null;
-
-// Initialize Redis client if available
-if (process.env.REDIS_URL && process.env.NODE_ENV !== 'test') {
-  try {
-    redisClient = new Redis(process.env.REDIS_URL, {
-      maxRetriesPerRequest: 3,
-      lazyConnect: true,
-    });
-
-    redisClient.on('error', (err) => {
-      console.error('Redis connection error:', err);
-      // Fallback to memory store if Redis fails
-      redisClient = null;
-    });
-  } catch (error) {
-    console.error('Failed to initialize Redis:', error);
-    redisClient = null;
-  }
+// Types for better testability
+export interface RateLimitStore {
+  increment(key: string): Promise<{ totalHits: number; resetTime: Date }>;
+  decrement(key: string): Promise<void>;
+  resetKey(key: string): Promise<void>;
 }
 
+export interface RedisPipeline {
+  incr(key: string): RedisPipeline;
+  expire(key: string, seconds: number): RedisPipeline;
+  exec(): Promise<Array<[Error | null, unknown]> | null>;
+}
+
+export interface RedisClientInterface {
+  pipeline(): RedisPipeline;
+  decr(key: string): Promise<number>;
+  keys(pattern: string): Promise<string[]>;
+  del(...keys: string[]): Promise<number>;
+  ping(): Promise<string>;
+  on(event: string, callback: (error?: Error) => void): void;
+  quit(): Promise<string>;
+}
+
+// Redis client factory for better testability
+export const createRedisClient = (url: string): RedisClientInterface => {
+  return new Redis(url, {
+    maxRetriesPerRequest: 3,
+    lazyConnect: true,
+  });
+};
+
+// Redis client instance
+let redisClient: RedisClientInterface | null = null;
+
+// Initialize Redis client if available
+export const initializeRedis = (): RedisClientInterface | null => {
+  if (process.env.REDIS_URL && process.env.NODE_ENV !== 'test') {
+    try {
+      redisClient = createRedisClient(process.env.REDIS_URL);
+
+      redisClient.on('error', (err) => {
+        console.error('Redis connection error:', err);
+        // Fallback to memory store if Redis fails
+        redisClient = null;
+      });
+
+      return redisClient;
+    } catch (error) {
+      console.error('Failed to initialize Redis:', error);
+      redisClient = null;
+      return null;
+    }
+  }
+  return null;
+};
+
+// Initialize Redis on module load
+redisClient = initializeRedis();
+
 // Custom store for Redis-backed rate limiting
-class RedisStore {
-  private redis: Redis;
+export class RedisStore implements RateLimitStore {
+  private redis: RedisClientInterface;
   private prefix: string;
 
-  constructor(redis: Redis, prefix = 'rl:') {
+  constructor(redis: RedisClientInterface, prefix = 'rl:') {
     this.redis = redis;
     this.prefix = prefix;
   }
@@ -86,7 +123,7 @@ class RedisStore {
 }
 
 // Key generator function that considers user authentication
-const keyGenerator = (req: Request): string => {
+export const keyGenerator = (req: Request): string => {
   const authReq = req as Request & { user?: { id: string } };
 
   // Use user ID if authenticated, otherwise use IP
@@ -101,7 +138,7 @@ const keyGenerator = (req: Request): string => {
 };
 
 // Custom handler for rate limit exceeded
-const rateLimitHandler = (req: Request, res: Response): void => {
+export const rateLimitHandler = (req: Request, res: Response): void => {
   const authReq = req as Request & { user?: { id: string } };
   const isAuthenticated = !!authReq.user?.id;
 
@@ -116,7 +153,7 @@ const rateLimitHandler = (req: Request, res: Response): void => {
 };
 
 // Skip function for certain routes or conditions
-const skipSuccessfulRequests = (req: Request, res: Response): boolean => {
+export const skipSuccessfulRequests = (req: Request, res: Response): boolean => {
   // Skip counting successful requests for health checks
   if (req.url === '/health' && res.statusCode < 400) {
     return true;
@@ -140,24 +177,30 @@ export const generalRateLimit: RateLimitRequestHandler = rateLimit({
   // store: redisClient ? new RedisStore(redisClient) : undefined, // Disabled for now, using memory store
 });
 
+// Auth-specific key generator that always uses IP
+export const authKeyGenerator = (req: Request): string => {
+  // Always use IP for auth endpoints
+  const forwarded = req.headers['x-forwarded-for'] as string;
+  const ip = forwarded ? forwarded.split(',')[0].trim() : req.connection.remoteAddress;
+  return `auth:${ip}`;
+};
+
+// Auth-specific handler for rate limit exceeded
+export const authRateLimitHandler = (req: Request, res: Response): void => {
+  res.status(429).json({
+    error: 'Too many authentication attempts',
+    code: 'AUTH_RATE_LIMIT_EXCEEDED',
+    message: 'Too many login attempts from this IP. Please try again in 15 minutes.',
+    retryAfter: res.get('Retry-After'),
+  });
+};
+
 // Strict rate limiter for authentication endpoints
 export const authRateLimit: RateLimitRequestHandler = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes
   max: 5, // Limit each IP to 5 requests per windowMs
-  keyGenerator: (req: Request) => {
-    // Always use IP for auth endpoints
-    const forwarded = req.headers['x-forwarded-for'] as string;
-    const ip = forwarded ? forwarded.split(',')[0].trim() : req.connection.remoteAddress;
-    return `auth:${ip}`;
-  },
-  handler: (req: Request, res: Response) => {
-    res.status(429).json({
-      error: 'Too many authentication attempts',
-      code: 'AUTH_RATE_LIMIT_EXCEEDED',
-      message: 'Too many login attempts from this IP. Please try again in 15 minutes.',
-      retryAfter: res.get('Retry-After'),
-    });
-  },
+  keyGenerator: authKeyGenerator,
+  handler: authRateLimitHandler,
   standardHeaders: true,
   legacyHeaders: false,
   // store: redisClient ? new RedisStore(redisClient, 'auth:') : undefined, // Disabled for now

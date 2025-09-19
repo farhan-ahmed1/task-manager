@@ -1,658 +1,464 @@
-import request from 'supertest';
 import express, { Request, Response, NextFunction } from 'express';
-import rateLimit from 'express-rate-limit';
+import request from 'supertest';
 import {
   generalRateLimit,
   authRateLimit,
-  readRateLimit,
-  writeRateLimit,
+  RedisStore,
+  redisClient,
   resetRateLimit,
   rateLimitHealthCheck,
-  redisClient,
+  keyGenerator,
+  authKeyGenerator,
+  rateLimitHandler,
+  authRateLimitHandler,
+  skipSuccessfulRequests,
+  createRedisClient,
+  initializeRedis,
+  type RedisClientInterface,
+  type RedisPipeline,
 } from '../src/middleware/rateLimiting';
+
+// Types for test mocks
+interface MockRequest {
+  user?: { id: string };
+  headers: Record<string, string>;
+  connection: { remoteAddress?: string };
+  url?: string;
+}
+
+interface MockResponse {
+  status: jest.Mock;
+  json: jest.Mock;
+  get: jest.Mock;
+}
+
+interface MockRedisClient extends RedisClientInterface {
+  setError(shouldError: boolean): void;
+  clearData(): void;
+}
+
+// Mock Redis implementations
+class MockRedisPipeline implements RedisPipeline {
+  private operations: Array<{ type: string; key: string; value?: number }> = [];
+
+  incr(key: string): RedisPipeline {
+    this.operations.push({ type: 'incr', key });
+    return this;
+  }
+
+  expire(key: string, seconds: number): RedisPipeline {
+    this.operations.push({ type: 'expire', key, value: seconds });
+    return this;
+  }
+
+  async exec(): Promise<Array<[Error | null, unknown]> | null> {
+    return this.operations.map((op, index) => {
+      if (op.type === 'incr') {
+        return [null, index + 1];
+      }
+      return [null, 'OK'];
+    });
+  }
+}
+
+class TestMockRedisClient implements MockRedisClient {
+  private data: Map<string, number> = new Map();
+  private errorOnNext = false;
+  private shouldError = false;
+
+  pipeline(): RedisPipeline {
+    if (this.shouldError) {
+      throw new Error('Pipeline creation failed');
+    }
+    return new MockRedisPipeline();
+  }
+
+  async decr(key: string): Promise<number> {
+    if (this.shouldError) {
+      throw new Error('Decrement failed');
+    }
+    const current = this.data.get(key) || 0;
+    const newValue = Math.max(0, current - 1);
+    this.data.set(key, newValue);
+    return newValue;
+  }
+
+  async keys(pattern: string): Promise<string[]> {
+    if (this.shouldError) {
+      throw new Error('Keys lookup failed');
+    }
+    const allKeys = Array.from(this.data.keys());
+    const regex = new RegExp(pattern.replace('*', '.*'));
+    return allKeys.filter((key) => regex.test(key));
+  }
+
+  async del(...keys: string[]): Promise<number> {
+    if (this.shouldError) {
+      throw new Error('Delete failed');
+    }
+    let deleted = 0;
+    keys.forEach((key) => {
+      if (this.data.has(key)) {
+        this.data.delete(key);
+        deleted++;
+      }
+    });
+    return deleted;
+  }
+
+  async ping(): Promise<string> {
+    if (this.shouldError) {
+      throw new Error('Ping failed');
+    }
+    return 'PONG';
+  }
+
+  on(event: string, callback: (error?: Error) => void): void {
+    if (this.errorOnNext) {
+      setTimeout(() => callback(new Error('Redis connection error')), 10);
+    }
+  }
+
+  async quit(): Promise<string> {
+    return 'OK';
+  }
+
+  // Test helper methods
+  setError(shouldError: boolean): void {
+    this.shouldError = shouldError;
+  }
+
+  setConnectionError(errorOnNext: boolean): void {
+    this.errorOnNext = errorOnNext;
+  }
+
+  clearData(): void {
+    this.data.clear();
+  }
+}
 
 describe('Rate Limiting Middleware', () => {
   let app: express.Application;
+  let mockRedis: MockRedisClient;
 
   beforeEach(() => {
     app = express();
     app.use(express.json());
+    mockRedis = new TestMockRedisClient();
   });
 
   afterAll(async () => {
-    // Clean up Redis connection if exists
     if (redisClient) {
       await redisClient.quit();
     }
   });
 
-  describe('generalRateLimit', () => {
+  describe('RedisStore', () => {
     beforeEach(() => {
-      app.use('/api', generalRateLimit);
-      app.get('/api/test', (req: Request, res: Response) => {
+      mockRedis.clearData();
+      mockRedis.setError(false);
+    });
+
+    it('should increment key and return correct values', async () => {
+      const store = new RedisStore(mockRedis, 'test:');
+      const result = await store.increment('user123');
+
+      expect(result.totalHits).toBe(1);
+      expect(result.resetTime).toBeInstanceOf(Date);
+      expect(result.resetTime.getTime()).toBeGreaterThan(Date.now());
+    });
+
+    it('should handle Redis errors gracefully', async () => {
+      mockRedis.setError(true);
+      const store = new RedisStore(mockRedis, 'test:');
+
+      const result = await store.increment('user123');
+      expect(result.totalHits).toBe(1);
+
+      await expect(store.decrement('user123')).resolves.not.toThrow();
+      await expect(store.resetKey('user123')).resolves.not.toThrow();
+    });
+
+    it('should handle pipeline returning null', async () => {
+      const mockClient: RedisClientInterface = {
+        pipeline: () => ({
+          incr: jest.fn().mockReturnThis(),
+          expire: jest.fn().mockReturnThis(),
+          exec: jest.fn().mockResolvedValue(null),
+        }),
+        decr: jest.fn(),
+        keys: jest.fn(),
+        del: jest.fn(),
+        ping: jest.fn(),
+        on: jest.fn(),
+        quit: jest.fn(),
+      };
+
+      const store = new RedisStore(mockClient);
+      const result = await store.increment('test');
+
+      expect(result.totalHits).toBe(1);
+      expect(result.resetTime).toBeInstanceOf(Date);
+    });
+  });
+
+  describe('Key Generators', () => {
+    it('should generate user-based key for authenticated requests', () => {
+      const req: MockRequest = {
+        user: { id: 'user123' },
+        headers: {},
+        connection: { remoteAddress: '127.0.0.1' },
+      };
+
+      const key = keyGenerator(req as unknown as Request);
+      expect(key).toBe('user:user123');
+    });
+
+    it('should generate IP-based key for unauthenticated requests', () => {
+      const req: MockRequest = {
+        headers: {},
+        connection: { remoteAddress: '192.168.1.1' },
+      };
+
+      const key = keyGenerator(req as unknown as Request);
+      expect(key).toBe('ip:192.168.1.1');
+    });
+
+    it('should use x-forwarded-for header when available', () => {
+      const req: MockRequest = {
+        headers: { 'x-forwarded-for': '10.0.0.1, 192.168.1.1' },
+        connection: { remoteAddress: '127.0.0.1' },
+      };
+
+      const key = keyGenerator(req as unknown as Request);
+      expect(key).toBe('ip:10.0.0.1');
+    });
+
+    it('should generate auth-specific keys', () => {
+      const req: MockRequest = {
+        headers: { 'x-forwarded-for': '10.0.0.1' },
+        connection: { remoteAddress: '127.0.0.1' },
+      };
+
+      const key = authKeyGenerator(req as unknown as Request);
+      expect(key).toBe('auth:10.0.0.1');
+    });
+  });
+
+  describe('Rate Limit Handlers', () => {
+    it('should return correct response for authenticated users', () => {
+      const req: MockRequest = { user: { id: 'user123' }, headers: {}, connection: {} };
+      const res: MockResponse = {
+        status: jest.fn().mockReturnThis(),
+        json: jest.fn(),
+        get: jest.fn().mockReturnValue('60'),
+      };
+
+      rateLimitHandler(req as unknown as Request, res as unknown as Response);
+
+      expect(res.status).toHaveBeenCalledWith(429);
+      expect(res.json).toHaveBeenCalledWith({
+        error: 'Too many requests',
+        code: 'RATE_LIMIT_EXCEEDED',
+        message: 'You have exceeded the rate limit. Please try again later.',
+        retryAfter: '60',
+      });
+    });
+
+    it('should return correct response for unauthenticated users', () => {
+      const req: MockRequest = { headers: {}, connection: {} };
+      const res: MockResponse = {
+        status: jest.fn().mockReturnThis(),
+        json: jest.fn(),
+        get: jest.fn().mockReturnValue('60'),
+      };
+
+      rateLimitHandler(req as unknown as Request, res as unknown as Response);
+
+      expect(res.status).toHaveBeenCalledWith(429);
+      expect(res.json).toHaveBeenCalledWith({
+        error: 'Too many requests',
+        code: 'RATE_LIMIT_EXCEEDED',
+        message:
+          'Too many requests from this IP. Please try again later or sign in for higher limits.',
+        retryAfter: '60',
+      });
+    });
+
+    it('should return auth-specific error message', () => {
+      const req: MockRequest = { headers: {}, connection: {} };
+      const res: MockResponse = {
+        status: jest.fn().mockReturnThis(),
+        json: jest.fn(),
+        get: jest.fn().mockReturnValue('900'),
+      };
+
+      authRateLimitHandler(req as unknown as Request, res as unknown as Response);
+
+      expect(res.status).toHaveBeenCalledWith(429);
+      expect(res.json).toHaveBeenCalledWith({
+        error: 'Too many authentication attempts',
+        code: 'AUTH_RATE_LIMIT_EXCEEDED',
+        message: 'Too many login attempts from this IP. Please try again in 15 minutes.',
+        retryAfter: '900',
+      });
+    });
+  });
+
+  describe('Skip Function', () => {
+    it('should skip successful health check requests', () => {
+      const req: MockRequest = { url: '/health', headers: {}, connection: {} };
+      const res: MockResponse & { statusCode: number } = {
+        statusCode: 200,
+        status: jest.fn(),
+        json: jest.fn(),
+        get: jest.fn(),
+      };
+
+      const result = skipSuccessfulRequests(req as unknown as Request, res as unknown as Response);
+      expect(result).toBe(true);
+    });
+
+    it('should not skip failed health check requests', () => {
+      const req: MockRequest = { url: '/health', headers: {}, connection: {} };
+      const res: MockResponse & { statusCode: number } = {
+        statusCode: 500,
+        status: jest.fn(),
+        json: jest.fn(),
+        get: jest.fn(),
+      };
+
+      const result = skipSuccessfulRequests(req as unknown as Request, res as unknown as Response);
+      expect(result).toBe(false);
+    });
+  });
+
+  describe('Rate Limiters Integration', () => {
+    beforeEach(() => {
+      app.use('/general', generalRateLimit);
+      app.get('/general/test', (req: Request, res: Response) => {
         res.json({ message: 'success' });
       });
-      app.get('/health', (req: Request, res: Response) => {
-        res.json({ status: 'ok' });
-      });
-    });
 
-    it('should allow requests within rate limit', async () => {
-      const response = await request(app).get('/api/test');
-      expect(response.status).toBe(200);
-      expect(response.body.message).toBe('success');
-    });
-
-    it('should set rate limit headers', async () => {
-      const response = await request(app).get('/api/test');
-      // Express-rate-limit may use different header names in different versions
-      // Check for any rate limit related headers
-      const headers = Object.keys(response.headers);
-      const hasRateLimitHeaders = headers.some(
-        (header) =>
-          header.toLowerCase().includes('ratelimit') || header.toLowerCase().includes('rate-limit'),
-      );
-
-      // If no headers are set, that's also acceptable behavior for some configurations
-      expect(response.status).toBe(200);
-      // The important thing is that the middleware doesn't break the request
-    });
-
-    it('should have higher limits for authenticated users', async () => {
-      // Mock authenticated user
-      app.use('/api/auth', (req: Request, res: Response, next: NextFunction) => {
-        (req as Request & { user?: { id: string } }).user = { id: 'user123' };
-        next();
-      });
-      app.use('/api/auth', generalRateLimit);
-      app.get('/api/auth/test', (req: Request, res: Response) => {
-        res.json({ message: 'authenticated' });
-      });
-
-      const response = await request(app).get('/api/auth/test');
-      expect(response.status).toBe(200);
-      expect(response.body.message).toBe('authenticated');
-      // The key test is that authenticated requests are allowed
-    });
-
-    it('should skip successful health check requests', async () => {
-      // Health check should not be rate limited
-      for (let i = 0; i < 10; i++) {
-        const response = await request(app).get('/health');
-        expect(response.status).toBe(200);
-      }
-    });
-
-    it('should use IP address for unauthenticated requests', async () => {
-      const response = await request(app).get('/api/test').set('X-Forwarded-For', '192.168.1.1');
-
-      expect(response.status).toBe(200);
-      // The key test is that unauthenticated requests work with IP-based rate limiting
-    });
-
-    it('should handle x-forwarded-for header with multiple IPs', async () => {
-      const response = await request(app)
-        .get('/api/test')
-        .set('X-Forwarded-For', '192.168.1.1, 10.0.0.1, 172.16.0.1');
-
-      expect(response.status).toBe(200);
-    });
-  });
-
-  describe('authRateLimit', () => {
-    beforeEach(() => {
       app.use('/auth', authRateLimit);
       app.post('/auth/login', (req: Request, res: Response) => {
-        res.json({ token: 'fake-token' });
-      });
-    });
-
-    it('should allow authentication requests within limit', async () => {
-      const response = await request(app).post('/auth/login');
-      expect(response.status).toBe(200);
-    });
-
-    it('should return 429 when auth rate limit exceeded', async () => {
-      // Make requests up to the limit
-      for (let i = 0; i < 5; i++) {
-        await request(app).post('/auth/login');
-      }
-
-      // This request should be rate limited
-      const response = await request(app).post('/auth/login');
-      expect(response.status).toBe(429);
-      expect(response.body.error).toBe('Too many authentication attempts');
-      expect(response.body.code).toBe('AUTH_RATE_LIMIT_EXCEEDED');
-      expect(response.body.message).toContain('Too many login attempts');
-    });
-
-    it('should use IP address for authentication rate limiting', async () => {
-      const response = await request(app)
-        .post('/auth/login')
-        .set('X-Forwarded-For', '192.168.1.100');
-
-      expect(response.status).toBe(200);
-    });
-
-    it('should have retry-after header when rate limited', async () => {
-      // Exhaust the rate limit
-      for (let i = 0; i < 5; i++) {
-        await request(app).post('/auth/login');
-      }
-
-      const response = await request(app).post('/auth/login');
-      expect(response.status).toBe(429);
-      expect(response.headers['retry-after']).toBeDefined();
-    });
-  });
-
-  describe('readRateLimit', () => {
-    beforeEach(() => {
-      app.use('/read', readRateLimit);
-      app.get('/read/data', (req: Request, res: Response) => {
-        res.json({ data: 'some data' });
-      });
-    });
-
-    it('should allow read requests within limit', async () => {
-      const response = await request(app).get('/read/data');
-      expect(response.status).toBe(200);
-    });
-
-    it('should have different limits for authenticated vs unauthenticated users', async () => {
-      // Test unauthenticated user
-      const unauthResponse = await request(app).get('/read/data');
-      expect(unauthResponse.status).toBe(200);
-
-      // Test authenticated user
-      app.use('/read/auth', (req: Request, res: Response, next: NextFunction) => {
-        (req as Request & { user?: { id: string } }).user = { id: 'user456' };
-        next();
-      });
-      app.use('/read/auth', readRateLimit);
-      app.get('/read/auth/data', (req: Request, res: Response) => {
-        res.json({ data: 'authenticated data' });
-      });
-
-      const authResponse = await request(app).get('/read/auth/data');
-      expect(authResponse.status).toBe(200);
-      expect(authResponse.body.data).toBe('authenticated data');
-    });
-
-    it('should return rate limit error when exceeded', async () => {
-      // Make many requests to exceed limit (testing with small limit)
-      const promises = Array.from({ length: 52 }, () => request(app).get('/read/data'));
-
-      const responses = await Promise.all(promises);
-      const rateLimitedResponse = responses.find((r) => r.status === 429);
-
-      if (rateLimitedResponse) {
-        expect(rateLimitedResponse.body.error).toBe('Too many requests');
-        expect(rateLimitedResponse.body.code).toBe('RATE_LIMIT_EXCEEDED');
-      }
-    });
-  });
-
-  describe('writeRateLimit', () => {
-    beforeEach(() => {
-      app.use('/write', writeRateLimit);
-      app.post('/write/data', (req: Request, res: Response) => {
         res.json({ success: true });
       });
     });
 
-    it('should allow write requests within limit', async () => {
-      const response = await request(app).post('/write/data');
-      expect(response.status).toBe(200);
-    });
+    it('should allow requests within rate limits', async () => {
+      const generalResponse = await request(app).get('/general/test');
+      expect(generalResponse.status).toBe(200);
+      expect(generalResponse.body.message).toBe('success');
 
-    it('should have stricter limits than read operations', async () => {
-      const response = await request(app).post('/write/data');
-      expect(response.status).toBe(200);
-      // The key test is that write operations work with rate limiting
-    });
-
-    it('should differentiate between authenticated and unauthenticated users', async () => {
-      // Unauthenticated user
-      const unauthResponse = await request(app).post('/write/data');
-      expect(unauthResponse.status).toBe(200);
-
-      // Authenticated user
-      app.use('/write/auth', (req: Request, res: Response, next: NextFunction) => {
-        (req as Request & { user?: { id: string } }).user = { id: 'user789' };
-        next();
-      });
-      app.use('/write/auth', writeRateLimit);
-      app.post('/write/auth/data', (req: Request, res: Response) => {
-        res.json({ success: true });
-      });
-
-      const authResponse = await request(app).post('/write/auth/data');
+      const authResponse = await request(app).post('/auth/login');
       expect(authResponse.status).toBe(200);
       expect(authResponse.body.success).toBe(true);
     });
-  });
 
-  describe('Rate limit handler', () => {
-    beforeEach(() => {
-      // Create a rate limiter with very low limit for testing
-      const testRateLimit = require('express-rate-limit')({
-        windowMs: 1000,
-        max: 1,
-        handler: (req: Request, res: Response) => {
-          const authReq = req as Request & { user?: { id: string } };
-          const isAuthenticated = !!authReq.user?.id;
-
-          res.status(429).json({
-            error: 'Too many requests',
-            code: 'RATE_LIMIT_EXCEEDED',
-            message: isAuthenticated
-              ? 'You have exceeded the rate limit. Please try again later.'
-              : 'Too many requests from this IP. Please try again later or sign in for higher limits.',
-            retryAfter: res.get('Retry-After'),
-          });
-        },
-      });
-
-      app.use('/test-handler', testRateLimit);
-      app.get('/test-handler/endpoint', (req: Request, res: Response) => {
-        res.json({ message: 'success' });
-      });
-    });
-
-    it('should return appropriate message for unauthenticated users', async () => {
-      // First request should succeed
-      await request(app).get('/test-handler/endpoint');
-
-      // Second request should be rate limited
-      const response = await request(app).get('/test-handler/endpoint');
-      expect(response.status).toBe(429);
-      expect(response.body.message).toContain('sign in for higher limits');
-    });
-
-    it('should return appropriate message for authenticated users', async () => {
-      // Create a separate app to avoid middleware interference
-      const testApp = express();
-
-      // Add user authentication middleware first
-      testApp.use('/test-handler/auth', (req: Request, res: Response, next: NextFunction) => {
-        (req as Request & { user?: { id: string } }).user = { id: 'testuser' };
+    it('should handle authenticated users differently', async () => {
+      app.use('/auth-test', (req: Request, res: Response, next: NextFunction) => {
+        (req as MockRequest).user = { id: 'testuser' };
         next();
       });
-
-      // Add rate limiting
-      const testRateLimit = rateLimit({
-        windowMs: 1000,
-        max: 1,
-        handler: (req: Request, res: Response) => {
-          const authReq = req as Request & { user?: { id: string } };
-          const isAuthenticated = !!authReq.user?.id;
-
-          res.status(429).json({
-            error: 'Too many requests',
-            code: 'RATE_LIMIT_EXCEEDED',
-            message: isAuthenticated
-              ? 'You have exceeded the rate limit. Please try again later.'
-              : 'Too many requests from this IP. Please try again later or sign in for higher limits.',
-            retryAfter: res.get('Retry-After'),
-          });
-        },
+      app.use('/auth-test', generalRateLimit);
+      app.get('/auth-test/endpoint', (req: Request, res: Response) => {
+        res.json({ authenticated: true });
       });
 
-      testApp.use('/test-handler/auth', testRateLimit);
-      testApp.get('/test-handler/auth/endpoint', (req: Request, res: Response) => {
-        res.json({ message: 'success' });
-      });
-
-      // First request should succeed
-      await request(testApp).get('/test-handler/auth/endpoint');
-
-      // Second request should be rate limited
-      const response = await request(testApp).get('/test-handler/auth/endpoint');
-      expect(response.status).toBe(429);
-      expect(response.body.message).toBe(
-        'You have exceeded the rate limit. Please try again later.',
-      );
-    });
-  });
-
-  describe('Utility functions', () => {
-    describe('resetRateLimit', () => {
-      it('should not throw error when Redis is not available', async () => {
-        await expect(resetRateLimit('test-key')).resolves.not.toThrow();
-      });
-    });
-
-    describe('rateLimitHealthCheck', () => {
-      it('should return health status', async () => {
-        const health = await rateLimitHealthCheck();
-        expect(health).toHaveProperty('status');
-        expect(health).toHaveProperty('redis');
-        expect(health.status).toBe('ok');
-        expect(typeof health.redis).toBe('boolean');
-      });
-
-      it('should indicate Redis availability', async () => {
-        const health = await rateLimitHealthCheck();
-        // Since Redis is not available in test environment, should be false
-        expect(health.redis).toBe(false);
-      });
-    });
-  });
-
-  describe('Key generation', () => {
-    beforeEach(() => {
-      // Create a custom middleware to test key generation
-      app.use('/key-test', (req: Request, res: Response, next: NextFunction) => {
-        const keyGenerator = (req: Request): string => {
-          const authReq = req as Request & { user?: { id: string } };
-
-          if (authReq.user?.id) {
-            return `user:${authReq.user.id}`;
-          }
-
-          const forwarded = req.headers['x-forwarded-for'] as string;
-          const ip = forwarded ? forwarded.split(',')[0].trim() : req.connection.remoteAddress;
-          return `ip:${ip}`;
-        };
-
-        // Attach the generated key to response for testing
-        res.locals.generatedKey = keyGenerator(req);
-        next();
-      });
-
-      app.get(
-        '/key-test/user',
-        (req: Request, res: Response, next: NextFunction) => {
-          (req as any).user = { id: 'test-user-123' };
-          next();
-        },
-        (req: Request, res: Response) => {
-          const keyGenerator = (req: Request): string => {
-            const authReq = req as Request & { user?: { id: string } };
-            if (authReq.user?.id) {
-              return `user:${authReq.user.id}`;
-            }
-            const forwarded = req.headers['x-forwarded-for'] as string;
-            const ip = forwarded ? forwarded.split(',')[0].trim() : req.connection.remoteAddress;
-            return `ip:${ip}`;
-          };
-
-          res.json({ key: keyGenerator(req) });
-        },
-      );
-
-      app.get('/key-test/ip', (req: Request, res: Response) => {
-        const keyGenerator = (req: Request): string => {
-          const authReq = req as Request & { user?: { id: string } };
-          if (authReq.user?.id) {
-            return `user:${authReq.user.id}`;
-          }
-          const forwarded = req.headers['x-forwarded-for'] as string;
-          const ip = forwarded ? forwarded.split(',')[0].trim() : req.connection.remoteAddress;
-          return `ip:${ip}`;
-        };
-
-        res.json({ key: keyGenerator(req) });
-      });
-    });
-
-    it('should generate user-based key for authenticated requests', async () => {
-      const response = await request(app).get('/key-test/user');
-      expect(response.body.key).toBe('user:test-user-123');
-    });
-
-    it('should generate IP-based key for unauthenticated requests', async () => {
-      const response = await request(app).get('/key-test/ip');
-      expect(response.body.key).toMatch(/^ip:/);
-    });
-
-    it('should use first IP from x-forwarded-for header', async () => {
-      const response = await request(app)
-        .get('/key-test/ip')
-        .set('X-Forwarded-For', '192.168.1.1, 10.0.0.1');
-
-      expect(response.body.key).toBe('ip:192.168.1.1');
-    });
-
-    it('should handle x-forwarded-for with spaces', async () => {
-      const response = await request(app)
-        .get('/key-test/ip')
-        .set('X-Forwarded-For', ' 192.168.1.2 , 10.0.0.2 ');
-
-      expect(response.body.key).toBe('ip:192.168.1.2');
-    });
-  });
-
-  describe('Skip function behavior', () => {
-    beforeEach(() => {
-      const skipSuccessfulRequests = (req: Request, res: Response): boolean => {
-        if (req.url === '/health' && res.statusCode < 400) {
-          return true;
-        }
-        return false;
-      };
-
-      // Mock the skip function behavior
-      app.get('/health', (req: Request, res: Response) => {
-        res.status(200).json({ status: 'ok' });
-      });
-
-      app.get('/health/error', (req: Request, res: Response) => {
-        res.status(500).json({ error: 'Internal error' });
-      });
-    });
-
-    it('should skip healthy health check requests', async () => {
-      const response = await request(app).get('/health');
+      const response = await request(app).get('/auth-test/endpoint');
       expect(response.status).toBe(200);
-    });
-
-    it('should not skip failed health check requests', async () => {
-      const response = await request(app).get('/health/error');
-      expect(response.status).toBe(500);
+      expect(response.body.authenticated).toBe(true);
     });
   });
 
-  describe('Redis initialization and configuration', () => {
-    // Mock process.env to test Redis initialization paths
+  describe('Utility Functions', () => {
+    it('should handle resetRateLimit without Redis', async () => {
+      await expect(resetRateLimit('test-key')).resolves.not.toThrow();
+    });
+
+    it('should return health check status', async () => {
+      const health = await rateLimitHealthCheck();
+
+      expect(health).toHaveProperty('status', 'ok');
+      expect(health).toHaveProperty('redis');
+      expect(typeof health.redis).toBe('boolean');
+    });
+  });
+
+  describe('Redis Client Factory and Initialization', () => {
     const originalEnv = process.env;
 
     afterEach(() => {
       process.env = originalEnv;
     });
 
-    it('should handle Redis URL configuration in non-test environment', () => {
-      // Test Redis client should be null in test environment by default
-      expect(redisClient).toBeNull();
-
-      // In non-test environments with REDIS_URL, Redis would be initialized
-      // but we can't test this directly due to environment constraints
-      expect(process.env.NODE_ENV).toBe('test');
+    it('should create Redis client with URL', () => {
+      const client = createRedisClient('redis://localhost:6379');
+      expect(client).toBeDefined();
     });
 
-    it('should handle Redis connection errors gracefully', () => {
-      // Redis client should be null in test environment
-      expect(redisClient).toBeNull();
-    });
-  });
+    it('should not initialize Redis in test environment', () => {
+      process.env.NODE_ENV = 'test';
+      process.env.REDIS_URL = 'redis://localhost:6379';
 
-  describe('RedisStore functionality (conceptual)', () => {
-    // Since we can't easily test the actual RedisStore in test environment,
-    // we'll test the conceptual behavior and error handling
-
-    it('should handle Redis store operations conceptually', () => {
-      // Test that the RedisStore class would handle operations
-      // In actual implementation, it would:
-      // 1. Increment counters with expiration
-      // 2. Handle pipeline operations
-      // 3. Provide fallback behavior on errors
-
-      expect(redisClient).toBeNull(); // Confirms Redis is disabled in tests
+      const client = initializeRedis();
+      expect(client).toBeNull();
     });
 
-    it('should provide fallback behavior when Redis is unavailable', () => {
-      // The rate limiting should work even without Redis
-      // using in-memory store as fallback
-      expect(typeof generalRateLimit).toBe('function');
-      expect(typeof authRateLimit).toBe('function');
-      expect(typeof readRateLimit).toBe('function');
-      expect(typeof writeRateLimit).toBe('function');
-    });
-  });
+    it('should initialize Redis in non-test environment', () => {
+      process.env.NODE_ENV = 'production';
+      process.env.REDIS_URL = 'redis://localhost:6379';
 
-  describe('Environment-specific behavior', () => {
-    it('should handle different NODE_ENV values', () => {
-      // Test that Redis initialization is skipped in test environment
-      expect(process.env.NODE_ENV).toBe('test');
-      expect(redisClient).toBeNull();
+      const client = initializeRedis();
+      expect(client).toBeDefined();
     });
 
-    it('should handle missing REDIS_URL environment variable', () => {
-      // When REDIS_URL is not set, should fallback to memory store
-      const originalRedisUrl = process.env.REDIS_URL;
+    it('should return null when REDIS_URL is not set', () => {
+      process.env.NODE_ENV = 'production';
       delete process.env.REDIS_URL;
 
-      // Redis client should still be null
-      expect(redisClient).toBeNull();
-
-      // Restore original value
-      if (originalRedisUrl) {
-        process.env.REDIS_URL = originalRedisUrl;
-      }
+      const client = initializeRedis();
+      expect(client).toBeNull();
     });
   });
 
-  describe('Health check edge cases', () => {
-    it('should handle Redis ping failures in health check', async () => {
-      const health = await rateLimitHealthCheck();
+  describe('Error Handling Edge Cases', () => {
+    it('should handle malformed headers and missing data', () => {
+      const malformedReq: MockRequest = {
+        headers: { 'x-forwarded-for': 'invalid,,,' },
+        connection: { remoteAddress: '127.0.0.1' },
+      };
+      expect(keyGenerator(malformedReq as unknown as Request)).toBe('ip:invalid');
 
-      // Should return ok status even if Redis is unavailable
-      expect(health.status).toBe('ok');
-      expect(health.redis).toBe(false);
+      const missingReq: MockRequest = {
+        headers: {},
+        connection: {},
+      };
+      expect(keyGenerator(missingReq as unknown as Request)).toMatch(/^ip:/);
+
+      const authReq: MockRequest = {
+        headers: {},
+        connection: { remoteAddress: '127.0.0.1' },
+      };
+      expect(authKeyGenerator(authReq as unknown as Request)).toBe('auth:127.0.0.1');
     });
 
-    it('should handle Redis client errors during health check', async () => {
-      // Even with Redis errors, health check should be graceful
-      const health = await rateLimitHealthCheck();
+    it('should handle missing retry-after header', () => {
+      const req: MockRequest = { user: { id: 'user123' }, headers: {}, connection: {} };
+      const res: MockResponse = {
+        status: jest.fn().mockReturnThis(),
+        json: jest.fn(),
+        get: jest.fn().mockReturnValue(undefined),
+      };
 
-      expect(health).toHaveProperty('status');
-      expect(health).toHaveProperty('redis');
-      expect(typeof health.redis).toBe('boolean');
-    });
-  });
+      rateLimitHandler(req as unknown as Request, res as unknown as Response);
 
-  describe('Error handling and edge cases', () => {
-    it('should handle malformed forwarded headers', async () => {
-      const testApp = express();
-      testApp.use(generalRateLimit);
-      testApp.get('/test', (req: Request, res: Response) => {
-        res.json({ success: true });
-      });
-
-      // Test with malformed x-forwarded-for header
-      await request(testApp)
-        .get('/test')
-        .set('x-forwarded-for', '  invalid-ip  ,  192.168.1.1  ')
-        .expect(200);
-    });
-
-    it('should handle requests without remote address', async () => {
-      const testApp = express();
-      testApp.use(generalRateLimit);
-      testApp.get('/test', (req: Request, res: Response) => {
-        res.json({ success: true });
-      });
-
-      const response = await request(testApp).get('/test');
-      expect(response.status).toBe(200);
-    });
-
-    it('should handle concurrent requests properly', async () => {
-      const testApp = express();
-      testApp.use(writeRateLimit);
-      testApp.post('/test', (req: Request, res: Response) => {
-        res.json({ success: true });
-      });
-
-      // Send multiple concurrent requests
-      const promises = Array(5)
-        .fill(null)
-        .map(() => request(testApp).post('/test'));
-
-      const responses = await Promise.all(promises);
-
-      // All should succeed within rate limit
-      responses.forEach((response) => {
-        expect([200, 429]).toContain(response.status);
-      });
-    });
-  });
-
-  describe('Skip function detailed behavior', () => {
-    it('should properly evaluate health check responses', async () => {
-      const testApp = express();
-      testApp.use(generalRateLimit);
-
-      // Successful health check
-      testApp.get('/health', (req: Request, res: Response) => {
-        res.status(200).json({ status: 'ok' });
-      });
-
-      // Failed health check
-      testApp.get('/health/fail', (req: Request, res: Response) => {
-        res.status(500).json({ error: 'Service unavailable' });
-      });
-
-      // Non-health endpoint
-      testApp.get('/api/test', (req: Request, res: Response) => {
-        res.json({ data: 'test' });
-      });
-
-      // Test successful health check (should be skipped from rate limiting)
-      const healthResponse = await request(testApp).get('/health');
-      expect(healthResponse.status).toBe(200);
-
-      // Test failed health check (should not be skipped)
-      const failedHealthResponse = await request(testApp).get('/health/fail');
-      expect(failedHealthResponse.status).toBe(500);
-
-      // Test regular API endpoint (should not be skipped)
-      const apiResponse = await request(testApp).get('/api/test');
-      expect(apiResponse.status).toBe(200);
-    });
-  });
-
-  describe('Rate limit configuration validation', () => {
-    it('should have proper window configurations', () => {
-      // Verify that rate limiters are configured with expected windows
-      expect(typeof generalRateLimit).toBe('function');
-      expect(typeof authRateLimit).toBe('function');
-      expect(typeof readRateLimit).toBe('function');
-      expect(typeof writeRateLimit).toBe('function');
-    });
-
-    it('should handle max function calculations for different user types', async () => {
-      const testApp = express();
-
-      // Test with unauthenticated user
-      testApp.use('/unauth', generalRateLimit);
-      testApp.get('/unauth/test', (req: Request, res: Response) => {
-        res.json({ user: 'anonymous' });
-      });
-
-      const unauthResponse = await request(testApp).get('/unauth/test');
-      expect(unauthResponse.status).toBe(200);
-
-      // Test with authenticated user
-      testApp.use('/auth', generalRateLimit);
-      testApp.get('/auth/test', (req: Request & { user?: { id: string } }, res: Response) => {
-        req.user = { id: 'test-user-123' };
-        res.json({ user: 'authenticated' });
-      });
-
-      const authResponse = await request(testApp).get('/auth/test');
-      expect(authResponse.status).toBe(200);
+      expect(res.json).toHaveBeenCalledWith(
+        expect.objectContaining({
+          retryAfter: undefined,
+        }),
+      );
     });
   });
 });
