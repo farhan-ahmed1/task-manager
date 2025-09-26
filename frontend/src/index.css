@@ -134,7 +134,58 @@ form {
 .auth-form-container {
   backdrop-filter: blur(12px);
   background: linear-gradient(145deg, 
-    hsl(var(--background)/0.95) 0%, 
-    hsl(var(--background)/0.98) 100%);
-  border: 1px solid hsl(var(--border)/0.3);
+    rgba(255, 255, 255, 0.95), 
+    rgba(248, 250, 252, 0.95)
+  );
+  border: 1px solid rgba(148, 163, 184, 0.2);
+  box-shadow: 
+    0 10px 25px -5px rgba(0, 0, 0, 0.1),
+    0 0 0 1px rgba(255, 255, 255, 0.5) inset;
+}
+
+/* Modern backdrop and glass effects */
+.backdrop-blur-modern {
+  backdrop-filter: blur(12px) saturate(180%);
+  background: rgba(255, 255, 255, 0.85);
+  border: 1px solid rgba(148, 163, 184, 0.2);
+}
+
+/* Subtle background patterns */
+.bg-pattern-dots {
+  background-image: radial-gradient(rgba(148, 163, 184, 0.1) 1px, transparent 1px);
+  background-size: 20px 20px;
+}
+
+/* Enhanced hover transitions */
+.hover-lift {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.hover-lift:hover {
+  transform: translateY(-2px) scale(1.01);
+  box-shadow: 
+    0 20px 25px -5px rgba(0, 0, 0, 0.1),
+    0 10px 10px -5px rgba(0, 0, 0, 0.04),
+    0 0 0 1px rgba(59, 130, 246, 0.1);
+}
+
+/* Progress bar enhancements */
+.progress-modern {
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+  animation: shimmer 2s infinite;
+}
+
+@keyframes shimmer {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(100%); }
+}
+
+/* Status indicator animations */
+.status-pulse {
+  animation: status-pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+@keyframes status-pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
 }

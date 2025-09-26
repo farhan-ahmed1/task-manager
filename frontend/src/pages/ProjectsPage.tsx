@@ -1,11 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardTitle } from '@/components/ui/card';
 import { Alert } from '@/components/ui/alert';
 import ConfirmDialog from '@/components/ui/ConfirmDialog';
-import { ProjectCard, ProjectForm, ProjectStats, ProjectTaskView, ProjectSharingDialog } from '@/components/projects';
+import { ProjectCard, ProjectForm, ProjectStats, ProjectTaskView, ProjectSharingDialog, ProjectFilters } from '@/components/projects';
 import TaskForm from '@/components/tasks/TaskForm';
-import { Plus, AlertCircle, Loader2, BarChart3, FolderOpen } from 'lucide-react';
+import { Plus, AlertCircle, Loader2, BarChart3, FolderOpen, ArrowLeft } from 'lucide-react';
 import { useProjectStore, useTaskStore } from '@/store/useStore';
 import { projectService } from '@/services/projects';
 import { taskService } from '@/services/tasks';
@@ -43,6 +42,11 @@ const ProjectsPage: React.FC = () => {
   });
   const [isDeleting, setIsDeleting] = useState(false);
   const [viewMode, setViewMode] = useState<ViewMode>('dashboard');
+
+  // Project filtering and search state
+  const [searchQuery, setSearchQuery] = useState('');
+  const [sortBy, setSortBy] = useState('created_at');
+  const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc');
 
   // Project sharing state
   const [sharingProject, setSharingProject] = useState<Project | null>(null);
@@ -384,69 +388,127 @@ const ProjectsPage: React.FC = () => {
     setTaskFormError(null);
   };
 
-  const EmptyState = () => (
-    <Card className="text-center py-12">
-      <CardContent>
-        <FolderOpen className="h-16 w-16 text-muted-foreground mx-auto mb-4" />
-        <CardTitle className="mb-2">No Projects Yet</CardTitle>
-        <CardDescription className="mb-6">
-          Create your first project to start organizing your tasks
-        </CardDescription>
-        <Button onClick={() => setIsFormOpen(true)}>
-          <Plus className="h-4 w-4 mr-2" />
-          Create Your First Project
-        </Button>
-      </CardContent>
-    </Card>
-  );
+  // Filter and sort projects
+  const filteredAndSortedProjects = React.useMemo(() => {
+    let filtered = projects;
+
+    // Apply search filter
+    if (searchQuery.trim()) {
+      const query = searchQuery.toLowerCase().trim();
+      filtered = filtered.filter(project => 
+        project.name.toLowerCase().includes(query) ||
+        (project.description && project.description.toLowerCase().includes(query))
+      );
+    }
+
+    // Sort projects
+    const sorted = [...filtered].sort((a, b) => {
+      let comparison = 0;
+      
+      switch (sortBy) {
+        case 'name':
+          comparison = a.name.localeCompare(b.name);
+          break;
+        case 'created_at':
+          comparison = new Date(a.created_at).getTime() - new Date(b.created_at).getTime();
+          break;
+        case 'updated_at':
+          comparison = new Date(a.updated_at).getTime() - new Date(b.updated_at).getTime();
+          break;
+        case 'completion_rate': {
+          const aStats = projectStats[a.id];
+          const bStats = projectStats[b.id];
+          const aTotal = aStats ? aStats.PENDING + aStats.IN_PROGRESS + aStats.COMPLETED : 0;
+          const bTotal = bStats ? bStats.PENDING + bStats.IN_PROGRESS + bStats.COMPLETED : 0;
+          const aRate = aTotal > 0 ? Math.round((aStats.COMPLETED / aTotal) * 100) : 0;
+          const bRate = bTotal > 0 ? Math.round((bStats.COMPLETED / bTotal) * 100) : 0;
+          comparison = aRate - bRate;
+          break;
+        }
+        default:
+          comparison = new Date(a.created_at).getTime() - new Date(b.created_at).getTime();
+      }
+
+      return sortOrder === 'desc' ? -comparison : comparison;
+    });
+
+    return sorted;
+  }, [projects, searchQuery, sortBy, sortOrder, projectStats]);
+
+  // Handle filter functions
+  const handleSortChange = (newSortBy: string, newSortOrder: 'asc' | 'desc') => {
+    setSortBy(newSortBy);
+    setSortOrder(newSortOrder);
+  };
+
+  const handleClearFilters = () => {
+    setSearchQuery('');
+    setSortBy('created_at');
+    setSortOrder('desc');
+  };
+
+
 
   if (isLoading) {
     return (
-      <div className="container mx-auto px-4 py-8">
-        <div className="text-center py-12">
-          <Loader2 className="h-8 w-8 animate-spin mx-auto mb-4" />
-          <p className="text-muted-foreground">Loading projects...</p>
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50/30 to-slate-50">
+        <div className="flex flex-col items-center justify-center py-20">
+          <div className="bg-white/80 backdrop-blur-sm rounded-2xl p-8 border border-slate-200/60 shadow-lg">
+            <div className="flex flex-col items-center space-y-4">
+              <div className="relative">
+                <div className="h-12 w-12 rounded-full bg-blue-100 flex items-center justify-center">
+                  <Loader2 className="h-6 w-6 animate-spin text-blue-600" />
+                </div>
+              </div>
+              <div className="text-center">
+                <h3 className="font-semibold text-slate-900 mb-1">Loading your projects</h3>
+                <p className="text-sm text-slate-600">Getting everything ready for you...</p>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     );
   }
 
-  // Stats view
+    // Stats view
   if (viewMode === 'stats' && selectedProject) {
     const stats = projectStats[selectedProject.id];
     
     return (
-      <div className="container mx-auto px-4 py-8">
-        <div className="mb-6">
-          <div className="flex items-center space-x-4">
-            <Button
-              variant="outline"
-              onClick={() => {
-                setViewMode('dashboard');
-                setSelectedProject(null);
-              }}
-            >
-              ← Back to Projects
-            </Button>
-            <div>
-              <h1 className="text-2xl font-bold tracking-tight">Project Analytics</h1>
-              <p className="text-muted-foreground">
-                Detailed statistics for {selectedProject.name}
-              </p>
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50/30 to-slate-50">
+        <div className="container mx-auto px-4 py-8 max-w-7xl">
+          <div className="mb-6">
+            <div className="flex items-center space-x-4">
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => setViewMode('dashboard')}
+                className="text-slate-600 hover:text-slate-900"
+              >
+                <ArrowLeft className="h-4 w-4 mr-2" />
+                Back to Projects
+              </Button>
+              <div className="h-4 w-px bg-slate-300" />
+              <div>
+                <h1 className="text-xl font-semibold text-slate-900">{selectedProject.name}</h1>
+                <p className="text-sm text-slate-600">Project Analytics</p>
+              </div>
             </div>
           </div>
-        </div>
 
-        {stats ? (
-          <ProjectStats project={selectedProject} stats={stats} />
-        ) : (
-          <Card>
-            <CardContent className="text-center py-12">
-              <BarChart3 className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
-              <p className="text-muted-foreground">Loading project statistics...</p>
-            </CardContent>
-          </Card>
-        )}
+          {stats ? (
+            <ProjectStats project={selectedProject} stats={stats} />
+          ) : (
+            <div className="text-center py-16 bg-gradient-to-br from-slate-50 to-blue-50 rounded-2xl border border-slate-200/60">
+              <div className="max-w-md mx-auto">
+                <BarChart3 className="h-16 w-16 text-slate-400 mx-auto mb-4" />
+                <h3 className="text-xl font-semibold text-slate-900 mb-2">Loading Analytics</h3>
+                <p className="text-slate-600">Gathering project statistics...</p>
+              </div>
+            </div>
+          )}
+        </div>
       </div>
     );
   }
@@ -454,107 +516,209 @@ const ProjectsPage: React.FC = () => {
   // Tasks view
   if (viewMode === 'tasks' && selectedProject) {
     return (
-      <div className="container mx-auto px-4 py-8">
-        <div className="mb-6">
-          <div className="flex items-center space-x-4">
-            <Button
-              variant="outline"
-              onClick={() => {
-                setViewMode('dashboard');
-                setSelectedProject(null);
-              }}
-            >
-              ← Back to Projects
-            </Button>
-            <div>
-              <h1 className="text-2xl font-bold tracking-tight">Project Tasks</h1>
-              <p className="text-muted-foreground">
-                Manage tasks for {selectedProject.name}
-              </p>
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50/30 to-slate-50">
+        <div className="container mx-auto px-4 py-8 max-w-7xl">
+          <div className="mb-6">
+            <div className="flex items-center space-x-4">
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => {
+                  setViewMode('dashboard');
+                  setSelectedProject(null);
+                }}
+                className="text-slate-600 hover:text-slate-900"
+              >
+                <ArrowLeft className="h-4 w-4 mr-2" />
+                Back to Projects
+              </Button>
+              <div className="h-4 w-px bg-slate-300" />
+              <div>
+                <h1 className="text-xl font-semibold text-slate-900">{selectedProject.name}</h1>
+                <p className="text-sm text-slate-600">Project Tasks</p>
+              </div>
             </div>
           </div>
+
+          <ProjectTaskView
+            project={selectedProject}
+            onCreateTask={() => handleCreateTask(selectedProject.id)}
+            onEditTask={handleEditTask}
+            refreshTrigger={taskRefreshTrigger}
+          />
+
+          {/* Task Form Dialog for Tasks View */}
+          <TaskForm
+            open={isTaskFormOpen}
+            onOpenChange={handleTaskFormClose}
+            task={editingTask || undefined}
+            onSubmit={handleTaskFormSubmit}
+            loading={isTaskFormSubmitting}
+            defaultProjectId={taskFormProjectId}
+            showProjectSelector={true}
+          />
+
+          {/* Task Form Error for Tasks View */}
+          {taskFormError && isTaskFormOpen && (
+            <Alert className="mt-4">
+              <AlertCircle className="h-4 w-4" />
+              <p>{taskFormError}</p>
+            </Alert>
+          )}
         </div>
-
-        <ProjectTaskView
-          project={selectedProject}
-          onCreateTask={() => handleCreateTask(selectedProject.id)}
-          onEditTask={handleEditTask}
-          refreshTrigger={taskRefreshTrigger}
-        />
-
-        {/* Task Form Dialog for Tasks View */}
-        <TaskForm
-          open={isTaskFormOpen}
-          onOpenChange={handleTaskFormClose}
-          task={editingTask || undefined}
-          onSubmit={handleTaskFormSubmit}
-          loading={isTaskFormSubmitting}
-          defaultProjectId={taskFormProjectId}
-          showProjectSelector={true}
-        />
-
-        {/* Task Form Error for Tasks View */}
-        {taskFormError && isTaskFormOpen && (
-          <Alert className="mt-4">
-            <AlertCircle className="h-4 w-4" />
-            <p>{taskFormError}</p>
-          </Alert>
-        )}
       </div>
     );
   }
 
   // Main dashboard view
   return (
-    <div className="container mx-auto px-4 py-8">
-      <div className="mb-8">
-        <div className="flex items-center justify-between">
-          <div>
-            <h1 className="text-3xl font-bold tracking-tight">Projects</h1>
-            <p className="text-muted-foreground">
-              Organize your tasks with projects
-            </p>
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50/30 to-slate-50">
+      <div className="container mx-auto px-4 py-8 max-w-7xl">
+        {/* Error Alert */}
+        {error && (
+          <Alert variant="destructive" className="mb-6">
+            <AlertCircle className="h-4 w-4" />
+            <div className="ml-2">
+              <p className="font-medium">Error</p>
+              <p className="text-sm">{error}</p>
+            </div>
+          </Alert>
+        )}
+
+        {/* Header with Enhanced Design */}
+        <div className="bg-gradient-to-br from-slate-50 to-blue-50 rounded-2xl p-6 border border-slate-200/60 mb-8">
+          <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6">
+            <div className="space-y-3">
+              <div className="flex items-center gap-3">
+                <div className="h-10 w-10 rounded-xl bg-blue-600 flex items-center justify-center">
+                  <svg className="h-5 w-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
+                  </svg>
+                </div>
+                <div>
+                  <h1 className="text-2xl font-bold text-slate-900">Project Management</h1>
+                  <p className="text-slate-600">Organize and track your projects</p>
+                </div>
+              </div>
+              
+              {/* Enhanced Stats Cards */}
+              {projects.length > 0 && (
+                <div className="flex flex-wrap gap-3">
+                  <div className="bg-white/80 backdrop-blur-sm rounded-lg px-3 py-2 border border-slate-200/60">
+                    <div className="flex items-center gap-2">
+                      <div className="h-2 w-2 rounded-full bg-slate-400"></div>
+                      <span className="text-sm font-medium text-slate-700">{projects.length} Projects</span>
+                    </div>
+                  </div>
+                  <div className="bg-white/80 backdrop-blur-sm rounded-lg px-3 py-2 border border-slate-200/60">
+                    <div className="flex items-center gap-2">
+                      <div className="h-2 w-2 rounded-full bg-green-500"></div>
+                      <span className="text-sm font-medium text-slate-700">
+                        {Object.values(projectStats).reduce((acc, stats) => acc + (stats?.COMPLETED || 0), 0)} Tasks Done
+                      </span>
+                    </div>
+                  </div>
+                  <div className="bg-white/80 backdrop-blur-sm rounded-lg px-3 py-2 border border-slate-200/60">
+                    <div className="flex items-center gap-2">
+                      <div className="h-2 w-2 rounded-full bg-blue-500"></div>
+                      <span className="text-sm font-medium text-slate-700">
+                        {Object.values(projectStats).reduce((acc, stats) => acc + (stats?.IN_PROGRESS || 0), 0)} In Progress
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              )}
+            </div>
+            
+            <Button 
+              onClick={() => setIsFormOpen(true)}
+              size="lg"
+              className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-xl shadow-lg hover:shadow-xl transition-all duration-200 transform hover:scale-105"
+            >
+              <Plus className="h-5 w-5 mr-2" />
+              Create New Project
+            </Button>
           </div>
-          <Button onClick={() => setIsFormOpen(true)}>
-            <Plus className="h-4 w-4 mr-2" />
-            New Project
-          </Button>
         </div>
-      </div>
 
-      {error && (
-        <Alert variant="destructive" className="mb-6">
-          <AlertCircle className="h-4 w-4" />
-          <div className="ml-2">
-            <p className="font-medium">Error</p>
-            <p className="text-sm">{error}</p>
-          </div>
-        </Alert>
-      )}
-
-        {projects.length === 0 ? (
-        <EmptyState />
-      ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {projects.map((project) => (
-            <ProjectCard
-              key={project.id}
-              project={project}
-              stats={projectStats[project.id]}
-              onEdit={handleEditProject}
-              onDelete={(project) => {
-                // Don't allow delete if already deleting
-                if (!isDeleting) {
-                  setDeleteDialog({ isOpen: true, project });
-                }
-              }}
-              onViewTasks={handleViewTasks}
-              onViewStats={handleViewStats}
-              onShare={handleShareProject}
+        {/* Filters */}
+        {projects.length > 0 && (
+          <div className="mb-6">
+            <ProjectFilters
+              search={searchQuery}
+              onSearchChange={setSearchQuery}
+              sortBy={sortBy}
+              sortOrder={sortOrder}
+              onSortChange={handleSortChange}
+              onClearFilters={handleClearFilters}
             />
-          ))}
-        </div>
-      )}      {/* Project Form Dialog */}
+          </div>
+        )}
+
+        {/* Project Cards or Empty State */}
+        {projects.length === 0 ? (
+          <div className="text-center py-16 bg-gradient-to-br from-slate-50 to-blue-50 rounded-2xl border border-slate-200/60">
+            <div className="max-w-md mx-auto">
+              <div className="text-slate-400 mb-6">
+                <FolderOpen className="mx-auto h-16 w-16" />
+              </div>
+              <h3 className="text-xl font-semibold text-slate-900 mb-2">No Projects Yet</h3>
+              <p className="text-slate-600 mb-6">Create your first project to start organizing your tasks and boost your productivity.</p>
+              <Button 
+                onClick={() => setIsFormOpen(true)}
+                size="lg"
+                className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-xl shadow-lg hover:shadow-xl transition-all duration-200 transform hover:scale-105"
+              >
+                <Plus className="h-5 w-5 mr-2" />
+                Create Your First Project
+              </Button>
+            </div>
+          </div>
+        ) : filteredAndSortedProjects.length === 0 ? (
+          <div className="text-center py-16 bg-gradient-to-br from-slate-50 to-blue-50 rounded-2xl border border-slate-200/60">
+            <div className="max-w-md mx-auto">
+              <div className="text-slate-400 mb-6">
+                <svg className="mx-auto h-16 w-16" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                </svg>
+              </div>
+              <h3 className="text-xl font-semibold text-slate-900 mb-2">No Projects Found</h3>
+              <p className="text-slate-600 mb-6">
+                {searchQuery ? `No projects match "${searchQuery}". Try adjusting your search.` : 'No projects match your current filters.'}
+              </p>
+              <Button 
+                onClick={handleClearFilters}
+                variant="outline"
+                size="lg"
+                className="border-slate-300 text-slate-700 hover:bg-slate-50 px-6 py-3 rounded-xl"
+              >
+                Clear Filters
+              </Button>
+            </div>
+          </div>
+        ) : (
+          <div className="space-y-4">
+            {filteredAndSortedProjects.map((project) => (
+              <ProjectCard
+                key={project.id}
+                project={project}
+                stats={projectStats[project.id]}
+                onEdit={handleEditProject}
+                onDelete={(project) => {
+                  // Don't allow delete if already deleting
+                  if (!isDeleting) {
+                    setDeleteDialog({ isOpen: true, project });
+                  }
+                }}
+                onViewTasks={handleViewTasks}
+                onViewStats={handleViewStats}
+                onShare={handleShareProject}
+              />
+            ))}
+          </div>
+        )}
+
+        {/* Project Form Dialog */}
       <ProjectForm
         isOpen={isFormOpen}
         onClose={() => {
@@ -604,18 +768,19 @@ const ProjectsPage: React.FC = () => {
         </Alert>
       )}
 
-      {/* Project Sharing Dialog */}
-      {sharingProject && (
-        <ProjectSharingDialog
-          isOpen={isSharingDialogOpen}
-          onClose={handleCloseSharingDialog}
-          project={sharingProject}
-          onInviteUser={handleInviteUser}
-          onRemoveMember={handleRemoveMember}
-          isInviting={isInvitingUser}
-          error={sharingError}
-        />
-      )}
+        {/* Project Sharing Dialog */}
+        {sharingProject && (
+          <ProjectSharingDialog
+            isOpen={isSharingDialogOpen}
+            onClose={handleCloseSharingDialog}
+            project={sharingProject}
+            onInviteUser={handleInviteUser}
+            onRemoveMember={handleRemoveMember}
+            isInviting={isInvitingUser}
+            error={sharingError}
+          />
+        )}
+      </div>
     </div>
   );
 };
