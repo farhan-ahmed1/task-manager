@@ -244,15 +244,28 @@ const TaskList: React.FC = () => {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center py-12">
-        <Loader2 className="h-8 w-8 animate-spin text-gray-500" />
-        <span className="ml-2 text-gray-500">Loading tasks...</span>
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50/30 to-slate-50">
+        <div className="flex flex-col items-center justify-center py-20">
+          <div className="bg-white/80 backdrop-blur-sm rounded-2xl p-8 border border-slate-200/60 shadow-lg">
+            <div className="flex flex-col items-center space-y-4">
+              <div className="relative">
+                <div className="h-12 w-12 rounded-full bg-blue-100 flex items-center justify-center">
+                  <Loader2 className="h-6 w-6 animate-spin text-blue-600" />
+                </div>
+              </div>
+              <div className="text-center">
+                <h3 className="font-semibold text-slate-900 mb-1">Loading your tasks</h3>
+                <p className="text-sm text-slate-600">Getting everything ready for you...</p>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
     );
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-8">
       {/* Error Alert */}
       {error && (
         <Alert variant="destructive">
@@ -271,21 +284,68 @@ const TaskList: React.FC = () => {
         </Alert>
       )}
 
-      {/* Header with Stats */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-        <div>
-          <h1 className="text-2xl font-bold text-gray-900">Tasks</h1>
-          <p className="text-sm text-gray-600">
-            {stats.total} total • {stats.completed} completed • 
-            {stats.inProgress} in progress • {stats.pending} pending
-            {stats.overdue > 0 && ` • ${stats.overdue} overdue`}
-          </p>
+      {/* Header with Enhanced Stats */}
+      <div className="bg-gradient-to-br from-slate-50 to-blue-50 rounded-2xl p-6 border border-slate-200/60">
+        <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6">
+          <div className="space-y-3">
+            <div className="flex items-center gap-3">
+              <div className="h-10 w-10 rounded-xl bg-blue-600 flex items-center justify-center">
+                <svg className="h-5 w-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+                </svg>
+              </div>
+              <div>
+                <h1 className="text-2xl font-bold text-slate-900">Task Management</h1>
+                <p className="text-slate-600">Stay organized and productive</p>
+              </div>
+            </div>
+            
+            {/* Enhanced Stats Cards */}
+            <div className="flex flex-wrap gap-3">
+              <div className="bg-white/80 backdrop-blur-sm rounded-lg px-3 py-2 border border-slate-200/60">
+                <div className="flex items-center gap-2">
+                  <div className="h-2 w-2 rounded-full bg-slate-400"></div>
+                  <span className="text-sm font-medium text-slate-700">{stats.total} Total</span>
+                </div>
+              </div>
+              <div className="bg-white/80 backdrop-blur-sm rounded-lg px-3 py-2 border border-slate-200/60">
+                <div className="flex items-center gap-2">
+                  <div className="h-2 w-2 rounded-full bg-green-500"></div>
+                  <span className="text-sm font-medium text-slate-700">{stats.completed} Completed</span>
+                </div>
+              </div>
+              <div className="bg-white/80 backdrop-blur-sm rounded-lg px-3 py-2 border border-slate-200/60">
+                <div className="flex items-center gap-2">
+                  <div className="h-2 w-2 rounded-full bg-blue-500"></div>
+                  <span className="text-sm font-medium text-slate-700">{stats.inProgress} In Progress</span>
+                </div>
+              </div>
+              <div className="bg-white/80 backdrop-blur-sm rounded-lg px-3 py-2 border border-slate-200/60">
+                <div className="flex items-center gap-2">
+                  <div className="h-2 w-2 rounded-full bg-amber-500"></div>
+                  <span className="text-sm font-medium text-slate-700">{stats.pending} Pending</span>
+                </div>
+              </div>
+              {stats.overdue > 0 && (
+                <div className="bg-red-50/80 backdrop-blur-sm rounded-lg px-3 py-2 border border-red-200/60">
+                  <div className="flex items-center gap-2">
+                    <div className="h-2 w-2 rounded-full bg-red-500 animate-pulse"></div>
+                    <span className="text-sm font-medium text-red-700">{stats.overdue} Overdue</span>
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
+          
+          <Button 
+            onClick={() => setShowTaskForm(true)}
+            size="lg"
+            className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-xl shadow-lg hover:shadow-xl transition-all duration-200 transform hover:scale-105"
+          >
+            <Plus className="h-5 w-5 mr-2" />
+            Create New Task
+          </Button>
         </div>
-        
-        <Button onClick={() => setShowTaskForm(true)}>
-          <Plus className="h-4 w-4 mr-2" />
-          New Task
-        </Button>
       </div>
 
       {/* Filters */}
@@ -304,32 +364,36 @@ const TaskList: React.FC = () => {
 
       {/* Task Grid */}
       {filteredAndSortedTasks.length === 0 ? (
-        <div className="text-center py-12 bg-gray-50 rounded-lg border">
+        <div className="text-center py-16 bg-gradient-to-br from-slate-50 to-blue-50 rounded-2xl border border-slate-200/60">
           <div className="max-w-md mx-auto">
-            <div className="text-gray-400 mb-4">
-              <svg className="mx-auto h-12 w-12" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+            <div className="text-slate-400 mb-6">
+              <svg className="mx-auto h-16 w-16" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" />
               </svg>
             </div>
-            <h3 className="text-lg font-medium text-gray-900 mb-2">
+            <h3 className="text-xl font-semibold text-slate-900 mb-3">
               {tasks.length === 0 ? 'No tasks yet' : 'No tasks match your filters'}
             </h3>
-            <p className="text-gray-600 mb-4">
+            <p className="text-slate-600 mb-6 leading-relaxed">
               {tasks.length === 0 
-                ? 'Get started by creating your first task.'
-                : 'Try adjusting your search or filter criteria.'
+                ? 'Ready to get productive? Create your first task and start organizing your work.'
+                : 'Try adjusting your search terms or filter criteria to find what you\'re looking for.'
               }
             </p>
             {tasks.length === 0 && (
-              <Button onClick={() => setShowTaskForm(true)}>
-                <Plus className="h-4 w-4 mr-2" />
+              <Button 
+                onClick={() => setShowTaskForm(true)}
+                size="lg"
+                className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-3 rounded-xl shadow-lg hover:shadow-xl transition-all duration-200 transform hover:scale-105"
+              >
+                <Plus className="h-5 w-5 mr-2" />
                 Create Your First Task
               </Button>
             )}
           </div>
         </div>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        <div className="space-y-4">
           {filteredAndSortedTasks.map((task) => (
             <TaskCard
               key={task.id}
