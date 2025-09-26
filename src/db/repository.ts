@@ -153,11 +153,32 @@ export const updateUserPassword = async (id: string, passwordHash: string): Prom
 };
 
 export const createProject = async (ownerId: string, name: string, description?: string) => {
-  const res = await pool.query(
-    `INSERT INTO projects (owner_id, name, description) VALUES ($1, $2, $3) RETURNING *`,
-    [ownerId, name, description],
-  );
-  return res.rows[0];
+  const client = await pool.connect();
+  try {
+    await client.query('BEGIN');
+
+    // Create the project
+    const projectRes = await client.query(
+      `INSERT INTO projects (owner_id, name, description) VALUES ($1, $2, $3) RETURNING *`,
+      [ownerId, name, description],
+    );
+    const project = projectRes.rows[0];
+
+    // Add the owner as an OWNER member with ACCEPTED status
+    await client.query(
+      `INSERT INTO project_members (project_id, user_id, role, invited_by, accepted_at, status)
+       VALUES ($1, $2, 'OWNER', $3, now(), 'ACCEPTED')`,
+      [project.id, ownerId, ownerId],
+    );
+
+    await client.query('COMMIT');
+    return project;
+  } catch (error) {
+    await client.query('ROLLBACK');
+    throw error;
+  } finally {
+    client.release();
+  }
 };
 
 export const getProjectsForOwner = async (ownerId: string) => {
