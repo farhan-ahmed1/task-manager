@@ -3,7 +3,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
-import { MoreHorizontal, Edit, Trash2, BarChart3, FolderOpen } from 'lucide-react';
+import { MoreHorizontal, Edit, Trash2, BarChart3, FolderOpen, Users } from 'lucide-react';
 import type { Project } from '@/types/api';
 import type { ProjectStats } from '@/services/projects';
 
@@ -14,6 +14,7 @@ interface ProjectCardProps {
   onDelete?: (project: Project) => void;
   onViewTasks?: (project: Project) => void;
   onViewStats?: (project: Project) => void;
+  onShare?: (project: Project) => void;
 }
 
 const ProjectCard: React.FC<ProjectCardProps> = ({
@@ -23,6 +24,7 @@ const ProjectCard: React.FC<ProjectCardProps> = ({
   onDelete,
   onViewTasks,
   onViewStats,
+  onShare,
 }) => {
   const totalTasks = stats ? stats.PENDING + stats.IN_PROGRESS + stats.COMPLETED : 0;
   const completedTasks = stats?.COMPLETED || 0;
@@ -72,6 +74,12 @@ const ProjectCard: React.FC<ProjectCardProps> = ({
                 <DropdownMenuItem onClick={() => onViewStats(project)}>
                   <BarChart3 className="h-4 w-4 mr-2" />
                   View Analytics
+                </DropdownMenuItem>
+              )}
+              {onShare && (
+                <DropdownMenuItem onClick={() => onShare(project)}>
+                  <Users className="h-4 w-4 mr-2" />
+                  Share Project
                 </DropdownMenuItem>
               )}
               <DropdownMenuSeparator />

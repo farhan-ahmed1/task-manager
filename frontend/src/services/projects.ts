@@ -58,6 +58,19 @@ class ProjectService {
         },
       });
 
+      // Handle rate limiting
+      if (response.status === 429) {
+        const retryAfter = response.headers.get('Retry-After');
+        return {
+          success: false,
+          error: new ProjectServiceError(
+            `Too many requests. ${retryAfter ? `Please wait ${retryAfter} seconds before trying again.` : 'Please try again later.'}`,
+            'RATE_LIMIT_EXCEEDED',
+            429
+          ),
+        };
+      }
+
       // Handle responses with no content (like DELETE 204)
       if (response.status === 204 || options.method === 'DELETE') {
         if (!response.ok) {
@@ -204,6 +217,95 @@ class ProjectService {
 
     return { success: true, data: result.data.data };
   }
+
+  /**
+   * Get project members
+   */
+  async getProjectMembers(projectId: string): Promise<Result<ProjectMember[]>> {
+    const result = await this.request<ApiResponse<ProjectMember[]>>(`/api/projects/${projectId}/members`);
+    
+    if (!result.success) {
+      return result;
+    }
+
+    return { success: true, data: result.data.data };
+  }
+
+  /**
+   * Invite user to project
+   */
+  async inviteUserToProject(
+    projectId: string, 
+    email: string, 
+    role: 'ADMIN' | 'MEMBER' | 'VIEWER' = 'MEMBER'
+  ): Promise<Result<ProjectInvitation>> {
+    const result = await this.request<ApiResponse<ProjectInvitation>>(`/api/projects/${projectId}/invite`, {
+      method: 'POST',
+      body: JSON.stringify({ email, role }),
+    });
+
+    if (!result.success) {
+      return result;
+    }
+
+    return { success: true, data: result.data.data };
+  }
+
+  /**
+   * Remove project member
+   */
+  async removeProjectMember(projectId: string, userId: string): Promise<Result<void>> {
+    const result = await this.request<void>(`/api/projects/${projectId}/members/${userId}`, {
+      method: 'DELETE',
+    });
+
+    if (!result.success) {
+      return result;
+    }
+
+    return { success: true, data: undefined };
+  }
+
+  /**
+   * Accept project invitation
+   */
+  async acceptProjectInvitation(token: string): Promise<Result<ProjectMember>> {
+    const result = await this.request<ApiResponse<ProjectMember>>(`/api/projects/accept-invitation/${token}`, {
+      method: 'POST',
+    });
+
+    if (!result.success) {
+      return result;
+    }
+
+    return { success: true, data: result.data.data };
+  }
+}
+
+// Types for project sharing
+export interface ProjectMember {
+  id: string;
+  project_id: string;
+  user_id: string;
+  role: 'OWNER' | 'ADMIN' | 'MEMBER' | 'VIEWER';
+  status: 'PENDING' | 'ACCEPTED' | 'DECLINED';
+  invited_by: string;
+  invited_at: string;
+  accepted_at?: string;
+  user_email?: string;
+  user_name?: string;
+}
+
+export interface ProjectInvitation {
+  id: string;
+  project_id: string;
+  email: string;
+  role: 'ADMIN' | 'MEMBER' | 'VIEWER';
+  token: string;
+  expires_at: string;
+  invited_by: string;
+  invited_by_name?: string;
+  project_name?: string;
 }
 
 // Export singleton instance

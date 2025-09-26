@@ -1,7 +1,7 @@
 import express, { Response, NextFunction } from 'express';
 import requireAuth, { AuthedRequest } from '../middleware/auth';
 import * as repo from '../db/repository';
-import { CreateProjectSchema, UpdateProjectSchema } from '../validation/project';
+import { CreateProjectSchema, UpdateProjectSchema, InviteUserSchema } from '../validation/project';
 import { ProjectNotFoundError } from '../utils/errors';
 
 const router = express.Router();
@@ -85,6 +85,85 @@ router.get(
       if (!project) throw new ProjectNotFoundError(id);
       const stats = await repo.getProjectStats(ownerId, id);
       res.json({ data: stats });
+    } catch (err) {
+      next(err);
+    }
+  },
+);
+
+// Project sharing endpoints
+
+// Get project members
+router.get(
+  '/:id/members',
+  requireAuth,
+  async (req: AuthedRequest, res: Response, next: NextFunction) => {
+    try {
+      const userId = req.userId!;
+      const { id } = req.params;
+      const members = await repo.getProjectMembers(userId, id);
+      res.json({ data: members });
+    } catch (err) {
+      next(err);
+    }
+  },
+);
+
+// Invite user to project
+router.post(
+  '/:id/invite',
+  requireAuth,
+  async (req: AuthedRequest, res: Response, next: NextFunction) => {
+    try {
+      const invitedBy = req.userId!;
+      const { id } = req.params;
+      const data = InviteUserSchema.parse(req.body);
+
+      const invitation = await repo.inviteUserToProject(invitedBy, id, data.email, data.role);
+      res.status(201).json({
+        data: invitation,
+        message: 'Invitation sent successfully',
+      });
+    } catch (err) {
+      next(err);
+    }
+  },
+);
+
+// Accept project invitation
+router.post(
+  '/accept-invitation/:token',
+  requireAuth,
+  async (req: AuthedRequest, res: Response, next: NextFunction) => {
+    try {
+      const userId = req.userId!;
+      const { token } = req.params;
+      const member = await repo.acceptProjectInvitation(token, userId);
+      res.json({
+        data: member,
+        message: 'Successfully joined project',
+      });
+    } catch (err) {
+      next(err);
+    }
+  },
+);
+
+// Remove project member
+router.delete(
+  '/:id/members/:userId',
+  requireAuth,
+  async (req: AuthedRequest, res: Response, next: NextFunction) => {
+    try {
+      const removedBy = req.userId!;
+      const { id, userId } = req.params;
+      const success = await repo.removeProjectMember(removedBy, id, userId);
+
+      if (success) {
+        res.status(204).send();
+      } else {
+        res.status(404).json({ error: 'Member not found or cannot be removed' });
+      }
     } catch (err) {
       next(err);
     }

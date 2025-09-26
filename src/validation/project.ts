@@ -10,5 +10,11 @@ export const UpdateProjectSchema = z.object({
   description: z.string().max(2000).optional(),
 });
 
+export const InviteUserSchema = z.object({
+  email: z.string().email(),
+  role: z.enum(['ADMIN', 'MEMBER', 'VIEWER']).optional().default('MEMBER'),
+});
+
 export type CreateProjectDto = z.infer<typeof CreateProjectSchema>;
 export type UpdateProjectDto = z.infer<typeof UpdateProjectSchema>;
+export type InviteUserDto = z.infer<typeof InviteUserSchema>;

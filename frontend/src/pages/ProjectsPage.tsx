@@ -3,7 +3,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardTitle } from '@/components/ui/card';
 import { Alert } from '@/components/ui/alert';
 import ConfirmDialog from '@/components/ui/ConfirmDialog';
-import { ProjectCard, ProjectForm, ProjectStats, ProjectTaskView } from '@/components/projects';
+import { ProjectCard, ProjectForm, ProjectStats, ProjectTaskView, ProjectSharingDialog } from '@/components/projects';
 import TaskForm from '@/components/tasks/TaskForm';
 import { Plus, AlertCircle, Loader2, BarChart3, FolderOpen } from 'lucide-react';
 import { useProjectStore, useTaskStore } from '@/store/useStore';
@@ -43,6 +43,12 @@ const ProjectsPage: React.FC = () => {
   });
   const [isDeleting, setIsDeleting] = useState(false);
   const [viewMode, setViewMode] = useState<ViewMode>('dashboard');
+
+  // Project sharing state
+  const [sharingProject, setSharingProject] = useState<Project | null>(null);
+  const [isSharingDialogOpen, setIsSharingDialogOpen] = useState(false);
+  const [isInvitingUser, setIsInvitingUser] = useState(false);
+  const [sharingError, setSharingError] = useState<string | null>(null);
 
   // Task management state
   const [isTaskFormOpen, setIsTaskFormOpen] = useState(false);
@@ -94,34 +100,55 @@ const ProjectsPage: React.FC = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []); // Empty dependency array - only run on mount (Zustand setters are stable)
 
-  // Load project stats when projects change
+  // Load project stats when projects change (debounced to prevent rapid API calls)
   useEffect(() => {
     if (projects.length > 0) {
-      const loadStats = async () => {
+      // Debounce the stats loading to prevent rapid successive calls
+      const timeoutId = setTimeout(async () => {
         try {
-          const statsPromises = projects.map(async (project) => {
-            const result = await projectService.getProjectStats(project.id);
-            return { projectId: project.id, stats: result.success ? result.data : null };
-          });
-
-          const statsResults = await Promise.all(statsPromises);
-          const statsMap: Record<string, ProjectStatsType> = {};
+          // Only load stats for projects we don't already have stats for
+          const projectsNeedingStats = projects.filter(project => !projectStats[project.id]);
           
-          statsResults.forEach(({ projectId, stats }) => {
-            if (stats) {
-              statsMap[projectId] = stats;
-            }
-          });
+          if (projectsNeedingStats.length === 0) {
+            return; // No new projects to load stats for
+          }
 
-          setProjectStats(statsMap);
+          // Limit concurrent requests to prevent rate limiting
+          const BATCH_SIZE = 5;
+          const newStatsMap: Record<string, ProjectStatsType> = { ...projectStats };
+          
+          for (let i = 0; i < projectsNeedingStats.length; i += BATCH_SIZE) {
+            const batch = projectsNeedingStats.slice(i, i + BATCH_SIZE);
+            
+            const statsPromises = batch.map(async (project) => {
+              const result = await projectService.getProjectStats(project.id);
+              return { projectId: project.id, stats: result.success ? result.data : null };
+            });
+
+            const batchResults = await Promise.all(statsPromises);
+            
+            batchResults.forEach(({ projectId, stats }) => {
+              if (stats) {
+                newStatsMap[projectId] = stats;
+              }
+            });
+
+            // Small delay between batches to be respectful to rate limits
+            if (i + BATCH_SIZE < projectsNeedingStats.length) {
+              await new Promise(resolve => setTimeout(resolve, 100));
+            }
+          }
+
+          setProjectStats(newStatsMap);
         } catch (err) {
           console.error('Failed to load project stats:', err);
         }
-      };
+      }, 300); // 300ms debounce
 
-      loadStats();
+      return () => clearTimeout(timeoutId);
     }
-  }, [projects]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [projects]); // projectStats intentionally excluded to prevent infinite loop
 
 
 
@@ -214,6 +241,53 @@ const ProjectsPage: React.FC = () => {
   const handleViewStats = (project: Project) => {
     setSelectedProject(project);
     setViewMode('stats');
+  };
+
+  const handleShareProject = (project: Project) => {
+    setSharingProject(project);
+    setSharingError(null);
+    setIsSharingDialogOpen(true);
+  };
+
+  const handleInviteUser = async (email: string, role: 'ADMIN' | 'MEMBER' | 'VIEWER') => {
+    if (!sharingProject) return;
+
+    setIsInvitingUser(true);
+    setSharingError(null);
+
+    try {
+      const result = await projectService.inviteUserToProject(sharingProject.id, email, role);
+      
+      if (!result.success) {
+        setSharingError(result.error.message);
+      }
+      // Success is handled by the dialog component
+    } catch {
+      setSharingError('Failed to invite user');
+    } finally {
+      setIsInvitingUser(false);
+    }
+  };
+
+  const handleRemoveMember = async (userId: string) => {
+    if (!sharingProject) return;
+
+    try {
+      const result = await projectService.removeProjectMember(sharingProject.id, userId);
+      
+      if (!result.success) {
+        setSharingError(result.error.message);
+      }
+      // Success is handled by the dialog component
+    } catch {
+      setSharingError('Failed to remove member');
+    }
+  };
+
+  const handleCloseSharingDialog = () => {
+    setIsSharingDialogOpen(false);
+    setSharingProject(null);
+    setSharingError(null);
   };
 
   const handleFormSubmit = async (data: CreateProjectRequest | UpdateProjectRequest) => {
@@ -476,6 +550,7 @@ const ProjectsPage: React.FC = () => {
               }}
               onViewTasks={handleViewTasks}
               onViewStats={handleViewStats}
+              onShare={handleShareProject}
             />
           ))}
         </div>
@@ -527,6 +602,19 @@ const ProjectsPage: React.FC = () => {
           <AlertCircle className="h-4 w-4" />
           <p>{taskFormError}</p>
         </Alert>
+      )}
+
+      {/* Project Sharing Dialog */}
+      {sharingProject && (
+        <ProjectSharingDialog
+          isOpen={isSharingDialogOpen}
+          onClose={handleCloseSharingDialog}
+          project={sharingProject}
+          onInviteUser={handleInviteUser}
+          onRemoveMember={handleRemoveMember}
+          isInviting={isInvitingUser}
+          error={sharingError}
+        />
       )}
     </div>
   );

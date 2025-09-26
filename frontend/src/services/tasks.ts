@@ -32,8 +32,28 @@ export type Result<T, E = TaskServiceError> =
   | { success: false; error: E };
 
 class TaskService {
+  private cache: { [key: string]: { data: unknown; timestamp: number } } = {};
+  private readonly CACHE_DURATION = 5000; // 5 seconds cache
+
   private getAuthToken(): string | null {
     return localStorage.getItem('authToken');
+  }
+
+  private getCacheKey(endpoint: string, params?: unknown): string {
+    return `${endpoint}_${params ? JSON.stringify(params) : ''}`;
+  }
+
+  private isValidCache(cacheEntry: { data: unknown; timestamp: number }): boolean {
+    return Date.now() - cacheEntry.timestamp < this.CACHE_DURATION;
+  }
+
+  private clearTasksCache(): void {
+    // Clear all cache entries that are related to task lists
+    Object.keys(this.cache).forEach(key => {
+      if (key.startsWith('/api/tasks')) {
+        delete this.cache[key];
+      }
+    });
   }
 
   private async request<T>(
@@ -51,6 +71,19 @@ class TaskService {
           ...options.headers,
         },
       });
+
+      // Handle rate limiting
+      if (response.status === 429) {
+        const retryAfter = response.headers.get('Retry-After');
+        return {
+          success: false,
+          error: new TaskServiceError(
+            `Too many requests. ${retryAfter ? `Please wait ${retryAfter} seconds before trying again.` : 'Please try again later.'}`,
+            'RATE_LIMIT_EXCEEDED',
+            429
+          ),
+        };
+      }
 
       if (!response.ok) {
         let errorData: ApiError;
@@ -128,7 +161,25 @@ class TaskService {
     const query = searchParams.toString();
     const endpoint = `/api/tasks${query ? `?${query}` : ''}`;
     
-    return this.request<Task[]>(endpoint);
+    // Check cache first
+    const cacheKey = this.getCacheKey(endpoint, filters);
+    const cachedEntry = this.cache[cacheKey];
+    
+    if (cachedEntry && this.isValidCache(cachedEntry)) {
+      return { success: true, data: cachedEntry.data as Task[] };
+    }
+    
+    const result = await this.request<Task[]>(endpoint);
+    
+    // Cache successful results
+    if (result.success) {
+      this.cache[cacheKey] = {
+        data: result.data,
+        timestamp: Date.now()
+      };
+    }
+    
+    return result;
   }
 
   async getTask(id: string): Promise<Result<Task>> {
@@ -136,23 +187,44 @@ class TaskService {
   }
 
   async createTask(taskData: CreateTaskRequest): Promise<Result<Task>> {
-    return this.request<Task>('/api/tasks', {
+    const result = await this.request<Task>('/api/tasks', {
       method: 'POST',
       body: JSON.stringify(taskData),
     });
+    
+    // Clear cache after successful creation
+    if (result.success) {
+      this.clearTasksCache();
+    }
+    
+    return result;
   }
 
   async updateTask(id: string, updates: UpdateTaskRequest): Promise<Result<Task>> {
-    return this.request<Task>(`/api/tasks/${id}`, {
+    const result = await this.request<Task>(`/api/tasks/${id}`, {
       method: 'PUT',
       body: JSON.stringify(updates),
     });
+    
+    // Clear cache after successful update
+    if (result.success) {
+      this.clearTasksCache();
+    }
+    
+    return result;
   }
 
   async deleteTask(id: string): Promise<Result<void>> {
-    return this.request<void>(`/api/tasks/${id}`, {
+    const result = await this.request<void>(`/api/tasks/${id}`, {
       method: 'DELETE',
     });
+    
+    // Clear cache after successful deletion
+    if (result.success) {
+      this.clearTasksCache();
+    }
+    
+    return result;
   }
 }
 

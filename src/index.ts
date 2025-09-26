@@ -17,7 +17,6 @@ import {
   generalRateLimit,
   authRateLimit,
   readRateLimit,
-  writeRateLimit,
   rateLimitHealthCheck,
 } from './middleware/rateLimiting';
 
@@ -76,8 +75,8 @@ setupSwagger(app);
 // Routes with specific rate limiting (disabled in test environment)
 if (process.env.NODE_ENV !== 'test') {
   app.use('/auth', authRateLimit, authRouter);
-  app.use('/api/tasks', readRateLimit, writeRateLimit, tasksRouter);
-  app.use('/api/projects', readRateLimit, writeRateLimit, projectsRouter);
+  app.use('/api/tasks', readRateLimit, tasksRouter);
+  app.use('/api/projects', readRateLimit, projectsRouter);
 } else {
   app.use('/auth', authRouter);
   app.use('/api/tasks', tasksRouter);
