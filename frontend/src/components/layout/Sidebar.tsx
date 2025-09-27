@@ -16,19 +16,13 @@ import {
   MoreHorizontal,
   Hash,
   ChevronDown,
-  ChevronRight
+  ChevronRight,
+  PanelLeftClose
 } from 'lucide-react';
 import { projectService } from '@/services/projects';
 import type { Project } from '@/types/api';
 
 const mainNavigation = [
-  { 
-    name: 'Add task', 
-    href: '/tasks/new', 
-    icon: Plus, 
-    isAction: true,
-    variant: 'primary' as const
-  },
   { 
     name: 'Search', 
     href: '/search', 
@@ -66,10 +60,11 @@ const mainNavigation = [
 interface SidebarProps {
   isOpen?: boolean;
   onClose?: () => void;
+  onToggle?: () => void;
   className?: string;
 }
 
-const Sidebar: React.FC<SidebarProps> = ({ onClose, className }) => {
+const Sidebar: React.FC<SidebarProps> = ({ onClose, onToggle, className }) => {
   const { user } = useAuth();
   const location = useLocation();
   const [projects, setProjects] = useState<Project[]>([]);
@@ -151,41 +146,68 @@ const Sidebar: React.FC<SidebarProps> = ({ onClose, className }) => {
       borderRight: '1px solid #DADCE0'
     }}>
 
+      {/* Workspace Header */}
+      <div className="p-4 pb-2" style={{ borderBottom: '1px solid #DADCE0' }}>
+        <div className="flex items-center justify-between">
+          <div className="flex items-center space-x-3">
+            <div>
+              <h2 className="text-sm font-semibold" style={{ color: '#202124' }}>
+                {user?.name?.split(' ')[0]}'s Workspace
+              </h2>
+            </div>
+          </div>
+          <button
+            onClick={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+              console.log('Toggle button clicked, onToggle:', onToggle);
+              if (onToggle) {
+                onToggle();
+              } else {
+                console.log('No onToggle function provided');
+              }
+            }}
+            className="p-1.5 rounded-md transition-colors hover:bg-gray-200 hover:bg-opacity-80"
+            style={{ color: '#5F6368' }}
+            title="Collapse sidebar"
+          >
+            <PanelLeftClose className="w-5 h-5" />
+          </button>
+        </div>
+      </div>
+
       {/* Main Navigation */}
       <div className="flex-1 overflow-y-auto">
-        <nav className="p-2 space-y-0.5">
+        <div className="p-4 pb-2">
+          {/* Add Task Button */}
+          <div 
+            className="w-full flex items-center justify-start h-11 px-4 font-medium text-sm cursor-pointer transition-all duration-150 mb-4"
+            style={{ 
+              backgroundColor: '#5A8DEF',
+              color: '#FFFFFF',
+              borderRadius: '8px',
+              boxShadow: '0 1px 2px rgba(0, 0, 0, 0.05)'
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.backgroundColor = '#4A7DE5';
+              e.currentTarget.style.boxShadow = '0 2px 4px rgba(0, 0, 0, 0.1)';
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.backgroundColor = '#5A8DEF';
+              e.currentTarget.style.boxShadow = '0 1px 2px rgba(0, 0, 0, 0.05)';
+            }}
+            onClick={() => setIsAddTaskModalOpen(true)}
+          >
+            <Plus className="w-4 h-4 mr-3" />
+            Add task
+          </div>
+        </div>
+        
+        <nav className="px-2 space-y-0.5">
           {mainNavigation.map((item) => {
             const Icon = item.icon;
             const isActive = isCurrentPath(item.href);
             
-            if (item.isAction) {
-              return (
-                <div key={item.name}>
-                  <div 
-                    className="w-full flex items-center justify-start h-10 px-4 font-medium text-sm mb-4 cursor-pointer transition-all duration-150"
-                    style={{ 
-                      backgroundColor: '#4285F4',
-                      color: '#FFFFFF',
-                      borderRadius: '8px',
-                      boxShadow: '0 1px 3px rgba(0, 0, 0, 0.1)'
-                    }}
-                    onMouseEnter={(e) => {
-                      e.currentTarget.style.backgroundColor = '#1A73E8';
-                      e.currentTarget.style.boxShadow = '0 2px 6px rgba(0, 0, 0, 0.15)';
-                    }}
-                    onMouseLeave={(e) => {
-                      e.currentTarget.style.backgroundColor = '#4285F4';
-                      e.currentTarget.style.boxShadow = '0 1px 3px rgba(0, 0, 0, 0.1)';
-                    }}
-                    onClick={() => setIsAddTaskModalOpen(true)}
-                  >
-                    <Icon className="w-4 h-4 mr-3" />
-                    {item.name}
-                  </div>
-                </div>
-              );
-            }
-
             return (
               <Link
                 key={item.name}

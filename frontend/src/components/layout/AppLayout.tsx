@@ -2,13 +2,13 @@ import React from 'react';
 import { Outlet, useLocation } from 'react-router-dom';
 import { useAuth } from '@/context/AuthContext';
 import { Button } from '@/components/ui/button';
-import { Menu, X } from 'lucide-react';
+import { Menu, X, PanelLeftClose } from 'lucide-react';
 import Sidebar from './Sidebar';
 
 const AppLayout: React.FC = () => {
   const { logout } = useAuth();
   const location = useLocation();
-  const [sidebarOpen, setSidebarOpen] = React.useState(false);
+  const [sidebarOpen, setSidebarOpen] = React.useState(true);
 
   const handleLogout = () => {
     logout();
@@ -32,7 +32,7 @@ const AppLayout: React.FC = () => {
             className="fixed inset-0 bg-gray-600 bg-opacity-75" 
             onClick={() => setSidebarOpen(false)} 
           />
-          <div className="relative flex-1 flex flex-col max-w-xs w-full">
+          <div className="relative flex-1 flex flex-col max-w-[304px] w-full">
             <div className="absolute top-0 right-0 -mr-12 pt-2">
               <button
                 type="button"
@@ -43,20 +43,44 @@ const AppLayout: React.FC = () => {
                 <X className="h-6 w-6 text-white" />
               </button>
             </div>
-            <Sidebar onClose={() => setSidebarOpen(false)} />
+            <Sidebar onClose={() => setSidebarOpen(false)} onToggle={() => setSidebarOpen(!sidebarOpen)} />
           </div>
         </div>
       )}
 
       {/* Desktop sidebar */}
-      <div className="hidden md:flex md:flex-shrink-0">
-        <div className="flex flex-col w-72">
-          <Sidebar />
+      <div className={`transition-all duration-500 ease-out ${sidebarOpen ? 'md:flex md:flex-shrink-0' : 'md:w-0 md:overflow-hidden'} hidden md:block`}>
+        <div className="flex flex-col w-[304px]">
+          <Sidebar onToggle={() => {
+            console.log('Toggle called from AppLayout, current state:', sidebarOpen);
+            setSidebarOpen(!sidebarOpen);
+          }} />
         </div>
       </div>
 
+      {/* Floating toggle button - visible when sidebar is collapsed */}
+      {!sidebarOpen && (
+        <div className="fixed top-4 left-4 z-40 hidden md:block animate-in fade-in duration-300">
+          <button
+            onClick={() => {
+              console.log('Floating toggle clicked');
+              setSidebarOpen(true);
+            }}
+            className="p-2 rounded-lg transition-all duration-200 hover:bg-gray-100 hover:bg-opacity-50 hover:scale-110 active:scale-95"
+            style={{ 
+              color: '#6B7280'
+            }}
+            title="Open sidebar"
+          >
+            <PanelLeftClose className="w-5 h-5" />
+          </button>
+        </div>
+      )}
+
       {/* Main content */}
-      <div className="flex flex-col w-0 flex-1 overflow-hidden">
+      <div className={`flex flex-col w-0 flex-1 overflow-hidden transition-all duration-500 ease-out ${
+        !sidebarOpen ? 'md:ml-16' : ''
+      }`}>
         {/* Mobile header */}
         <div className="md:hidden">
           <div className="flex items-center justify-between px-4 py-3" style={{ 
