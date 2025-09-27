@@ -9,6 +9,12 @@ import DashboardPage from '@/pages/DashboardPage';
 import TasksPage from '@/pages/TasksPage';
 import ProjectsPage from '@/pages/ProjectsPage';
 import ProfilePage from '@/pages/ProfilePage';
+import AddTaskPage from '@/pages/AddTaskPage';
+import TodayPage from '@/pages/TodayPage';
+import InboxPage from '@/pages/InboxPage';
+import UpcomingPage from '@/pages/UpcomingPage';
+import CompletedPage from '@/pages/CompletedPage';
+import SearchPage from '@/pages/SearchPage';
 
 // Import components
 import AppLayout from '@/components/layout/AppLayout';
@@ -29,10 +35,17 @@ function App() {
               <AppLayout />
             </ProtectedRoute>
           }>
-            <Route index element={<Navigate to="/dashboard" replace />} />
+            <Route index element={<Navigate to="/inbox" replace />} />
             <Route path="dashboard" element={<DashboardPage />} />
+            <Route path="search" element={<SearchPage />} />
+            <Route path="inbox" element={<InboxPage />} />
+            <Route path="today" element={<TodayPage />} />
+            <Route path="upcoming" element={<UpcomingPage />} />
+            <Route path="completed" element={<CompletedPage />} />
             <Route path="tasks" element={<TasksPage />} />
+            <Route path="tasks/new" element={<AddTaskPage />} />
             <Route path="projects" element={<ProjectsPage />} />
+            <Route path="projects/:id" element={<ProjectsPage />} />
             <Route path="profile" element={<ProfilePage />} />
           </Route>
           

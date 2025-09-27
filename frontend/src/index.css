@@ -2,26 +2,53 @@
 
 @layer base {
   :root {
+    /* Task Manager Design System */
+    --primary: #4285F4;
+    --primary-dark: #1A73E8;
+    --primary-light: #E3F2FD;
+    --success: #34A853;
+    --warning: #FF9800;
+    --error: #EA4335;
+    --info: #9C27B0;
+    --text-primary: #202124;
+    --text-secondary: #5F6368;
+    --text-muted: #9AA0A6;
+    --border: #DADCE0;
+    --border-light: #F1F3F4;
+    --background: #F8F9FA;
+    --background-off: #FAFBFC;
+    --surface: #FFFFFF;
+    --surface-hover: #F1F3F4;
+    --radius-sm: 4px;
+    --radius-md: 8px;
+    --radius-lg: 12px;
+    --spacing-xs: 4px;
+    --spacing-sm: 8px;
+    --spacing-md: 16px;
+    --spacing-lg: 24px;
+    --spacing-xl: 32px;
+    
+    /* Shadcn compatibility */
     --background: 0 0% 100%;
-    --foreground: 222.2 84% 4.9%;
+    --foreground: 210 11% 15%;
     --card: 0 0% 100%;
-    --card-foreground: 222.2 84% 4.9%;
+    --card-foreground: 210 11% 15%;
     --popover: 0 0% 100%;
-    --popover-foreground: 222.2 84% 4.9%;
-    --primary: 221.2 83.2% 53.3%;
-    --primary-foreground: 210 40% 98%;
-    --secondary: 210 40% 96%;
-    --secondary-foreground: 222.2 84% 4.9%;
-    --muted: 210 40% 96%;
-    --muted-foreground: 215.4 16.3% 46.9%;
-    --accent: 210 40% 96%;
-    --accent-foreground: 222.2 84% 4.9%;
-    --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 210 40% 98%;
-    --border: 214.3 31.8% 91.4%;
-    --input: 214.3 31.8% 91.4%;
-    --ring: 221.2 83.2% 53.3%;
-    --radius: 0.75rem;
+    --popover-foreground: 210 11% 15%;
+    --primary: 214 100% 59%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 220 14% 96%;
+    --secondary-foreground: 210 6% 21%;
+    --muted: 220 14% 96%;
+    --muted-foreground: 215 25% 27%;
+    --accent: 220 14% 96%;
+    --accent-foreground: 210 6% 21%;
+    --destructive: 4 90% 58%;
+    --destructive-foreground: 0 0% 100%;
+    --border: 220 13% 91%;
+    --input: 220 13% 91%;
+    --ring: 214 100% 59%;
+    --radius: 0.5rem;
   }
 
   .dark {
@@ -53,10 +80,12 @@
   }
   
   body {
-    background-color: hsl(var(--background));
-    color: hsl(var(--foreground));
-    font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
-    line-height: 1.5;
+    background-color: var(--background);
+    color: var(--text-primary);
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+    font-size: 14px;
+    font-weight: 400;
+    line-height: 1.43;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
   }
@@ -66,37 +95,200 @@
   }
 }
 
+/* Typography */
+.text-h1 {
+  font-size: 32px;
+  font-weight: 600;
+  line-height: 40px;
+}
+
+.text-h2 {
+  font-size: 24px;
+  font-weight: 600;
+  line-height: 32px;
+}
+
+.text-h3 {
+  font-size: 18px;
+  font-weight: 500;
+  line-height: 24px;
+}
+
+.text-body-large {
+  font-size: 16px;
+  font-weight: 400;
+  line-height: 24px;
+}
+
+.text-body {
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 20px;
+}
+
+.text-body-small {
+  font-size: 12px;
+  font-weight: 400;
+  line-height: 16px;
+}
+
+.text-caption {
+  font-size: 11px;
+  font-weight: 500;
+  line-height: 16px;
+}
+
 /* Enhanced focus states and interactions */
 input:focus-visible,
 button:focus-visible {
-  outline: 2px solid hsl(var(--ring));
-  outline-offset: 2px;
+  outline: none;
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px rgba(66, 133, 244, 0.1);
 }
 
 /* Smooth transitions for better UX */
 button,
 input,
-a {
+a,
+.transition-all {
   transition: all 0.15s ease-in-out;
 }
 
-/* Better card shadows */
-.shadow-sm {
-  box-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+/* Task Manager Card Styles */
+.tm-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: var(--spacing-md);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
 }
 
-.shadow-md {
-  box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+.tm-card:hover {
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  border-color: var(--primary);
 }
 
-/* Hover effects for interactive elements */
-a:hover {
-  opacity: 0.8;
+/* Button Styles */
+.tm-btn-primary {
+  background: var(--primary);
+  color: white;
+  padding: 12px 24px;
+  border-radius: var(--radius-md);
+  font-weight: 500;
+  border: none;
+  cursor: pointer;
+  transition: all 0.15s ease-in-out;
 }
 
-/* Form improvements */
-form {
-  position: relative;
+.tm-btn-primary:hover {
+  background: var(--primary-dark);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+}
+
+.tm-btn-secondary {
+  background: var(--surface);
+  color: var(--primary);
+  border: 1px solid var(--border);
+  padding: 12px 24px;
+  border-radius: var(--radius-md);
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.15s ease-in-out;
+}
+
+.tm-btn-secondary:hover {
+  background: var(--surface-hover);
+  border-color: var(--primary);
+}
+
+.tm-btn-ghost {
+  background: transparent;
+  color: var(--text-secondary);
+  padding: 12px 16px;
+  border-radius: 6px;
+  font-weight: 500;
+  border: none;
+  cursor: pointer;
+  transition: all 0.15s ease-in-out;
+}
+
+.tm-btn-ghost:hover {
+  background: var(--surface-hover);
+  color: var(--text-primary);
+}
+
+/* Priority Indicators */
+.priority-high {
+  color: var(--error);
+  border-left: 3px solid var(--error);
+}
+
+.priority-medium {
+  color: var(--warning);
+  border-left: 3px solid var(--warning);
+}
+
+.priority-low {
+  color: var(--success);
+  border-left: 3px solid var(--success);
+}
+
+.priority-none {
+  color: var(--text-muted);
+  border-left: 3px solid var(--text-muted);
+}
+
+/* Task States */
+.task-completed {
+  text-decoration: line-through;
+  color: var(--text-secondary);
+}
+
+.task-overdue {
+  background-color: rgba(234, 67, 53, 0.05);
+  border-left: 3px solid var(--error);
+}
+
+.task-due-today {
+  background-color: rgba(255, 152, 0, 0.05);
+  border-left: 3px solid var(--warning);
+}
+
+/* Form Inputs */
+.tm-input {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 12px 16px;
+  font-size: 14px;
+  color: var(--text-primary);
+  width: 100%;
+  transition: all 0.15s ease-in-out;
+}
+
+.tm-input:focus {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px rgba(66, 133, 244, 0.1);
+  outline: none;
+}
+
+.tm-input::placeholder {
+  color: var(--text-muted);
+}
+
+/* Progress Bar */
+.tm-progress {
+  background: var(--border-light);
+  height: 8px;
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.tm-progress-fill {
+  background: linear-gradient(90deg, var(--primary), var(--success));
+  height: 100%;
+  border-radius: 4px;
+  transition: width 0.3s ease-in-out;
 }
 
 /* Loading states */
