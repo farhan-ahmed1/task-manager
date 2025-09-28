@@ -1,5 +1,12 @@
 import pool from './pool';
-import { Task, CreateTaskDto, UpdateTaskDto } from '../../types/task';
+import {
+  Task,
+  CreateTaskDto,
+  UpdateTaskDto,
+  Section,
+  CreateSectionDto,
+  UpdateSectionDto,
+} from '../../types/task';
 // --- Task CRUD Operations ---
 
 export const createTask = async (userId: string, data: CreateTaskDto): Promise<Task> => {
@@ -10,12 +17,13 @@ export const createTask = async (userId: string, data: CreateTaskDto): Promise<T
     priority = 'MEDIUM',
     due_date = null,
     project_id = null,
+    section_id = null,
   } = data;
   const res = await pool.query(
-    `INSERT INTO tasks (project_id, title, description, status, priority, due_date, created_at, updated_at)
-     VALUES ($1, $2, $3, $4, $5, $6, now(), now())
+    `INSERT INTO tasks (project_id, section_id, title, description, status, priority, due_date, created_at, updated_at)
+     VALUES ($1, $2, $3, $4, $5, $6, $7, now(), now())
      RETURNING *`,
-    [project_id, title, description, status, priority, due_date],
+    [project_id, section_id, title, description, status, priority, due_date],
   );
   const task = res.rows[0];
   // Assign task to user
@@ -522,4 +530,108 @@ export const hasProjectAccess = async (
   }
 
   return { hasAccess: true, role: res.rows[0].role };
+};
+
+// --- Section CRUD Operations ---
+
+export const createSection = async (userId: string, data: CreateSectionDto): Promise<Section> => {
+  const { name, project_id = null } = data;
+  // Get next order index
+  const orderRes = await pool.query(
+    `SELECT COALESCE(MAX(order_index), -1) + 1 as next_order
+     FROM sections 
+     WHERE user_id = $1 AND ($2::uuid IS NULL OR project_id = $2)`,
+    [userId, project_id],
+  );
+  const nextOrder = orderRes.rows[0].next_order;
+  const res = await pool.query(
+    `INSERT INTO sections (user_id, project_id, name, order_index, created_at, updated_at)
+     VALUES ($1, $2, $3, $4, now(), now())
+     RETURNING *`,
+    [userId, project_id, name, nextOrder],
+  );
+  return res.rows[0];
+};
+
+export const getSections = async (userId: string, projectId?: string): Promise<Section[]> => {
+  const res = await pool.query(
+    `SELECT * FROM sections 
+     WHERE user_id = $1 AND ($2::uuid IS NULL OR project_id = $2)
+     ORDER BY order_index ASC, created_at ASC`,
+    [userId, projectId || null],
+  );
+  return res.rows;
+};
+
+export const getSectionById = async (
+  userId: string,
+  sectionId: string,
+): Promise<Section | null> => {
+  const res = await pool.query(
+    `SELECT * FROM sections 
+     WHERE id = $1 AND user_id = $2`,
+    [sectionId, userId],
+  );
+  return res.rows[0] || null;
+};
+
+export const updateSection = async (
+  userId: string,
+  sectionId: string,
+  updates: UpdateSectionDto,
+): Promise<Section | null> => {
+  // Build dynamic SET clause
+  const fields = [];
+  const values = [];
+  let idx = 1;
+
+  for (const [key, value] of Object.entries(updates)) {
+    if (value !== undefined) {
+      fields.push(`${key} = $${idx}`);
+      values.push(value);
+      idx++;
+    }
+  }
+
+  if (fields.length === 0) return null;
+
+  // Add updated_at
+  fields.push(`updated_at = $${idx}`);
+  values.push(new Date());
+  idx++;
+
+  // Add parameters for WHERE clause
+  values.push(sectionId); // section id
+  values.push(userId); // user id
+
+  const setClause = fields.join(', ');
+  const res = await pool.query(
+    `UPDATE sections SET ${setClause}
+     WHERE id = $${idx} AND user_id = $${idx + 1}
+     RETURNING *`,
+    values,
+  );
+  return res.rows[0] || null;
+};
+
+export const deleteSection = async (userId: string, sectionId: string): Promise<boolean> => {
+  // First, update tasks in this section to have no section_id
+  await pool.query(
+    `UPDATE tasks SET section_id = NULL, updated_at = now()
+     WHERE section_id = $1 AND id IN (
+       SELECT t.id FROM tasks t
+       JOIN task_assignments ta ON ta.task_id = t.id
+       WHERE ta.user_id = $2
+     )`,
+    [sectionId, userId],
+  );
+
+  // Then delete the section
+  const res = await pool.query(
+    `DELETE FROM sections 
+     WHERE id = $1 AND user_id = $2
+     RETURNING id`,
+    [sectionId, userId],
+  );
+  return res.rowCount > 0;
 };

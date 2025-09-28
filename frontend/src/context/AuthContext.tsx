@@ -31,20 +31,16 @@ const initialState: AuthState = {
 };
 
 const authReducer = (state: AuthState, action: AuthAction): AuthState => {
-  console.log('🟢 AuthReducer: Action dispatched:', action.type);
-  
   switch (action.type) {
     case 'LOGIN':
     case 'RESTORE_SESSION': {
-      const newState = {
+      return {
         ...state,
         user: action.payload.user,
         token: action.payload.token,
         isAuthenticated: true,
         isLoading: false,
       };
-      console.log('🟢 AuthReducer: New authenticated state:', { isAuthenticated: newState.isAuthenticated, userId: newState.user?.id });
-      return newState;
     }
     case 'LOGOUT':
       return {

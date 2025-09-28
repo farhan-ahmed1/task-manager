@@ -6,6 +6,7 @@ import compression from 'compression';
 import authRouter from './routes/auth';
 import tasksRouter from './routes/tasks';
 import projectsRouter from './routes/projects';
+import sectionsRouter from './routes/sections';
 import { setupSwagger } from './config/swagger';
 import {
   addRequestMetadata,
@@ -77,10 +78,12 @@ if (process.env.NODE_ENV !== 'test') {
   app.use('/auth', authRateLimit, authRouter);
   app.use('/api/tasks', readRateLimit, tasksRouter);
   app.use('/api/projects', readRateLimit, projectsRouter);
+  app.use('/api/sections', readRateLimit, sectionsRouter);
 } else {
   app.use('/auth', authRouter);
   app.use('/api/tasks', tasksRouter);
   app.use('/api/projects', projectsRouter);
+  app.use('/api/sections', sectionsRouter);
 }
 
 // Health check endpoint with comprehensive status

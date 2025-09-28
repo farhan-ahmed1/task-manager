@@ -13,6 +13,8 @@ interface InboxTaskItemProps {
   onToggleComplete: (task: Task) => void;
   onComment?: (task: Task) => void;
   onOptions?: (task: Task) => void;
+  showDescription?: boolean;
+  showDueDate?: boolean;
 }
 
 const InboxTaskItem: React.FC<InboxTaskItemProps> = ({
@@ -21,7 +23,9 @@ const InboxTaskItem: React.FC<InboxTaskItemProps> = ({
   onDateUpdate,
   onToggleComplete,
   onComment,
-  onOptions
+  onOptions,
+  showDescription = true,
+  showDueDate = true
 }) => {
   const [isHovered, setIsHovered] = useState(false);
   const [showDatePicker, setShowDatePicker] = useState(false);
@@ -159,7 +163,7 @@ const InboxTaskItem: React.FC<InboxTaskItemProps> = ({
           </h4>
           
           {/* Description - show first line only */}
-          {task.description && (
+          {showDescription && task.description && (
             <p 
               className={`text-xs mt-1 line-clamp-1 ${
                 isCompleted ? 'line-through opacity-60' : ''
@@ -174,7 +178,7 @@ const InboxTaskItem: React.FC<InboxTaskItemProps> = ({
           )}
           
           {/* Due date - only show if it exists */}
-          {task.due_date && (
+          {showDueDate && task.due_date && (
             <div className="mt-1">
               <span 
                 className={`text-xs px-2 py-0.5 rounded-md ${

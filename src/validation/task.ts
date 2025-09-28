@@ -9,6 +9,7 @@ export const CreateTaskSchema = z.object({
   priority: z.enum(['LOW', 'MEDIUM', 'HIGH']).optional(),
   due_date: z.coerce.date().optional(),
   project_id: z.string().uuid().optional(),
+  section_id: z.string().uuid().optional(),
 });
 
 export const UpdateTaskSchema = z.object({
@@ -18,6 +19,7 @@ export const UpdateTaskSchema = z.object({
   priority: z.enum(['LOW', 'MEDIUM', 'HIGH']).optional(),
   due_date: z.coerce.date().optional(),
   project_id: z.string().uuid().optional(),
+  section_id: z.string().uuid().optional(),
 });
 
 export type CreateTaskDto = z.infer<typeof CreateTaskSchema>;

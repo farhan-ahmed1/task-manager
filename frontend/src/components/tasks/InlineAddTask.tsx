@@ -5,12 +5,12 @@ import type { CreateTaskRequest, TaskPriority } from '@/types/api';
 
 interface InlineAddTaskProps {
   onSubmit: (task: CreateTaskRequest) => void;
-  placeholder?: string;
+  sectionId?: string; // Allow passing section ID for section-specific task creation
 }
 
 const InlineAddTask: React.FC<InlineAddTaskProps> = ({ 
-  onSubmit, 
-  placeholder = "Add a task..." 
+  onSubmit,
+  sectionId
 }) => {
   const [isExpanded, setIsExpanded] = useState(false);
   const [taskTitle, setTaskTitle] = useState('');
@@ -73,7 +73,8 @@ const InlineAddTask: React.FC<InlineAddTaskProps> = ({
         description: taskDescription.trim() || undefined,
         priority: priority || 'MEDIUM',
         due_date: dueDate || undefined,
-        status: 'PENDING'
+        status: 'PENDING',
+        section_id: sectionId // Include section ID if provided
       };
 
       await onSubmit(taskData);
@@ -88,6 +89,8 @@ const InlineAddTask: React.FC<InlineAddTaskProps> = ({
       setIsExpanded(false);
     } catch (error) {
       console.error('Failed to create task:', error);
+      // TODO: Show user-friendly error message (toast/notification)
+      alert('Failed to create task. Please check your connection and try again.');
     } finally {
       setIsLoading(false);
     }
@@ -135,24 +138,26 @@ const InlineAddTask: React.FC<InlineAddTaskProps> = ({
 
   if (!isExpanded) {
     return (
-      <div className="px-4 py-2">
+      <div className="px-4 py-2 ml-8">
         <button
           onClick={() => setIsExpanded(true)}
-          className="flex items-center w-full text-left py-2 px-3 rounded-lg transition-all duration-200 hover:bg-gray-50/40"
+          className="group flex items-center w-full text-left py-2 px-3 rounded-lg transition-all duration-200 hover:bg-gray-50/40"
           style={{ 
             backgroundColor: 'transparent',
             color: 'var(--text-muted)'
           }}
         >
-          <Plus className="w-4 h-4 mr-3 flex-shrink-0" />
-          <span className="text-sm">{placeholder}</span>
+          <div className="w-5 h-5 mr-3 flex-shrink-0 rounded-full border border-gray-300 flex items-center justify-center transition-all duration-200 group-hover:bg-blue-600 group-hover:border-blue-600">
+            <Plus className="w-3 h-3 transition-colors duration-200 group-hover:text-white" />
+          </div>
+          <span className="text-sm transition-colors duration-200 group-hover:text-blue-600">Add task</span>
         </button>
       </div>
     );
   }
 
   return (
-    <div ref={containerRef} className="px-4 py-3">
+    <div ref={containerRef} className="px-4 py-3 ml-8">
       <div 
         className={`transition-all duration-200 rounded-lg ${isExpanded ? 'bg-gray-50/40 border border-gray-200/60' : ''}`}
         onKeyDown={handleKeyDown}

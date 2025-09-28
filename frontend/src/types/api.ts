@@ -14,11 +14,23 @@ export interface User {
 export interface Task {
   id: string;
   project_id?: string;
+  section_id?: string;
   title: string;
   description?: string;
   status: TaskStatus;
   priority: TaskPriority;
   due_date?: string;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface Section {
+  id: string;
+  user_id: string;
+  project_id?: string;
+  name: string;
+  collapsed: boolean;
+  order_index: number;
   created_at: string;
   updated_at: string;
 }
@@ -39,6 +51,7 @@ export interface CreateTaskRequest {
   priority?: TaskPriority;
   due_date?: string;
   project_id?: string;
+  section_id?: string;
 }
 
 export interface UpdateTaskRequest {
@@ -48,6 +61,7 @@ export interface UpdateTaskRequest {
   priority?: TaskPriority;
   due_date?: string;
   project_id?: string;
+  section_id?: string;
 }
 
 export interface CreateProjectRequest {
@@ -58,6 +72,16 @@ export interface CreateProjectRequest {
 export interface UpdateProjectRequest {
   name?: string;
   description?: string;
+}
+
+export interface CreateSectionRequest {
+  name: string;
+}
+
+export interface UpdateSectionRequest {
+  name?: string;
+  collapsed?: boolean;
+  order_index?: number;
 }
 
 export interface LoginRequest {

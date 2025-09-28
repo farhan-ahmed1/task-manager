@@ -160,11 +160,8 @@ const Sidebar: React.FC<SidebarProps> = ({ onClose, onToggle, className }) => {
             onClick={(e) => {
               e.preventDefault();
               e.stopPropagation();
-              console.log('Toggle button clicked, onToggle:', onToggle);
               if (onToggle) {
                 onToggle();
-              } else {
-                console.log('No onToggle function provided');
               }
             }}
             className="p-1.5 rounded-md transition-colors hover:bg-gray-200 hover:bg-opacity-80"

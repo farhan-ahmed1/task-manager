@@ -52,7 +52,6 @@ const AppLayout: React.FC = () => {
       <div className={`transition-all duration-500 ease-out ${sidebarOpen ? 'md:flex md:flex-shrink-0' : 'md:w-0 md:overflow-hidden'} hidden md:block`}>
         <div className="flex flex-col w-[304px]">
           <Sidebar onToggle={() => {
-            console.log('Toggle called from AppLayout, current state:', sidebarOpen);
             setSidebarOpen(!sidebarOpen);
           }} />
         </div>
@@ -63,7 +62,6 @@ const AppLayout: React.FC = () => {
         <div className="fixed top-4 left-4 z-40 hidden md:block animate-in fade-in duration-300">
           <button
             onClick={() => {
-              console.log('Floating toggle clicked');
               setSidebarOpen(true);
             }}
             className="p-2 rounded-lg transition-all duration-200 hover:bg-gray-100 hover:bg-opacity-50 hover:scale-110 active:scale-95"
