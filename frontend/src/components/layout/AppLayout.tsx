@@ -24,7 +24,9 @@ const AppLayout: React.FC = () => {
   };
 
   return (
-    <div className="h-screen flex overflow-hidden" style={{ backgroundColor: 'var(--background-off)' }}>
+    <div className="h-screen flex overflow-hidden" style={{ 
+      backgroundColor: location.pathname === '/completed' ? '#ffffff' : 'var(--background-off)' 
+    }}>
       {/* Mobile sidebar overlay */}
       {sidebarOpen && (
         <div className="fixed inset-0 flex z-40 md:hidden">
@@ -148,7 +150,9 @@ const AppLayout: React.FC = () => {
         </header>
 
         {/* Page content */}
-        <main className="flex-1 relative overflow-y-auto focus:outline-none" style={{ backgroundColor: 'var(--background)' }}>
+        <main className="flex-1 relative overflow-y-auto focus:outline-none" style={{ 
+          backgroundColor: location.pathname === '/completed' ? '#ffffff' : 'var(--background)' 
+        }}>
           <div className="h-full">
             <Outlet />
           </div>
