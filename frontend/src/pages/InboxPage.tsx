@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/button';
 import InboxTaskItem from '@/components/tasks/InboxTaskItem';
 import InlineAddTask from '@/components/tasks/InlineAddTask';
 import AddTaskModal from '@/components/tasks/AddTaskModal';
-import TaskDetailDialog from '@/components/tasks/TaskDetailDialog';
+import TaskDetailsModal from '@/components/tasks/TaskDetailsModal';
 import DragOverlay from '@/components/tasks/DragOverlay';
 import DropIndicator from '@/components/tasks/DropIndicator';
 import SectionHeader from '@/components/tasks/SectionHeader';
@@ -189,7 +189,54 @@ const InboxPage: React.FC = () => {
     setShowTaskDetail(true);
   };
 
+  // Get all visible tasks for navigation
+  const getAllVisibleTasks = () => {
+    let allVisibleTasks: Task[] = [];
+    
+    // Add default tasks
+    allVisibleTasks = [...getDefaultTasks()];
+    
+    // Add tasks from each section
+    sections.forEach(section => {
+      if (!section.collapsed) {
+        allVisibleTasks = [...allVisibleTasks, ...getTasksForSection(section.id)];
+      }
+    });
+    
+    return allVisibleTasks;
+  };
 
+  // Handle task navigation in modal
+  const handlePreviousTask = () => {
+    if (!selectedTask) return;
+    
+    const visibleTasks = getAllVisibleTasks();
+    const currentIndex = visibleTasks.findIndex((t: Task) => t.id === selectedTask.id);
+    if (currentIndex > 0) {
+      setSelectedTask(visibleTasks[currentIndex - 1]);
+    }
+  };
+
+  const handleNextTask = () => {
+    if (!selectedTask) return;
+    
+    const visibleTasks = getAllVisibleTasks();
+    const currentIndex = visibleTasks.findIndex((t: Task) => t.id === selectedTask.id);
+    if (currentIndex < visibleTasks.length - 1) {
+      setSelectedTask(visibleTasks[currentIndex + 1]);
+    }
+  };
+
+  const getNavigationState = () => {
+    if (!selectedTask) return { hasPrevious: false, hasNext: false };
+    
+    const visibleTasks = getAllVisibleTasks();
+    const currentIndex = visibleTasks.findIndex((t: Task) => t.id === selectedTask.id);
+    return {
+      hasPrevious: currentIndex > 0,
+      hasNext: currentIndex < visibleTasks.length - 1
+    };
+  };
 
   const handleTaskDelete = async (taskId: string) => {
     try {
@@ -620,9 +667,9 @@ const InboxPage: React.FC = () => {
         />
 
         {selectedTask && (
-          <TaskDetailDialog
+          <TaskDetailsModal
             open={showTaskDetail}
-            onOpenChange={(open) => {
+            onOpenChange={(open: boolean) => {
               if (!open) {
                 setShowTaskDetail(false);
                 setSelectedTask(null);
@@ -631,6 +678,10 @@ const InboxPage: React.FC = () => {
             task={selectedTask}
             onEdit={handleEditTask}
             onDelete={() => handleTaskDelete(selectedTask.id)}
+            onPreviousTask={handlePreviousTask}
+            onNextTask={handleNextTask}
+            hasPreviousTask={getNavigationState().hasPrevious}
+            hasNextTask={getNavigationState().hasNext}
           />
         )}
         

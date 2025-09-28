@@ -5,7 +5,7 @@ import { Alert, AlertDescription } from '@/components/ui/alert';
 import TaskCard from './TaskCard';
 import TaskForm from './TaskForm';
 import TaskFilters from './TaskFilters';
-import TaskDetailDialog from './TaskDetailDialog';
+import TaskDetailsModal from './TaskDetailsModal';
 import ConfirmDialog from '../ui/ConfirmDialog';
 import { taskService, TaskServiceError } from '@/services/tasks';
 import { filterTasks, sortTasks, getTaskStats } from '@/lib/taskUtils';
@@ -223,6 +223,35 @@ const TaskList: React.FC = () => {
     setShowDetailDialog(true);
   };
 
+  // Handle task navigation in modal
+  const handlePreviousTask = () => {
+    if (!selectedTask) return;
+    
+    const currentIndex = filteredAndSortedTasks.findIndex((t: Task) => t.id === selectedTask.id);
+    if (currentIndex > 0) {
+      setSelectedTask(filteredAndSortedTasks[currentIndex - 1]);
+    }
+  };
+
+  const handleNextTask = () => {
+    if (!selectedTask) return;
+    
+    const currentIndex = filteredAndSortedTasks.findIndex((t: Task) => t.id === selectedTask.id);
+    if (currentIndex < filteredAndSortedTasks.length - 1) {
+      setSelectedTask(filteredAndSortedTasks[currentIndex + 1]);
+    }
+  };
+
+  const getNavigationState = () => {
+    if (!selectedTask) return { hasPrevious: false, hasNext: false };
+    
+    const currentIndex = filteredAndSortedTasks.findIndex((t: Task) => t.id === selectedTask.id);
+    return {
+      hasPrevious: currentIndex > 0,
+      hasNext: currentIndex < filteredAndSortedTasks.length - 1
+    };
+  };
+
   // Handle delete confirmation
   const handleDeleteClick = (task: Task) => {
     setTaskToDelete(task);
@@ -420,13 +449,17 @@ const TaskList: React.FC = () => {
         loading={formLoading}
       />
 
-      {/* Task Detail Dialog */}
-      <TaskDetailDialog
+      {/* Task Details Modal */}
+      <TaskDetailsModal
         task={selectedTask}
         open={showDetailDialog}
         onOpenChange={setShowDetailDialog}
         onEdit={handleEditTask}
         onDelete={handleDeleteClick}
+        onPreviousTask={handlePreviousTask}
+        onNextTask={handleNextTask}
+        hasPreviousTask={getNavigationState().hasPrevious}
+        hasNextTask={getNavigationState().hasNext}
       />
 
       {/* Delete Confirmation Dialog */}
