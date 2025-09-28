@@ -138,10 +138,10 @@ const InlineAddTask: React.FC<InlineAddTaskProps> = ({
 
   if (!isExpanded) {
     return (
-      <div className="px-4 py-2 ml-8">
+      <div className="px-4 py-1 ml-8">
         <button
           onClick={() => setIsExpanded(true)}
-          className="group flex items-center w-full text-left py-2 px-3 rounded-lg transition-all duration-200 hover:bg-gray-50/40"
+          className="group flex items-center w-full text-left py-1 px-2 rounded-lg transition-all duration-200 hover:bg-gray-50/40"
           style={{ 
             backgroundColor: 'transparent',
             color: 'var(--text-muted)'

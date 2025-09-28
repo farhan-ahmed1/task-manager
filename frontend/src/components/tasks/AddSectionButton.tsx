@@ -79,7 +79,7 @@ const AddSectionButton: React.FC<AddSectionButtonProps> = ({
   }
 
   return (
-    <div className={`py-4 ${className}`}>
+    <div className={`py-2 ${className}`}>
       <button
         onClick={() => setIsAdding(true)}
         disabled={disabled}

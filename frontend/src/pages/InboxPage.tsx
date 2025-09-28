@@ -511,8 +511,16 @@ const InboxPage: React.FC = () => {
                               </div>
                             ))}
                             
+                            {/* Separator line before add task */}
+                            {(() => {
+                              const defaultTasks = getDefaultTasks();
+                              return defaultTasks.length > 0 && (
+                                <hr className="border-0 h-px my-0 opacity-70" style={{ backgroundColor: 'var(--border-light)' }} />
+                              );
+                            })()}
+                            
                             {/* Inline add task for default inbox */}
-                            <div className="px-4 py-3">
+                            <div className="px-4 pt-3 pb-2">
                               <InlineAddTask 
                                 onSubmit={handleCreateTask}
                                 sectionId={undefined} // Default tasks have no section
@@ -565,8 +573,13 @@ const InboxPage: React.FC = () => {
                                 </div>
                               ))}
                               
+                              {/* Separator line before add task */}
+                              {sectionTasks.length > 0 && (
+                                <hr className="border-0 h-px my-0 opacity-70" style={{ backgroundColor: 'var(--border-light)' }} />
+                              )}
+                              
                               {/* Inline add task for this section */}
-                              <div className="px-4 py-3">
+                              <div className="px-4 pt-3 pb-2">
                                 <InlineAddTask 
                                   onSubmit={handleCreateTask}
                                   sectionId={section.id} // Pass section ID for section-specific tasks
