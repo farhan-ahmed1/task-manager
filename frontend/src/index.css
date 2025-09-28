@@ -156,7 +156,7 @@ a,
 
 /* Task Manager Card Styles */
 .tm-card {
-  background: var(--surface);
+  background: var(--background);
   border: 1px solid var(--border);
   border-radius: var(--radius-md);
   padding: var(--spacing-md);
@@ -346,6 +346,31 @@ a,
 .bg-pattern-dots {
   background-image: radial-gradient(rgba(148, 163, 184, 0.1) 1px, transparent 1px);
   background-size: 20px 20px;
+}
+
+/* Line clamp utilities */
+.line-clamp-1 {
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 1;
+  line-clamp: 1;
+}
+
+.line-clamp-2 {
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+}
+
+.line-clamp-3 {
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 3;
+  line-clamp: 3;
 }
 
 /* Enhanced hover transitions */
