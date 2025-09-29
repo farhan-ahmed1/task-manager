@@ -349,22 +349,6 @@ const ProjectHeader: React.FC<ProjectHeaderProps> = ({
         </div>
       </div>
 
-      {/* Project title section */}
-      <div className="px-6 py-6">
-        <div className="flex items-center gap-4">
-          <div className="flex-1">
-            <h1 className="text-2xl font-semibold text-gray-900 mb-1">
-              {project.name}
-            </h1>
-            {project.description && (
-              <p className="text-gray-600 text-sm">
-                {project.description}
-              </p>
-            )}
-          </div>
-        </div>
-      </div>
-
       {/* Bottom shadow divider */}
       <div className="h-px bg-gradient-to-r from-transparent via-gray-200 to-transparent" />
     </header>
