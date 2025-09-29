@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { FolderOpen } from 'lucide-react';
-import ProjectTasksLayout from '@/components/projects/ProjectTasksLayout';
 import ProjectHeader from '@/components/layout/ProjectHeader';
+import ProjectTasksLayout from '@/components/projects/ProjectTasksLayout';
+
 import { projectService } from '@/services/projects';
 import { useAuth } from '@/context/AuthContext';
 import type { Project } from '@/types/api';
@@ -78,6 +79,8 @@ const IndividualProjectPage: React.FC = () => {
     );
   }
 
+
+
   const handleEdit = () => {
     // TODO: Implement project editing
     console.log('Edit project:', project?.name);
@@ -103,10 +106,9 @@ const IndividualProjectPage: React.FC = () => {
         onShare={handleShare}
       />
       
-      {/* Project content using shared layout */}
+      {/* Project content with simplified individual project title */}
       <ProjectTasksLayout
         project={project}
-        icon={<FolderOpen className="w-5 h-5 mr-2" style={{ color: 'var(--primary)' }} />}
         title={project.name}
         emptyStateTitle="This project is empty"
         emptyStateDescription="Add your first task to start organizing work in this project."

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Plus, MessageCircle, MoreHorizontal, Edit2, Check, X } from 'lucide-react';
+import { Plus, Edit2, Check, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import InboxTaskItem from '@/components/tasks/InboxTaskItem';
 import InlineAddTask from '@/components/tasks/InlineAddTask';
@@ -8,8 +8,9 @@ import TaskDetailsModal from '@/components/tasks/TaskDetailsModal';
 import DragOverlay from '@/components/tasks/DragOverlay';
 import DropIndicator from '@/components/tasks/DropIndicator';
 import SectionHeader from '@/components/tasks/SectionHeader';
-import ViewOptionsMenu, { type ViewOptions } from '@/components/tasks/ViewOptionsMenu';
+
 import AddSectionButton from '@/components/tasks/AddSectionButton';
+import { type ViewOptions } from '@/components/tasks/ViewOptionsMenu';
 import { taskService } from '@/services/tasks';
 import { sectionService } from '@/services/sections';
 import { projectService } from '@/services/projects';
@@ -65,7 +66,11 @@ const ProjectTasksLayout: React.FC<ProjectTasksLayoutProps> = ({
   const [selectedTask, setSelectedTask] = useState<Task | null>(null);
   const [activeId, setActiveId] = useState<string | number | null>(null);
   const [overId, setOverId] = useState<string | number | null>(null);
-  const [viewOptions, setViewOptions] = useState<ViewOptions>({
+
+  const [selectedSectionId, setSelectedSectionId] = useState<string | null>(null);
+  const [isEditingTitle, setIsEditingTitle] = useState(false);
+  const [editingTitle, setEditingTitle] = useState(title);
+  const [viewOptions] = useState<ViewOptions>({
     showCompletedTasks: false,
     showDescriptions: true,
     showDueDates: true,
@@ -74,9 +79,6 @@ const ProjectTasksLayout: React.FC<ProjectTasksLayoutProps> = ({
     sortOrder: 'desc',
     layout: 'list'
   });
-  const [selectedSectionId, setSelectedSectionId] = useState<string | null>(null);
-  const [isEditingTitle, setIsEditingTitle] = useState(false);
-  const [editingTitle, setEditingTitle] = useState(title);
 
   // Update editing title when title prop changes
   useEffect(() => {
@@ -498,104 +500,65 @@ const ProjectTasksLayout: React.FC<ProjectTasksLayoutProps> = ({
 
   return (
     <div className="max-w-5xl mx-auto">
-      {/* Sticky header */}
+      {/* Simplified project header - just title */}
       <div 
-        className="sticky top-0 z-10 px-6 py-4 border-b backdrop-blur-sm"
+        className="px-6 py-8"
         style={{ 
-          backgroundColor: 'rgba(var(--background-rgb, 255, 255, 255), 0.95)',
-          borderColor: 'var(--border-subtle)',
-          height: '72px'
+          backgroundColor: 'var(--background)',
         }}
       >
-        <div className="flex items-center justify-between">
-          <div className="flex items-center">
-            {icon}
-            {project && isEditingTitle ? (
-              <div className="flex items-center space-x-2">
-                <input
-                  type="text"
-                  value={editingTitle}
-                  onChange={(e) => setEditingTitle(e.target.value)}
-                  className="text-h2 bg-transparent border-none outline-none focus:bg-white focus:border focus:border-blue-300 focus:rounded px-2 py-1"
-                  style={{ color: 'var(--text-primary)' }}
-                  onKeyDown={(e) => {
-                    if (e.key === 'Enter') {
-                      handleSaveTitle();
-                    } else if (e.key === 'Escape') {
-                      handleCancelEdit();
-                    }
-                  }}
-                  autoFocus
-                />
+        <div className="flex items-center">
+          {project && isEditingTitle ? (
+            <div className="flex items-center space-x-2">
+              <input
+                type="text"
+                value={editingTitle}
+                onChange={(e) => setEditingTitle(e.target.value)}
+                className="text-3xl font-semibold bg-transparent border-none outline-none focus:bg-white focus:border focus:border-blue-300 focus:rounded px-2 py-1"
+                style={{ color: 'var(--text-primary)' }}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter') {
+                    handleSaveTitle();
+                  } else if (e.key === 'Escape') {
+                    handleCancelEdit();
+                  }
+                }}
+                autoFocus
+              />
+              <Button
+                variant="ghost"
+                size="sm"
+                className="p-1 h-auto hover:bg-green-50"
+                onClick={handleSaveTitle}
+              >
+                <Check className="w-4 h-4 text-green-600" />
+              </Button>
+              <Button
+                variant="ghost"
+                size="sm"
+                className="p-1 h-auto hover:bg-red-50"
+                onClick={handleCancelEdit}
+              >
+                <X className="w-4 h-4 text-red-600" />
+              </Button>
+            </div>
+          ) : (
+            <div className="flex items-center group">
+              <h1 className="text-3xl font-semibold" style={{ color: 'var(--text-primary)' }}>
+                {title}
+              </h1>
+              {project && (
                 <Button
                   variant="ghost"
                   size="sm"
-                  className="p-1 h-auto hover:bg-green-50"
-                  onClick={handleSaveTitle}
+                  className="p-1 h-auto hover:bg-blue-50 opacity-0 group-hover:opacity-100 transition-opacity ml-2"
+                  onClick={() => setIsEditingTitle(true)}
                 >
-                  <Check className="w-4 h-4 text-green-600" />
+                  <Edit2 className="w-4 h-4" style={{ color: 'var(--text-muted)' }} />
                 </Button>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  className="p-1 h-auto hover:bg-red-50"
-                  onClick={handleCancelEdit}
-                >
-                  <X className="w-4 h-4 text-red-600" />
-                </Button>
-              </div>
-            ) : (
-              <div className="flex items-center group">
-                <h1 className="text-h2" style={{ color: 'var(--text-primary)' }}>
-                  {title}
-                </h1>
-                {project && (
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    className="p-1 h-auto hover:bg-blue-50 opacity-0 group-hover:opacity-100 transition-opacity ml-2"
-                    onClick={() => setIsEditingTitle(true)}
-                  >
-                    <Edit2 className="w-4 h-4" style={{ color: 'var(--text-muted)' }} />
-                  </Button>
-                )}
-              </div>
-            )}
-          </div>
-          
-          <div className="flex items-center space-x-2">
-            <ViewOptionsMenu
-              options={viewOptions}
-              onOptionsChange={setViewOptions}
-            />
-            <Button
-              variant="ghost"
-              size="sm"
-              className="p-2 h-auto hover:bg-blue-50"
-              title="Comments"
-              onClick={() => {}}
-            >
-              <MessageCircle className="w-4 h-4" style={{ color: 'var(--text-muted)' }} />
-            </Button>
-            <Button
-              variant="ghost"
-              size="sm"
-              className="p-2 h-auto hover:bg-blue-50"
-              title="Project options"
-              onClick={() => {}}
-            >
-              <MoreHorizontal className="w-4 h-4" style={{ color: 'var(--text-muted)' }} />
-            </Button>
-            <Button
-              onClick={() => setShowAddTaskModal(true)}
-              variant="ghost"
-              size="sm"
-              className="p-2 h-auto hover:bg-blue-50"
-              title="Add task"
-            >
-              <Plus className="w-4 h-4" style={{ color: 'var(--text-muted)' }} />
-            </Button>
-          </div>
+              )}
+            </div>
+          )}
         </div>
       </div>
       
