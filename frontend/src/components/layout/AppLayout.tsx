@@ -27,6 +27,8 @@ const AppLayout: React.FC = () => {
     return path.charAt(0).toUpperCase() + path.slice(1);
   };
 
+  const isProjectPage = location.pathname.startsWith('/projects/');
+
   return (
     <div className="h-screen flex overflow-hidden" style={{ 
       backgroundColor: 'var(--background)' 
@@ -127,30 +129,32 @@ const AppLayout: React.FC = () => {
           </div>
         </div>
 
-        {/* Desktop header */}
-        <header className="hidden md:block" style={{ 
-          backgroundColor: 'var(--background)',
-          borderBottom: '1px solid var(--border-subtle)'
-        }}>
-          <div className="px-6 py-8">
-            <div className="flex justify-between items-center">
-              <h1 className="text-h1" style={{ color: 'var(--text-primary)' }}>
-                {getPageTitle()}
-              </h1>
-              <button 
-                onClick={handleLogout}
-                className="py-2 px-4 text-sm hover:opacity-60"
-                style={{
-                  color: 'var(--text-secondary)',
-                  backgroundColor: 'transparent',
-                  border: 'none'
-                }}
-              >
-                Logout
-              </button>
+        {/* Desktop header - hidden for individual project pages */}
+        {!isProjectPage && (
+          <header className="hidden md:block" style={{ 
+            backgroundColor: 'var(--background)',
+            borderBottom: '1px solid var(--border-subtle)'
+          }}>
+            <div className="px-6 py-8">
+              <div className="flex justify-between items-center">
+                <h1 className="text-h1" style={{ color: 'var(--text-primary)' }}>
+                  {getPageTitle()}
+                </h1>
+                <button 
+                  onClick={handleLogout}
+                  className="py-2 px-4 text-sm hover:opacity-60"
+                  style={{
+                    color: 'var(--text-secondary)',
+                    backgroundColor: 'transparent',
+                    border: 'none'
+                  }}
+                >
+                  Logout
+                </button>
+              </div>
             </div>
-          </div>
-        </header>
+          </header>
+        )}
 
         {/* Page content */}
         <main className="flex-1 relative overflow-y-auto focus:outline-none" style={{ 

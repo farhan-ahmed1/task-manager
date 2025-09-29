@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { FolderOpen } from 'lucide-react';
 import ProjectTasksLayout from '@/components/projects/ProjectTasksLayout';
+import ProjectHeader from '@/components/layout/ProjectHeader';
 import { projectService } from '@/services/projects';
 import { useAuth } from '@/context/AuthContext';
 import type { Project } from '@/types/api';
@@ -77,8 +78,31 @@ const IndividualProjectPage: React.FC = () => {
     );
   }
 
+  const handleEdit = () => {
+    // TODO: Implement project editing
+    console.log('Edit project:', project?.name);
+  };
+
+  const handleDelete = () => {
+    // TODO: Implement project deletion
+    console.log('Delete project:', project?.name);
+  };
+
+  const handleShare = () => {
+    // TODO: Implement project sharing
+    console.log('Share project:', project?.name);
+  };
+
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50/30 to-slate-50">
+    <div className="min-h-screen" style={{ backgroundColor: 'var(--background)' }}>
+      {/* Project Header */}
+      <ProjectHeader 
+        project={project}
+        onEdit={handleEdit}
+        onDelete={handleDelete}
+        onShare={handleShare}
+      />
+      
       {/* Project content using shared layout */}
       <ProjectTasksLayout
         project={project}

@@ -502,9 +502,9 @@ const ProjectTasksLayout: React.FC<ProjectTasksLayoutProps> = ({
       <div 
         className="sticky top-0 z-10 px-6 py-4 border-b backdrop-blur-sm"
         style={{ 
-          backgroundColor: 'rgba(248, 249, 250, 0.95)',
-          borderColor: 'var(--border-light)',
-          height: '56px'
+          backgroundColor: 'rgba(var(--background-rgb, 255, 255, 255), 0.95)',
+          borderColor: 'var(--border-subtle)',
+          height: '72px'
         }}
       >
         <div className="flex items-center justify-between">
