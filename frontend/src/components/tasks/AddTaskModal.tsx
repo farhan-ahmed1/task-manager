@@ -1,8 +1,9 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { Calendar, Flag, MoreHorizontal, Bell, Inbox } from 'lucide-react';
+import { Calendar, Flag, MoreHorizontal, Bell, Inbox, FolderOpen, ChevronDown } from 'lucide-react';
 import DatePickerModal from '@/components/ui/DatePickerModal';
+import { projectService } from '@/services/projects';
 
-import type { CreateTaskRequest } from '@/types/api';
+import type { CreateTaskRequest, Project } from '@/types/api';
 
 interface AddTaskModalProps {
   isOpen: boolean;
@@ -24,9 +25,13 @@ const AddTaskModal: React.FC<AddTaskModalProps> = ({
   const [dueDate, setDueDate] = useState('');
   const [showDatePicker, setShowDatePicker] = useState(false);
   const [showPriorityPicker, setShowPriorityPicker] = useState(false);
+  const [showProjectPicker, setShowProjectPicker] = useState(false);
+  const [projects, setProjects] = useState<Project[]>([]);
+  const [projectsLoading, setProjectsLoading] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   
   const priorityPickerRef = useRef<HTMLDivElement>(null);
+  const projectPickerRef = useRef<HTMLDivElement>(null);
 
   // Handle click outside to close pickers
   useEffect(() => {
@@ -34,16 +39,40 @@ const AddTaskModal: React.FC<AddTaskModalProps> = ({
       if (priorityPickerRef.current && !priorityPickerRef.current.contains(event.target as Node)) {
         setShowPriorityPicker(false);
       }
+      if (projectPickerRef.current && !projectPickerRef.current.contains(event.target as Node)) {
+        setShowProjectPicker(false);
+      }
     };
 
-    if (showPriorityPicker) {
+    if (showPriorityPicker || showProjectPicker) {
       document.addEventListener('mousedown', handleClickOutside);
     }
 
     return () => {
       document.removeEventListener('mousedown', handleClickOutside);
     };
-  }, [showPriorityPicker]);
+  }, [showPriorityPicker, showProjectPicker]);
+
+  // Load projects when modal opens
+  useEffect(() => {
+    if (isOpen) {
+      const loadProjects = async () => {
+        setProjectsLoading(true);
+        try {
+          const result = await projectService.getProjects();
+          if (result.success) {
+            setProjects(result.data);
+          }
+        } catch (error) {
+          console.error('Failed to load projects:', error);
+        } finally {
+          setProjectsLoading(false);
+        }
+      };
+
+      loadProjects();
+    }
+  }, [isOpen]);
 
   const handleSubmit = async () => {
     if (!taskTitle.trim()) return;
@@ -69,6 +98,7 @@ const AddTaskModal: React.FC<AddTaskModalProps> = ({
       setDueDate('');
       setShowDatePicker(false);
       setShowPriorityPicker(false);
+      setShowProjectPicker(false);
       onClose();
     } catch (error) {
       console.error('Failed to create task:', error);
@@ -83,6 +113,8 @@ const AddTaskModal: React.FC<AddTaskModalProps> = ({
     } else if (e.key === 'Escape') {
       if (showPriorityPicker) {
         setShowPriorityPicker(false);
+      } else if (showProjectPicker) {
+        setShowProjectPicker(false);
       } else {
         onClose();
       }
@@ -114,6 +146,31 @@ const AddTaskModal: React.FC<AddTaskModalProps> = ({
 
   const handleDateSelection = (dateString: string) => {
     setDueDate(dateString);
+  };
+
+  const handleProjectSelection = (projectId: string | null) => {
+    setSelectedProjectId(projectId || '');
+    setShowProjectPicker(false);
+  };
+
+  const getSelectedProject = () => {
+    return projects.find(p => p.id === selectedProjectId);
+  };
+
+  const getProjectDisplayInfo = () => {
+    const selectedProject = getSelectedProject();
+    if (selectedProject) {
+      return {
+        name: selectedProject.name,
+        icon: FolderOpen,
+        color: '#4285F4' // Blue for projects
+      };
+    }
+    return {
+      name: 'Inbox',
+      icon: Inbox,
+      color: '#EA4335' // Red for inbox
+    };
   };
 
 
@@ -257,12 +314,83 @@ const AddTaskModal: React.FC<AddTaskModalProps> = ({
 
         {/* Footer */}
         <div className="flex items-center justify-between p-5 pt-4 border-t border-gray-100">
-          {/* Left: Inbox Selector */}
+          {/* Left: Project Selector */}
           <div className="flex items-center gap-2">
-            <button className="flex items-center gap-2 px-3 py-2 text-sm font-medium text-gray-600 hover:bg-gray-50 rounded-lg transition-colors">
-              <Inbox className="w-4 h-4" style={{ color: '#EA4335' }} />
-              <span>Inbox</span>
-            </button>
+            <div className="relative" ref={projectPickerRef}>
+              <button 
+                className="flex items-center gap-2 px-3 py-2 text-sm font-medium text-gray-600 hover:bg-gray-50 rounded-lg transition-colors"
+                onClick={() => setShowProjectPicker(!showProjectPicker)}
+                disabled={projectsLoading}
+              >
+                {React.createElement(getProjectDisplayInfo().icon, { 
+                  className: "w-4 h-4", 
+                  style: { color: getProjectDisplayInfo().color } 
+                })}
+                <span>{projectsLoading ? 'Loading...' : getProjectDisplayInfo().name}</span>
+                <ChevronDown className="w-3 h-3 text-gray-400" />
+              </button>
+
+              {/* Project Picker Dropdown */}
+              {showProjectPicker && (
+                <div className="absolute bottom-full left-0 mb-2 w-64 bg-white rounded-xl shadow-lg border border-gray-200 z-50 max-h-60 overflow-y-auto">
+                  <div className="p-2">
+                    {/* Inbox Option */}
+                    <button
+                      onClick={() => handleProjectSelection(null)}
+                      className="w-full flex items-center gap-3 px-3 py-2 text-sm hover:bg-gray-50 rounded-lg transition-colors text-left"
+                    >
+                      <Inbox className="w-4 h-4 text-red-500 flex-shrink-0" />
+                      <div className="flex-1 min-w-0">
+                        <span className="font-medium text-gray-900 block truncate">Inbox</span>
+                        <span className="text-xs text-gray-500">No project assigned</span>
+                      </div>
+                      {!selectedProjectId && (
+                        <div className="w-2 h-2 bg-blue-500 rounded-full flex-shrink-0" />
+                      )}
+                    </button>
+
+                    {/* Project Options */}
+                    {projects.length > 0 && (
+                      <>
+                        <div className="border-t border-gray-100 my-2" />
+                        <div className="space-y-1">
+                          {projects.map((project) => (
+                            <button
+                              key={project.id}
+                              onClick={() => handleProjectSelection(project.id)}
+                              className="w-full flex items-center gap-3 px-3 py-2 text-sm hover:bg-gray-50 rounded-lg transition-colors text-left"
+                            >
+                              <FolderOpen className="w-4 h-4 text-blue-500 flex-shrink-0" />
+                              <div className="flex-1 min-w-0">
+                                <span className="font-medium text-gray-900 block truncate">{project.name}</span>
+                                {project.description && (
+                                  <span className="text-xs text-gray-500 block truncate">{project.description}</span>
+                                )}
+                              </div>
+                              {selectedProjectId === project.id && (
+                                <div className="w-2 h-2 bg-blue-500 rounded-full flex-shrink-0" />
+                              )}
+                            </button>
+                          ))}
+                        </div>
+                      </>
+                    )}
+
+                    {/* No Projects State */}
+                    {projects.length === 0 && !projectsLoading && (
+                      <>
+                        <div className="border-t border-gray-100 my-2" />
+                        <div className="px-3 py-4 text-center">
+                          <FolderOpen className="w-8 h-8 text-gray-300 mx-auto mb-2" />
+                          <p className="text-sm text-gray-500 mb-1">No projects yet</p>
+                          <p className="text-xs text-gray-400">Create a project to organize your tasks</p>
+                        </div>
+                      </>
+                    )}
+                  </div>
+                </div>
+              )}
+            </div>
           </div>
 
           {/* Right: Action Buttons */}
