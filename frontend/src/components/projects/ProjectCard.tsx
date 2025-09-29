@@ -14,6 +14,7 @@ interface ProjectCardProps {
   onViewTasks?: (project: Project) => void;
   onViewStats?: (project: Project) => void;
   onShare?: (project: Project) => void;
+  onNavigateToProject?: (project: Project) => void;
 }
 
 const ProjectCard: React.FC<ProjectCardProps> = ({
@@ -24,6 +25,7 @@ const ProjectCard: React.FC<ProjectCardProps> = ({
   onViewTasks,
   onViewStats,
   onShare,
+  onNavigateToProject,
 }) => {
   const totalTasks = stats ? stats.PENDING + stats.IN_PROGRESS + stats.COMPLETED : 0;
   const completedTasks = stats?.COMPLETED || 0;
@@ -45,7 +47,10 @@ const ProjectCard: React.FC<ProjectCardProps> = ({
   };
 
   return (
-    <Card className="group hover:shadow-lg hover:shadow-slate-200/50 transition-all duration-300 cursor-pointer backdrop-blur-sm bg-white/90 hover:bg-white border-slate-200/60 hover:border-slate-300/60 transform hover:-translate-y-1 rounded-xl">
+    <Card 
+      className="group hover:shadow-lg hover:shadow-slate-200/50 transition-all duration-300 cursor-pointer backdrop-blur-sm bg-white/90 hover:bg-white border-slate-200/60 hover:border-slate-300/60 transform hover:-translate-y-1 rounded-xl"
+      onClick={() => onNavigateToProject?.(project)}
+    >
       <CardContent className="p-6">
         <div className="flex items-start gap-6">
           {/* Left Section - Project Info */}

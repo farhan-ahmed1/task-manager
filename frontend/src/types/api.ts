@@ -76,6 +76,7 @@ export interface UpdateProjectRequest {
 
 export interface CreateSectionRequest {
   name: string;
+  project_id?: string;
 }
 
 export interface UpdateSectionRequest {

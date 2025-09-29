@@ -65,16 +65,19 @@ app.use(
 
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 
-// Rate limiting (disabled in test environment)
-if (process.env.NODE_ENV !== 'test') {
+// Rate limiting (disabled in test environment or when explicitly disabled)
+const rateLimitingDisabled =
+  process.env.NODE_ENV === 'test' || process.env.DISABLE_RATE_LIMITING === 'true';
+
+if (!rateLimitingDisabled) {
   app.use(generalRateLimit);
 }
 
 // API Documentation
 setupSwagger(app);
 
-// Routes with specific rate limiting (disabled in test environment)
-if (process.env.NODE_ENV !== 'test') {
+// Routes with specific rate limiting (disabled in test environment or when explicitly disabled)
+if (!rateLimitingDisabled) {
   app.use('/auth', authRateLimit, authRouter);
   app.use('/api/tasks', readRateLimit, tasksRouter);
   app.use('/api/projects', readRateLimit, projectsRouter);

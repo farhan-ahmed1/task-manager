@@ -161,17 +161,35 @@ export const skipSuccessfulRequests = (req: Request, res: Response): boolean => 
   return false;
 };
 
+// Development skip function - completely bypasses rate limiting for local development
+export const skipInDevelopment = (req: Request): boolean => {
+  if (process.env.NODE_ENV === 'development') {
+    // Get the IP address
+    const forwarded = req.headers['x-forwarded-for'] as string;
+    const ip = forwarded ? forwarded.split(',')[0].trim() : req.connection.remoteAddress;
+    // Skip rate limiting for localhost/development IPs
+    if (ip === '127.0.0.1' || ip === '::1' || ip === '::ffff:127.0.0.1' || ip === 'localhost') {
+      return true;
+    }
+  }
+  return false;
+};
+
 // General API rate limiter
 export const generalRateLimit: RateLimitRequestHandler = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes
   max: (req: Request) => {
     const authReq = req as Request & { user?: { id: string } };
-    // Higher limits for authenticated users
+    // Much higher limits in development
+    if (process.env.NODE_ENV === 'development') {
+      return authReq.user?.id ? 10000 : 5000;
+    }
+    // Higher limits for authenticated users in production
     return authReq.user?.id ? 1000 : 100;
   },
   keyGenerator,
   handler: rateLimitHandler,
-  skip: skipSuccessfulRequests,
+  skip: (req, res) => skipInDevelopment(req) || skipSuccessfulRequests(req, res),
   standardHeaders: true,
   legacyHeaders: false,
   // store: redisClient ? new RedisStore(redisClient) : undefined, // Disabled for now, using memory store
@@ -198,9 +216,10 @@ export const authRateLimitHandler = (req: Request, res: Response): void => {
 // Strict rate limiter for authentication endpoints
 export const authRateLimit: RateLimitRequestHandler = rateLimit({
   windowMs: process.env.NODE_ENV === 'development' ? 1 * 60 * 1000 : 15 * 60 * 1000, // 1 minute in dev, 15 minutes in prod
-  max: process.env.NODE_ENV === 'development' ? 100 : 5, // 100 requests in dev, 5 in prod
+  max: process.env.NODE_ENV === 'development' ? 1000 : 5, // 1000 requests in dev, 5 in prod
   keyGenerator: authKeyGenerator,
   handler: authRateLimitHandler,
+  skip: skipInDevelopment,
   standardHeaders: true,
   legacyHeaders: false,
   // store: redisClient ? new RedisStore(redisClient, 'auth:') : undefined, // Disabled for now
@@ -211,11 +230,15 @@ export const readRateLimit: RateLimitRequestHandler = rateLimit({
   windowMs: 1 * 60 * 1000, // 1 minute
   max: (req: Request) => {
     const authReq = req as Request & { user?: { id: string } };
+    // Much higher limits in development
+    if (process.env.NODE_ENV === 'development') {
+      return authReq.user?.id ? 2000 : 1000;
+    }
     return authReq.user?.id ? 200 : 50;
   },
   keyGenerator,
   handler: rateLimitHandler,
-  skip: skipSuccessfulRequests,
+  skip: (req, res) => skipInDevelopment(req) || skipSuccessfulRequests(req, res),
   standardHeaders: true,
   legacyHeaders: false,
   // store: redisClient ? new RedisStore(redisClient, 'read:') : undefined, // Disabled for now

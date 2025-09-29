@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Alert } from '@/components/ui/alert';
 import ConfirmDialog from '@/components/ui/ConfirmDialog';
@@ -15,6 +16,7 @@ import type { CreateTaskFormData } from '@/validation/task';
 type ViewMode = 'dashboard' | 'stats' | 'tasks';
 
 const ProjectsPage: React.FC = () => {
+  const navigate = useNavigate();
   const {
     projects,
     selectedProject,
@@ -251,6 +253,10 @@ const ProjectsPage: React.FC = () => {
     setSharingProject(project);
     setSharingError(null);
     setIsSharingDialogOpen(true);
+  };
+
+  const handleNavigateToProject = (project: Project) => {
+    navigate(`/projects/${project.id}`);
   };
 
   const handleInviteUser = async (email: string, role: 'ADMIN' | 'MEMBER' | 'VIEWER') => {
@@ -713,6 +719,7 @@ const ProjectsPage: React.FC = () => {
                 onViewTasks={handleViewTasks}
                 onViewStats={handleViewStats}
                 onShare={handleShareProject}
+                onNavigateToProject={handleNavigateToProject}
               />
             ))}
           </div>

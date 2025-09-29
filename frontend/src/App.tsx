@@ -8,6 +8,7 @@ import RegisterPage from '@/pages/RegisterPage';
 import DashboardPage from '@/pages/DashboardPage';
 import TasksPage from '@/pages/TasksPage';
 import ProjectsPage from '@/pages/ProjectsPage';
+import IndividualProjectPage from '@/pages/IndividualProjectPage';
 import ProfilePage from '@/pages/ProfilePage';
 import AddTaskPage from '@/pages/AddTaskPage';
 import TodayPage from '@/pages/TodayPage';
@@ -45,7 +46,7 @@ function App() {
             <Route path="tasks" element={<TasksPage />} />
             <Route path="tasks/new" element={<AddTaskPage />} />
             <Route path="projects" element={<ProjectsPage />} />
-            <Route path="projects/:id" element={<ProjectsPage />} />
+            <Route path="projects/:projectId" element={<IndividualProjectPage />} />
             <Route path="profile" element={<ProfilePage />} />
           </Route>
           
