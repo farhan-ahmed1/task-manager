@@ -142,19 +142,17 @@ const Sidebar: React.FC<SidebarProps> = ({ onClose, onToggle, className }) => {
       "flex flex-col h-full",
       className
     )} style={{ 
-      backgroundColor: '#F8F9FA', 
-      borderRight: '1px solid #DADCE0'
+      backgroundColor: 'var(--background)', 
+      borderRight: '1px solid var(--border-subtle)'
     }}>
 
       {/* Workspace Header */}
-      <div className="p-4 pb-2" style={{ borderBottom: '1px solid #DADCE0' }}>
+      <div className="px-6 py-6">
         <div className="flex items-center justify-between">
-          <div className="flex items-center space-x-3">
-            <div>
-              <h2 className="text-sm font-semibold" style={{ color: '#202124' }}>
-                {user?.name?.split(' ')[0]}'s Workspace
-              </h2>
-            </div>
+          <div>
+            <h2 className="text-body font-medium" style={{ color: 'var(--text-primary)' }}>
+              {user?.name?.split(' ')[0]}'s workspace
+            </h2>
           </div>
           <button
             onClick={(e) => {
@@ -164,11 +162,11 @@ const Sidebar: React.FC<SidebarProps> = ({ onClose, onToggle, className }) => {
                 onToggle();
               }
             }}
-            className="p-1.5 rounded-md transition-colors hover:bg-gray-200 hover:bg-opacity-80"
-            style={{ color: '#5F6368' }}
+            className="p-2 hover:opacity-60"
+            style={{ color: 'var(--text-muted)' }}
             title="Collapse sidebar"
           >
-            <PanelLeftClose className="w-5 h-5" />
+            <PanelLeftClose className="w-4 h-4" />
           </button>
         </div>
       </div>
@@ -177,30 +175,16 @@ const Sidebar: React.FC<SidebarProps> = ({ onClose, onToggle, className }) => {
       <div className="flex-1 overflow-y-auto">
         <div className="p-4 pb-2">
           {/* Add Task Button */}
-          <div 
-            className="w-full flex items-center justify-start h-11 px-4 font-medium text-sm cursor-pointer transition-all duration-150 mb-4"
-            style={{ 
-              backgroundColor: '#5A8DEF',
-              color: '#FFFFFF',
-              borderRadius: '8px',
-              boxShadow: '0 1px 2px rgba(0, 0, 0, 0.05)'
-            }}
-            onMouseEnter={(e) => {
-              e.currentTarget.style.backgroundColor = '#4A7DE5';
-              e.currentTarget.style.boxShadow = '0 2px 4px rgba(0, 0, 0, 0.1)';
-            }}
-            onMouseLeave={(e) => {
-              e.currentTarget.style.backgroundColor = '#5A8DEF';
-              e.currentTarget.style.boxShadow = '0 1px 2px rgba(0, 0, 0, 0.05)';
-            }}
+          <button 
+            className="w-full flex items-center px-4 py-3 text-sm font-normal cursor-pointer hover:opacity-90 mb-8 bg-gray-900 text-white rounded-lg border-0"
             onClick={() => setIsAddTaskModalOpen(true)}
           >
             <Plus className="w-4 h-4 mr-3" />
             Add task
-          </div>
+          </button>
         </div>
         
-        <nav className="px-2 space-y-0.5">
+        <nav className="px-6 space-y-1">
           {mainNavigation.map((item) => {
             const Icon = item.icon;
             const isActive = isCurrentPath(item.href);
@@ -210,38 +194,22 @@ const Sidebar: React.FC<SidebarProps> = ({ onClose, onToggle, className }) => {
                 key={item.name}
                 to={item.href}
                 onClick={onClose}
-                className="flex items-center justify-between px-4 py-3 text-sm transition-all duration-150 group"
+                className="flex items-center justify-between py-2 text-sm group hover:opacity-60"
                 style={{
-                  borderRadius: 'var(--radius-sm)',
-                  backgroundColor: isActive ? 'var(--primary-light)' : 'transparent',
-                  color: isActive ? 'var(--primary-dark)' : 'var(--text-secondary)',
+                  color: isActive ? 'var(--text-primary)' : 'var(--text-secondary)',
                   fontWeight: isActive ? '500' : '400'
-                }}
-                onMouseEnter={(e) => {
-                  if (!isActive) {
-                    e.currentTarget.style.backgroundColor = 'var(--surface-hover)';
-                    e.currentTarget.style.color = 'var(--text-primary)';
-                  }
-                }}
-                onMouseLeave={(e) => {
-                  if (!isActive) {
-                    e.currentTarget.style.backgroundColor = 'transparent';
-                    e.currentTarget.style.color = 'var(--text-secondary)';
-                  }
                 }}
               >
                 <div className="flex items-center">
-                  <Icon className="w-4 h-4 mr-3 flex-shrink-0" style={{
-                    color: isActive ? 'var(--primary)' : 'var(--text-muted)'
+                  <Icon className="w-4 h-4 mr-4 flex-shrink-0" style={{
+                    color: isActive ? 'var(--text-primary)' : 'var(--text-muted)'
                   }} />
                   <span>{item.name}</span>
                 </div>
                 {item.count && (
-                  <span className="text-xs px-2 py-1 rounded-full text-center min-w-[1.5rem]" style={{
-                    backgroundColor: isActive ? 'var(--primary)' : 'var(--border-light)',
-                    color: isActive ? 'white' : 'var(--text-muted)',
-                    fontSize: '11px',
-                    fontWeight: '500'
+                  <span className="text-xs px-2 py-1 text-center min-w-[1.5rem]" style={{
+                    color: 'var(--text-muted)',
+                    fontSize: '12px'
                   }}>
                     {item.count}
                   </span>

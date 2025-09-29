@@ -20,12 +20,16 @@ const AppLayout: React.FC = () => {
     if (path === 'inbox') return 'Inbox';
     if (path === 'upcoming') return 'Upcoming';
     if (path === 'completed') return 'Completed';
+    if (path === 'tasks') return 'Tasks';
+    if (path === 'search') return 'Search';
+    if (path === 'projects') return 'Projects';
+    if (path.startsWith('projects/')) return 'Project';
     return path.charAt(0).toUpperCase() + path.slice(1);
   };
 
   return (
     <div className="h-screen flex overflow-hidden" style={{ 
-      backgroundColor: location.pathname === '/completed' ? '#ffffff' : 'var(--background-off)' 
+      backgroundColor: 'var(--background)' 
     }}>
       {/* Mobile sidebar overlay */}
       {sidebarOpen && (
@@ -125,33 +129,32 @@ const AppLayout: React.FC = () => {
 
         {/* Desktop header */}
         <header className="hidden md:block" style={{ 
-          backgroundColor: 'var(--surface)',
-          borderBottom: '1px solid var(--border)'
+          backgroundColor: 'var(--background)',
+          borderBottom: '1px solid var(--border-subtle)'
         }}>
-          <div className="px-6 py-5">
+          <div className="px-6 py-8">
             <div className="flex justify-between items-center">
-              <h1 className="text-h2" style={{ color: 'var(--text-primary)' }}>
+              <h1 className="text-h1" style={{ color: 'var(--text-primary)' }}>
                 {getPageTitle()}
               </h1>
-              <Button 
-                variant="outline" 
+              <button 
                 onClick={handleLogout}
-                className="tm-btn-secondary"
+                className="py-2 px-4 text-sm hover:opacity-60"
                 style={{
-                  padding: '8px 16px',
-                  fontSize: '14px',
-                  fontWeight: '500'
+                  color: 'var(--text-secondary)',
+                  backgroundColor: 'transparent',
+                  border: 'none'
                 }}
               >
                 Logout
-              </Button>
+              </button>
             </div>
           </div>
         </header>
 
         {/* Page content */}
         <main className="flex-1 relative overflow-y-auto focus:outline-none" style={{ 
-          backgroundColor: location.pathname === '/completed' ? '#ffffff' : 'var(--background)' 
+          backgroundColor: 'var(--background)' 
         }}>
           <div className="h-full">
             <Outlet />

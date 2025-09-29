@@ -2,31 +2,32 @@
 
 @layer base {
   :root {
-    /* Task Manager Design System */
-    --primary: #4285F4;
-    --primary-dark: #1A73E8;
-    --primary-light: #E3F2FD;
-    --success: #34A853;
-    --warning: #FF9800;
-    --error: #EA4335;
-    --info: #9C27B0;
-    --text-primary: #202124;
-    --text-secondary: #5F6368;
-    --text-muted: #9AA0A6;
-    --border: #DADCE0;
-    --border-light: #F1F3F4;
-    --background: #F8F9FA;
-    --background-off: #FAFBFC;
-    --surface: #FFFFFF;
-    --surface-hover: #F1F3F4;
-    --radius-sm: 4px;
-    --radius-md: 8px;
-    --radius-lg: 12px;
-    --spacing-xs: 4px;
-    --spacing-sm: 8px;
-    --spacing-md: 16px;
-    --spacing-lg: 24px;
-    --spacing-xl: 32px;
+    /* Task Manager Design System - Minimalist Approach */
+    --primary: #1a1a1a;
+    --primary-subtle: #f5f5f5;
+    --accent: #0066cc;
+    --success: #28a745;
+    --warning: #ffc107;
+    --error: #dc3545;
+    --text-primary: #1a1a1a;
+    --text-secondary: #6b7280;
+    --text-muted: #9ca3af;
+    --border: #e5e7eb;
+    --border-subtle: #f3f4f6;
+    --background: #ffffff;
+    --background-subtle: #fafafa;
+    --surface: #ffffff;
+    --surface-hover: rgba(0, 0, 0, 0.02);
+    --radius-sm: 2px;
+    --radius-md: 4px;
+    --radius-lg: 6px;
+    /* Generous spacing for breathing room */
+    --spacing-xs: 6px;
+    --spacing-sm: 12px;
+    --spacing-md: 24px;
+    --spacing-lg: 36px;
+    --spacing-xl: 48px;
+    --spacing-2xl: 64px;
     
     /* Shadcn compatibility */
     --background: 0 0% 100%;
@@ -82,10 +83,11 @@
   body {
     background-color: var(--background);
     color: var(--text-primary);
-    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
-    font-size: 14px;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    font-size: 15px;
     font-weight: 400;
-    line-height: 1.43;
+    line-height: 1.6;
+    letter-spacing: -0.01em;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
   }
@@ -95,110 +97,202 @@
   }
 }
 
-/* Typography */
+/* Minimalist Typography Scale - Hierarchy through Size and Spacing */
 .text-h1 {
-  font-size: 32px;
-  font-weight: 600;
-  line-height: 40px;
+  font-size: 28px;
+  font-weight: 500;
+  line-height: 1.3;
+  letter-spacing: -0.02em;
+  margin-bottom: var(--spacing-lg);
 }
 
 .text-h2 {
-  font-size: 24px;
-  font-weight: 600;
-  line-height: 32px;
+  font-size: 22px;
+  font-weight: 500;
+  line-height: 1.4;
+  letter-spacing: -0.01em;
+  margin-bottom: var(--spacing-md);
 }
 
 .text-h3 {
   font-size: 18px;
   font-weight: 500;
-  line-height: 24px;
+  line-height: 1.4;
+  margin-bottom: var(--spacing-sm);
 }
 
 .text-body-large {
   font-size: 16px;
   font-weight: 400;
-  line-height: 24px;
+  line-height: 1.6;
 }
 
 .text-body {
-  font-size: 14px;
+  font-size: 15px;
   font-weight: 400;
-  line-height: 20px;
+  line-height: 1.6;
 }
 
 .text-body-small {
-  font-size: 12px;
+  font-size: 13px;
   font-weight: 400;
-  line-height: 16px;
+  line-height: 1.5;
+  color: var(--text-secondary);
 }
 
 .text-caption {
-  font-size: 11px;
-  font-weight: 500;
-  line-height: 16px;
+  font-size: 12px;
+  font-weight: 400;
+  line-height: 1.4;
+  color: var(--text-muted);
 }
 
-/* Enhanced focus states and interactions */
+/* Subtle focus states - minimal but clear */
 input:focus-visible,
 button:focus-visible {
-  outline: none;
-  border-color: var(--primary);
-  box-shadow: 0 0 0 3px rgba(66, 133, 244, 0.1);
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
 }
 
-/* Smooth transitions for better UX */
-button,
-input,
-a,
-.transition-all {
-  transition: all 0.15s ease-in-out;
+/* Minimal transitions */
+* {
+  transition: opacity 0.2s ease;
 }
 
-/* Task Manager Card Styles */
+/* Clean card styles - rely on space and subtle borders */
 .tm-card {
-  background: var(--background);
-  border: 1px solid var(--border);
+  background: var(--surface);
+  border: 1px solid var(--border-subtle);
   border-radius: var(--radius-md);
-  padding: var(--spacing-md);
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+  padding: var(--spacing-lg);
 }
 
 .tm-card:hover {
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-  border-color: var(--primary);
+  border-color: var(--border);
 }
 
-/* Button Styles */
+/* Minimal button styles */
 .tm-btn-primary {
   background: var(--primary);
   color: white;
-  padding: 12px 24px;
+  padding: var(--spacing-sm) var(--spacing-md);
   border-radius: var(--radius-md);
-  font-weight: 500;
+  font-weight: 400;
   border: none;
   cursor: pointer;
-  transition: all 0.15s ease-in-out;
+  font-size: 15px;
 }
 
 .tm-btn-primary:hover {
-  background: var(--primary-dark);
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+  opacity: 0.9;
 }
 
 .tm-btn-secondary {
   background: var(--surface);
-  color: var(--primary);
+  color: var(--text-primary);
   border: 1px solid var(--border);
-  padding: 12px 24px;
+  padding: var(--spacing-sm) var(--spacing-md);
   border-radius: var(--radius-md);
-  font-weight: 500;
+  font-weight: 400;
   cursor: pointer;
-  transition: all 0.15s ease-in-out;
+  font-size: 15px;
 }
 
 .tm-btn-secondary:hover {
   background: var(--surface-hover);
-  border-color: var(--primary);
+}
+
+/* Minimalist utility classes */
+.minimal-border {
+  border: 1px solid var(--border-subtle);
+}
+
+.minimal-focus:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+.breathing-room {
+  padding: var(--spacing-lg);
+}
+
+.generous-spacing > * + * {
+  margin-top: var(--spacing-md);
+}
+
+.subtle-separator {
+  border-top: 1px solid var(--border-subtle);
+  padding-top: var(--spacing-md);
+  margin-top: var(--spacing-md);
+}
+
+/* Clean list styles */
+.minimal-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.minimal-list li {
+  padding: var(--spacing-sm) 0;
+  border-bottom: 1px solid var(--border-subtle);
+}
+
+.minimal-list li:last-child {
+  border-bottom: none;
+}
+
+/* Subtle hover states */
+.subtle-hover:hover {
+  opacity: 0.7;
+  transition: opacity 0.2s ease;
+}
+
+/* Clean form layouts */
+.form-group {
+  margin-bottom: var(--spacing-lg);
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: var(--spacing-xs);
+  font-size: 14px;
+  color: var(--text-secondary);
+}
+
+/* Minimal shadows for depth */
+.subtle-elevation {
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.02);
+}
+
+.subtle-elevation:hover {
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04);
+}
+
+/* Rounded corner utilities */
+.rounded-minimal {
+  border-radius: 4px;
+}
+
+.rounded-subtle {
+  border-radius: 8px;
+}
+
+.rounded-soft {
+  border-radius: 12px;
+}
+
+/* Modal and popup styling */
+.modal-overlay {
+  background: rgba(0, 0, 0, 0.4);
+  backdrop-filter: blur(4px);
+}
+
+.modal-content {
+  background: white;
+  border-radius: 12px;
+  border: 1px solid var(--border-subtle);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 }
 
 .tm-btn-ghost {
