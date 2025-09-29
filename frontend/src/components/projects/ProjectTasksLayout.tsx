@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Plus, MessageCircle, MoreHorizontal } from 'lucide-react';
+import { Plus, MessageCircle, MoreHorizontal, Edit2, Check, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import InboxTaskItem from '@/components/tasks/InboxTaskItem';
 import InlineAddTask from '@/components/tasks/InlineAddTask';
@@ -12,6 +12,7 @@ import ViewOptionsMenu, { type ViewOptions } from '@/components/tasks/ViewOption
 import AddSectionButton from '@/components/tasks/AddSectionButton';
 import { taskService } from '@/services/tasks';
 import { sectionService } from '@/services/sections';
+import { projectService } from '@/services/projects';
 import { useAuth } from '@/context/AuthContext';
 import {
   DndContext,
@@ -43,6 +44,7 @@ interface ProjectTasksLayoutProps {
   emptyStateTitle: string;
   emptyStateDescription: string;
   emptyButtonText: string;
+  onProjectUpdate?: (updatedProject: Project) => void;
 }
 
 const ProjectTasksLayout: React.FC<ProjectTasksLayoutProps> = ({
@@ -52,6 +54,7 @@ const ProjectTasksLayout: React.FC<ProjectTasksLayoutProps> = ({
   emptyStateTitle,
   emptyStateDescription, 
   emptyButtonText,
+  onProjectUpdate,
 }) => {
   const { isAuthenticated, token } = useAuth();
   const [tasks, setTasks] = useState<Task[]>([]);
@@ -72,6 +75,13 @@ const ProjectTasksLayout: React.FC<ProjectTasksLayoutProps> = ({
     layout: 'list'
   });
   const [selectedSectionId, setSelectedSectionId] = useState<string | null>(null);
+  const [isEditingTitle, setIsEditingTitle] = useState(false);
+  const [editingTitle, setEditingTitle] = useState(title);
+
+  // Update editing title when title prop changes
+  useEffect(() => {
+    setEditingTitle(title);
+  }, [title]);
 
   const sensors = useSensors(
     useSensor(PointerSensor),
@@ -280,6 +290,32 @@ const ProjectTasksLayout: React.FC<ProjectTasksLayoutProps> = ({
     // Placeholder for options menu
   };
 
+  // Title editing functions
+  const handleSaveTitle = async () => {
+    if (!project || !editingTitle.trim()) return;
+    
+    try {
+      const result = await projectService.updateProject(project.id, { name: editingTitle.trim() });
+      if (result.success) {
+        setIsEditingTitle(false);
+        // Call the callback to update the parent component
+        if (onProjectUpdate) {
+          onProjectUpdate(result.data);
+        }
+      } else {
+        alert('Failed to update project name: ' + result.error.message);
+      }
+    } catch (error) {
+      console.error('Error updating project name:', error);
+      alert('Failed to update project name. Please try again.');
+    }
+  };
+
+  const handleCancelEdit = () => {
+    setEditingTitle(title);
+    setIsEditingTitle(false);
+  };
+
   // Section management functions
   const handleAddSection = async (name: string) => {
     try {
@@ -474,9 +510,57 @@ const ProjectTasksLayout: React.FC<ProjectTasksLayoutProps> = ({
         <div className="flex items-center justify-between">
           <div className="flex items-center">
             {icon}
-            <h1 className="text-h2" style={{ color: 'var(--text-primary)' }}>
-              {title}
-            </h1>
+            {project && isEditingTitle ? (
+              <div className="flex items-center space-x-2">
+                <input
+                  type="text"
+                  value={editingTitle}
+                  onChange={(e) => setEditingTitle(e.target.value)}
+                  className="text-h2 bg-transparent border-none outline-none focus:bg-white focus:border focus:border-blue-300 focus:rounded px-2 py-1"
+                  style={{ color: 'var(--text-primary)' }}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter') {
+                      handleSaveTitle();
+                    } else if (e.key === 'Escape') {
+                      handleCancelEdit();
+                    }
+                  }}
+                  autoFocus
+                />
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="p-1 h-auto hover:bg-green-50"
+                  onClick={handleSaveTitle}
+                >
+                  <Check className="w-4 h-4 text-green-600" />
+                </Button>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="p-1 h-auto hover:bg-red-50"
+                  onClick={handleCancelEdit}
+                >
+                  <X className="w-4 h-4 text-red-600" />
+                </Button>
+              </div>
+            ) : (
+              <div className="flex items-center group">
+                <h1 className="text-h2" style={{ color: 'var(--text-primary)' }}>
+                  {title}
+                </h1>
+                {project && (
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="p-1 h-auto hover:bg-blue-50 opacity-0 group-hover:opacity-100 transition-opacity ml-2"
+                    onClick={() => setIsEditingTitle(true)}
+                  >
+                    <Edit2 className="w-4 h-4" style={{ color: 'var(--text-muted)' }} />
+                  </Button>
+                )}
+              </div>
+            )}
           </div>
           
           <div className="flex items-center space-x-2">

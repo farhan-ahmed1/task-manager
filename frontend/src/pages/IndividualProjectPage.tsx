@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { ArrowLeft, FolderOpen } from 'lucide-react';
-import { Button } from '@/components/ui/button';
+import { FolderOpen } from 'lucide-react';
 import ProjectTasksLayout from '@/components/projects/ProjectTasksLayout';
 import { projectService } from '@/services/projects';
 import { useAuth } from '@/context/AuthContext';
@@ -67,13 +66,12 @@ const IndividualProjectPage: React.FC = () => {
           <p className="text-body mb-4" style={{ color: 'var(--text-muted)' }}>
             {error || 'The project you are looking for does not exist or you do not have access to it.'}
           </p>
-          <Button 
+          <button 
             onClick={() => navigate('/projects')}
-            className="tm-btn-primary"
+            className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg transition-colors"
           >
-            <ArrowLeft className="w-4 h-4 mr-2" />
             Back to Projects
-          </Button>
+          </button>
         </div>
       </div>
     );
@@ -81,30 +79,6 @@ const IndividualProjectPage: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50/30 to-slate-50">
-      {/* Back button header */}
-      <div className="bg-white border-b border-slate-200/60 px-6 py-4">
-        <div className="max-w-5xl mx-auto">
-          <div className="flex items-center space-x-4">
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => navigate('/projects')}
-              className="text-slate-600 hover:text-slate-900"
-            >
-              <ArrowLeft className="h-4 w-4 mr-2" />
-              Back to Projects
-            </Button>
-            <div className="h-4 w-px bg-slate-300" />
-            <div>
-              <h1 className="text-lg font-semibold text-slate-900">{project.name}</h1>
-              {project.description && (
-                <p className="text-sm text-slate-600">{project.description}</p>
-              )}
-            </div>
-          </div>
-        </div>
-      </div>
-
       {/* Project content using shared layout */}
       <ProjectTasksLayout
         project={project}
@@ -113,6 +87,7 @@ const IndividualProjectPage: React.FC = () => {
         emptyStateTitle="This project is empty"
         emptyStateDescription="Add your first task to start organizing work in this project."
         emptyButtonText="Add your first task"
+        onProjectUpdate={(updatedProject) => setProject(updatedProject)}
       />
     </div>
   );
