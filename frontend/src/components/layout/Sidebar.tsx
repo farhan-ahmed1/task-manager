@@ -148,7 +148,7 @@ const Sidebar: React.FC<SidebarProps> = ({ onClose, onToggle, className }) => {
       "flex flex-col h-full",
       className
     )} style={{ 
-      backgroundColor: 'var(--background)', 
+      backgroundColor: '#fafbff',
       borderRight: '1px solid var(--border-subtle)'
     }}>
 
@@ -287,13 +287,13 @@ const Sidebar: React.FC<SidebarProps> = ({ onClose, onToggle, className }) => {
                       className="flex items-center justify-between px-4 py-2 text-sm transition-all duration-150 group ml-2"
                       style={{
                         borderRadius: 'var(--radius-sm)',
-                        backgroundColor: isActive ? 'var(--primary-light)' : 'transparent',
-                        color: isActive ? 'var(--primary-dark)' : 'var(--text-secondary)',
+                        backgroundColor: isActive ? 'rgba(59, 130, 246, 0.08)' : 'transparent',
+                        color: isActive ? 'var(--text-primary)' : 'var(--text-secondary)',
                         fontWeight: isActive ? '500' : '400'
                       }}
                       onMouseEnter={(e) => {
                         if (!isActive) {
-                          e.currentTarget.style.backgroundColor = 'var(--surface-hover)';
+                          e.currentTarget.style.backgroundColor = 'rgba(0, 0, 0, 0.03)';
                           e.currentTarget.style.color = 'var(--text-primary)';
                           e.currentTarget.style.paddingLeft = '20px';
                         }
@@ -313,8 +313,8 @@ const Sidebar: React.FC<SidebarProps> = ({ onClose, onToggle, className }) => {
                         <span className="truncate">{project.name}</span>
                       </div>
                       <span className="text-xs px-2 py-1 rounded-full text-center min-w-[1.5rem]" style={{
-                        backgroundColor: isActive ? 'var(--primary)' : 'var(--border-light)',
-                        color: isActive ? 'white' : 'var(--text-muted)',
+                        backgroundColor: isActive ? 'rgba(59, 130, 246, 0.15)' : 'rgba(0, 0, 0, 0.05)',
+                        color: isActive ? 'var(--text-primary)' : 'var(--text-muted)',
                         fontSize: '11px',
                         fontWeight: '500'
                       }}>
@@ -371,13 +371,13 @@ const Sidebar: React.FC<SidebarProps> = ({ onClose, onToggle, className }) => {
                       className="flex items-center justify-between px-4 py-2 text-sm transition-all duration-150 group ml-2"
                       style={{
                         borderRadius: 'var(--radius-sm)',
-                        backgroundColor: isActive ? 'var(--primary-light)' : 'transparent',
-                        color: isActive ? 'var(--primary-dark)' : 'var(--text-secondary)',
+                        backgroundColor: isActive ? 'rgba(59, 130, 246, 0.08)' : 'transparent',
+                        color: isActive ? 'var(--text-primary)' : 'var(--text-secondary)',
                         fontWeight: isActive ? '500' : '400'
                       }}
                       onMouseEnter={(e) => {
                         if (!isActive) {
-                          e.currentTarget.style.backgroundColor = 'var(--surface-hover)';
+                          e.currentTarget.style.backgroundColor = 'rgba(0, 0, 0, 0.03)';
                           e.currentTarget.style.color = 'var(--text-primary)';
                           e.currentTarget.style.paddingLeft = '20px';
                         }
@@ -397,8 +397,8 @@ const Sidebar: React.FC<SidebarProps> = ({ onClose, onToggle, className }) => {
                         <span className="truncate">{project.name}</span>
                       </div>
                       <span className="text-xs px-2 py-1 rounded-full text-center min-w-[1.5rem]" style={{
-                        backgroundColor: isActive ? 'var(--primary)' : 'var(--border-light)',
-                        color: isActive ? 'white' : 'var(--text-muted)',
+                        backgroundColor: isActive ? 'rgba(59, 130, 246, 0.15)' : 'rgba(0, 0, 0, 0.05)',
+                        color: isActive ? 'var(--text-primary)' : 'var(--text-muted)',
                         fontSize: '11px',
                         fontWeight: '500'
                       }}>
