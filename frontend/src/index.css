@@ -2,26 +2,61 @@
 
 @layer base {
   :root {
-    /* Task Manager Design System - Minimalist Approach */
-    --primary: #1a1a1a;
-    --primary-subtle: #f5f5f5;
-    --accent: #0066cc;
-    --success: #28a745;
-    --warning: #ffc107;
-    --error: #dc3545;
-    --text-primary: #1a1a1a;
-    --text-secondary: #6b7280;
-    --text-muted: #9ca3af;
-    --border: #e5e7eb;
-    --border-subtle: #f3f4f6;
-    --background: #ffffff;
-    --background-subtle: #fafafa;
-    --surface: #ffffff;
-    --surface-hover: rgba(0, 0, 0, 0.02);
-    --radius-sm: 2px;
-    --radius-md: 4px;
-    --radius-lg: 6px;
-    /* Generous spacing for breathing room */
+    /* Enhanced Slate Blue Design System - Professional & Sophisticated */
+    
+    /* Primary Colors - Refined Blue */
+    --primary: #2563EB;           /* Vibrant Blue (slightly warmer) */
+    --primary-dark: #1E40AF;      /* Deep Blue */
+    --primary-light: #DBEAFE;     /* Sky Blue */
+    --primary-subtle: #EFF6FF;    /* Very light blue */
+    
+    /* Secondary & Accent */
+    --accent: #3B82F6;            /* Bright Blue */
+    --accent-hover: #2563EB;      /* Darker on hover */
+    
+    /* Status Colors - More Vibrant */
+    --success: #10B981;           /* Emerald (modern green) */
+    --success-light: #D1FAE5;     /* Light emerald */
+    --warning: #F59E0B;           /* Amber (warmer) */
+    --warning-light: #FEF3C7;     /* Light amber */
+    --error: #EF4444;             /* Red (brighter) */
+    --error-light: #FEE2E2;       /* Light red */
+    --info: #3B82F6;              /* Blue */
+    --info-light: #DBEAFE;        /* Light blue */
+    
+    /* Backgrounds - Softer Gradients */
+    --background: #FFFFFF;        /* Pure white */
+    --bg-primary: #FFFFFF;
+    --bg-secondary: #F8FAFC;      /* Soft slate */
+    --bg-tertiary: #F1F5F9;       /* Light slate */
+    --background-subtle: #F8FAFC;
+    --bg-gradient-start: #F8FAFC;
+    --bg-gradient-end: #EFF6FF;   /* Hint of blue */
+    
+    /* Surfaces */
+    --surface: #FFFFFF;
+    --surface-hover: rgba(59, 130, 246, 0.04);  /* Subtle blue tint */
+    --surface-active: rgba(59, 130, 246, 0.08);
+    
+    /* Text - More Contrast */
+    --text-primary: #0F172A;      /* Near black */
+    --text-secondary: #475569;    /* Medium slate */
+    --text-tertiary: #94A3B8;     /* Light slate */
+    --text-muted: #CBD5E1;        /* Very light slate */
+    
+    /* Borders - Subtle */
+    --border: #E2E8F0;            /* Soft slate border */
+    --border-light: #F1F5F9;      /* Very light border */
+    --border-subtle: #F1F5F9;
+    --border-focus: #3B82F6;      /* Blue focus ring */
+    
+    /* Radius */
+    --radius-sm: 4px;
+    --radius-md: 6px;
+    --radius-lg: 8px;
+    --radius-xl: 12px;
+    
+    /* Spacing - Generous for breathing room */
     --spacing-xs: 6px;
     --spacing-sm: 12px;
     --spacing-md: 24px;
@@ -29,49 +64,30 @@
     --spacing-xl: 48px;
     --spacing-2xl: 64px;
     
-    /* Shadcn compatibility */
-    --background: 0 0% 100%;
-    --foreground: 210 11% 15%;
-    --card: 0 0% 100%;
-    --card-foreground: 210 11% 15%;
-    --popover: 0 0% 100%;
-    --popover-foreground: 210 11% 15%;
-    --primary: 214 100% 59%;
-    --primary-foreground: 0 0% 100%;
-    --secondary: 220 14% 96%;
-    --secondary-foreground: 210 6% 21%;
-    --muted: 220 14% 96%;
-    --muted-foreground: 215 25% 27%;
-    --accent: 220 14% 96%;
-    --accent-foreground: 210 6% 21%;
-    --destructive: 4 90% 58%;
-    --destructive-foreground: 0 0% 100%;
-    --border: 220 13% 91%;
-    --input: 220 13% 91%;
-    --ring: 214 100% 59%;
-    --radius: 0.5rem;
+    /* Note: Tailwind and components use hex values directly from the root variables above */
   }
 
   .dark {
-    --background: 222.2 84% 4.9%;
+    /* Dark mode with slate blue accents */
+    --background: 222 47% 11%;              /* #0F172A - Deep slate */
     --foreground: 210 40% 98%;
-    --card: 222.2 84% 4.9%;
+    --card: 215 28% 17%;                    /* #1E293B - Slate card */
     --card-foreground: 210 40% 98%;
-    --popover: 222.2 84% 4.9%;
+    --popover: 215 28% 17%;
     --popover-foreground: 210 40% 98%;
-    --primary: 217.2 91.2% 59.8%;
-    --primary-foreground: 222.2 84% 4.9%;
-    --secondary: 217.2 32.6% 17.5%;
+    --primary: 217 91% 60%;                 /* #2563EB - Keep vibrant blue */
+    --primary-foreground: 0 0% 100%;
+    --secondary: 215 28% 17%;
     --secondary-foreground: 210 40% 98%;
-    --muted: 217.2 32.6% 17.5%;
-    --muted-foreground: 215 20.2% 65.1%;
-    --accent: 217.2 32.6% 17.5%;
-    --accent-foreground: 210 40% 98%;
-    --destructive: 0 62.8% 30.6%;
-    --destructive-foreground: 210 40% 98%;
-    --border: 217.2 32.6% 17.5%;
-    --input: 217.2 32.6% 17.5%;
-    --ring: 224.3 76.3% 94.1%;
+    --muted: 215 28% 17%;
+    --muted-foreground: 215 20% 65%;
+    --accent: 217 91% 60%;
+    --accent-foreground: 0 0% 100%;
+    --destructive: 0 84% 60%;               /* #EF4444 */
+    --destructive-foreground: 0 0% 100%;
+    --border: 215 28% 25%;
+    --input: 215 28% 25%;
+    --ring: 217 91% 60%;
   }
 }
 
@@ -83,7 +99,7 @@
   body {
     background-color: var(--background);
     color: var(--text-primary);
-    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Helvetica Neue', sans-serif;
     font-size: 15px;
     font-weight: 400;
     line-height: 1.6;
@@ -554,4 +570,341 @@ button:focus-visible {
   0% { transform: scale(0.8); }
   50% { transform: scale(1.2); }
   100% { transform: scale(1); }
+}
+
+/* ==========================================
+   🎨 ICON ENHANCEMENT SYSTEM
+   ========================================== */
+
+/* Base icon improvements - crisp, clean, and professional */
+.icon-enhanced {
+  stroke-width: 2;
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  will-change: transform, color, stroke-width;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Icon size classes - larger and more prominent */
+.icon-xs {
+  width: 14px;
+  height: 14px;
+  stroke-width: 2.5;
+}
+
+.icon-sm {
+  width: 18px;
+  height: 18px;
+  stroke-width: 2;
+}
+
+.icon-md {
+  width: 20px;
+  height: 20px;
+  stroke-width: 2;
+}
+
+.icon-lg {
+  width: 24px;
+  height: 24px;
+  stroke-width: 1.75;
+}
+
+.icon-xl {
+  width: 28px;
+  height: 28px;
+  stroke-width: 1.5;
+}
+
+/* Icon hover effects - smooth and polished */
+.icon-hover:hover {
+  transform: scale(1.1);
+  filter: brightness(1.15);
+}
+
+.icon-hover-lift:hover {
+  transform: translateY(-1px) scale(1.08);
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.1));
+}
+
+.icon-hover-spin:hover {
+  transform: rotate(90deg);
+}
+
+.icon-hover-pulse:hover {
+  animation: icon-pulse 1s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+@keyframes icon-pulse {
+  0%, 100% { 
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% { 
+    opacity: 0.8;
+    transform: scale(1.05);
+  }
+}
+
+/* Icon button containers - clean and professional */
+.icon-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 0.5rem;
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
+}
+
+.icon-button::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: currentColor;
+  opacity: 0;
+  transition: opacity 0.25s ease;
+  border-radius: inherit;
+}
+
+.icon-button:hover::before {
+  opacity: 0.08;
+}
+
+.icon-button:active::before {
+  opacity: 0.12;
+}
+
+/* Icon with background container */
+.icon-container {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 0.5rem;
+  padding: 0.5rem;
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.icon-container:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+/* Status icon styles with crisp rendering */
+.icon-status {
+  stroke-width: 2.25;
+  filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.05));
+}
+
+.icon-status-success {
+  color: #22c55e;
+  stroke-width: 2.5;
+}
+
+.icon-status-warning {
+  color: #f59e0b;
+  stroke-width: 2.5;
+}
+
+.icon-status-error {
+  color: #ef4444;
+  stroke-width: 2.5;
+}
+
+.icon-status-info {
+  color: #3b82f6;
+  stroke-width: 2.5;
+}
+
+/* Action icon styles */
+.icon-action {
+  stroke-width: 2;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.icon-action:hover {
+  stroke-width: 2.5;
+  transform: scale(1.15);
+}
+
+/* Icon badge container */
+.icon-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.375rem 0.75rem;
+  border-radius: 0.5rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.icon-badge:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.icon-badge svg {
+  width: 16px;
+  height: 16px;
+  stroke-width: 2.5;
+}
+
+/* Animated icon transitions */
+.icon-fade-in {
+  animation: icon-fade-in 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+@keyframes icon-fade-in {
+  from {
+    opacity: 0;
+    transform: scale(0.8);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.icon-slide-in {
+  animation: icon-slide-in 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+@keyframes icon-slide-in {
+  from {
+    opacity: 0;
+    transform: translateX(-8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+/* Icon glow effects for special states */
+.icon-glow-success {
+  filter: drop-shadow(0 0 6px rgba(34, 197, 94, 0.4));
+}
+
+.icon-glow-warning {
+  filter: drop-shadow(0 0 6px rgba(245, 158, 11, 0.4));
+}
+
+.icon-glow-error {
+  filter: drop-shadow(0 0 6px rgba(239, 68, 68, 0.4));
+}
+
+.icon-glow-info {
+  filter: drop-shadow(0 0 6px rgba(59, 130, 246, 0.4));
+}
+
+/* Icon rotation animations */
+.icon-rotate-45 {
+  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.icon-rotate-45:hover {
+  transform: rotate(45deg);
+}
+
+.icon-rotate-90 {
+  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.icon-rotate-90:hover {
+  transform: rotate(90deg);
+}
+
+.icon-rotate-180 {
+  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.icon-rotate-180:hover {
+  transform: rotate(180deg);
+}
+
+/* Enhanced button hover with icon */
+.button-with-icon {
+  position: relative;
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.button-with-icon:hover svg {
+  transform: translateX(2px);
+}
+
+.button-with-icon:active svg {
+  transform: scale(0.95);
+}
+
+/* Lucide icon specific optimizations */
+svg[class*="lucide"] {
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  fill: none;
+  vertical-align: middle;
+  shape-rendering: geometricPrecision;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Icon color utilities with smooth transitions */
+.icon-color-transition {
+  transition: color 0.2s cubic-bezier(0.4, 0, 0.2, 1),
+              stroke 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Dropdown menu icon improvements */
+.dropdown-icon {
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  stroke-width: 2;
+}
+
+.dropdown-icon:hover {
+  stroke-width: 2.5;
+  opacity: 1;
+}
+
+/* Icon loading state */
+.icon-loading {
+  animation: icon-spin 1s linear infinite;
+}
+
+@keyframes icon-spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Icon with notification dot */
+.icon-with-dot {
+  position: relative;
+}
+
+.icon-with-dot::after {
+  content: '';
+  position: absolute;
+  top: -2px;
+  right: -2px;
+  width: 6px;
+  height: 6px;
+  background: #ef4444;
+  border-radius: 50%;
+  border: 2px solid white;
+  animation: dot-pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+@keyframes dot-pulse {
+  0%, 100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.5;
+    transform: scale(0.8);
+  }
 }

@@ -1,9 +1,10 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { Edit3, Calendar, MessageCircle, MoreHorizontal, Check } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import DatePickerModal from '@/components/ui/DatePickerModal';
 import DragHandle from '@/components/ui/DragHandle';
 import { useSortable } from '@dnd-kit/sortable';
+import { getPriorityColor } from '@/lib/colors';
 import type { Task } from '@/types/api';
 
 interface InboxTaskItemProps {
@@ -29,6 +30,7 @@ const InboxTaskItem: React.FC<InboxTaskItemProps> = ({
 }) => {
   const [isHovered, setIsHovered] = useState(false);
   const [showDatePicker, setShowDatePicker] = useState(false);
+  const datePickerRef = useRef<HTMLDivElement>(null);
 
   const {
     attributes,
@@ -37,18 +39,7 @@ const InboxTaskItem: React.FC<InboxTaskItemProps> = ({
     isDragging,
   } = useSortable({ id: task.id });
 
-  const getPriorityColor = (priority: Task['priority']) => {
-    switch (priority) {
-      case 'HIGH':
-        return '#EA4335'; // var(--error)
-      case 'MEDIUM':
-        return '#FF9800'; // var(--warning)
-      case 'LOW':
-        return '#34A853'; // var(--success)
-      default:
-        return '#9AA0A6'; // var(--text-muted)
-    }
-  };
+  // Removed local getPriorityColor - now using centralized version from lib/colors
 
   const formatDueDate = (dueDate: string) => {
     const date = new Date(dueDate);
@@ -100,10 +91,17 @@ const InboxTaskItem: React.FC<InboxTaskItemProps> = ({
   return (
     <div 
       ref={setNodeRef}
-      className="group flex items-center py-3 px-4 transition-all duration-200 hover:bg-gray-50/40 rounded-lg"
+      className="group flex items-center py-3 px-4 transition-all duration-200 hover:bg-muted/40 rounded-lg"
       style={style}
       onMouseEnter={() => setIsHovered(true)}
-      onMouseLeave={() => setIsHovered(false)}
+      onMouseLeave={(e) => {
+        // Don't hide if mouse is moving to the date picker
+        const relatedTarget = e.relatedTarget as HTMLElement;
+        if (datePickerRef.current && datePickerRef.current.contains(relatedTarget)) {
+          return;
+        }
+        setIsHovered(false);
+      }}
       {...attributes}
     >
       {/* Drag handle - only visible on hover */}
@@ -186,10 +184,10 @@ const InboxTaskItem: React.FC<InboxTaskItemProps> = ({
                 }`}
                 style={{ 
                   backgroundColor: isOverdue(task.due_date) && !isCompleted 
-                    ? '#FEECEB' 
+                    ? 'var(--error-light)' 
                     : 'var(--primary-light)',
                   color: isOverdue(task.due_date) && !isCompleted 
-                    ? '#EA4335' 
+                    ? 'var(--error)' 
                     : 'var(--primary-dark)'
                 }}
               >
@@ -211,13 +209,13 @@ const InboxTaskItem: React.FC<InboxTaskItemProps> = ({
             e.stopPropagation();
             onEdit(task);
           }}
-          className="p-1.5 h-auto hover:bg-gray-100/80 rounded-md transition-colors duration-200"
+          className="p-1.5 h-auto hover:bg-muted/80 rounded-md transition-colors duration-200"
           title="Edit task"
         >
           <Edit3 className="w-3.5 h-3.5" style={{ color: 'var(--text-muted)' }} />
         </Button>
 
-        <div className="relative">
+        <div className="relative z-50" ref={datePickerRef}>
           <Button
             variant="ghost"
             size="sm"
@@ -225,7 +223,7 @@ const InboxTaskItem: React.FC<InboxTaskItemProps> = ({
               e.stopPropagation();
               setShowDatePicker(true);
             }}
-            className="p-1.5 h-auto hover:bg-gray-100/80 rounded-md transition-colors duration-200"
+            className="p-1.5 h-auto hover:bg-muted/80 rounded-md transition-colors duration-200"
             title="Set date"
           >
             <Calendar className="w-3.5 h-3.5" style={{ color: 'var(--text-muted)' }} />
@@ -249,7 +247,7 @@ const InboxTaskItem: React.FC<InboxTaskItemProps> = ({
             e.stopPropagation();
             if (onComment) onComment(task);
           }}
-          className="p-1.5 h-auto hover:bg-gray-100/80 rounded-md transition-colors duration-200"
+          className="p-1.5 h-auto hover:bg-muted/80 rounded-md transition-colors duration-200"
           title="Add comment"
         >
           <MessageCircle className="w-3.5 h-3.5" style={{ color: 'var(--text-muted)' }} />
@@ -262,7 +260,7 @@ const InboxTaskItem: React.FC<InboxTaskItemProps> = ({
             e.stopPropagation();
             if (onOptions) onOptions(task);
           }}
-          className="p-1.5 h-auto hover:bg-gray-100/80 rounded-md transition-colors duration-200"
+          className="p-1.5 h-auto hover:bg-muted/80 rounded-md transition-colors duration-200"
           title="More options"
         >
           <MoreHorizontal className="w-3.5 h-3.5" style={{ color: 'var(--text-muted)' }} />

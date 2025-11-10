@@ -20,6 +20,7 @@ import {
 import { useProjectStore, useTaskStore } from '@/store/useStore';
 import { projectService } from '@/services/projects';
 import { taskService } from '@/services/tasks';
+import { getTaskStatusColor, getTaskPriorityColor } from '@/lib/taskUtils';
 import type { Task } from '@/types/api';
 import type { ProjectStats } from '@/services/projects';
 
@@ -126,32 +127,6 @@ const DashboardPage: React.FC = () => {
     });
   }, [tasks, projects]);
 
-  const getStatusColor = (status: string) => {
-    switch (status) {
-      case 'COMPLETED':
-        return 'bg-green-50 text-green-700 border-green-200';
-      case 'IN_PROGRESS':
-        return 'bg-blue-50 text-blue-700 border-blue-200';
-      case 'PENDING':
-        return 'bg-gray-50 text-gray-700 border-gray-200';
-      default:
-        return 'bg-gray-50 text-gray-700 border-gray-200';
-    }
-  };
-
-  const getPriorityColor = (priority: string) => {
-    switch (priority) {
-      case 'HIGH':
-        return 'bg-red-100 text-red-800';
-      case 'MEDIUM':
-        return 'bg-yellow-100 text-yellow-800';
-      case 'LOW':
-        return 'bg-green-100 text-green-800';
-      default:
-        return 'bg-gray-100 text-gray-800';
-    }
-  };
-
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
     const now = new Date();
@@ -167,7 +142,7 @@ const DashboardPage: React.FC = () => {
     return (
       <div className="container mx-auto px-4 py-8">
         <div className="text-center py-12">
-          <div className="animate-spin h-8 w-8 border-2 border-blue-600 border-t-transparent rounded-full mx-auto mb-4"></div>
+          <div className="animate-spin h-8 w-8 border-2 border-primary border-t-transparent rounded-full mx-auto mb-4"></div>
           <p className="text-muted-foreground">Loading dashboard...</p>
         </div>
       </div>
@@ -315,10 +290,10 @@ const DashboardPage: React.FC = () => {
                           </p>
                         )}
                         <div className="flex items-center gap-2 mt-2">
-                          <Badge variant="outline" className={`text-xs ${getStatusColor(task.status)}`}>
+                          <Badge variant="outline" className={`text-xs ${getTaskStatusColor(task.status)}`}>
                             {task.status.replace('_', ' ')}
                           </Badge>
-                          <Badge variant="outline" className={`text-xs ${getPriorityColor(task.priority)}`}>
+                          <Badge variant="outline" className={`text-xs ${getTaskPriorityColor(task.priority)}`}>
                             {task.priority}
                           </Badge>
                         </div>

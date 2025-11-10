@@ -132,7 +132,7 @@ const ProjectHeader: React.FC<ProjectHeaderProps> = ({
               >
                 <div className="relative">
                   <Calendar className="w-6 h-6" />
-                  <Crown className="w-3 h-3 text-yellow-500 absolute -top-1 -right-1" />
+                  <Crown className="w-3 h-3 text-warning absolute -top-1 -right-1" />
                 </div>
                 <span className="text-xs font-medium">Calendar</span>
               </button>
@@ -328,7 +328,7 @@ const ProjectHeader: React.FC<ProjectHeaderProps> = ({
             <Archive className="w-4 h-4 mr-2" />
             Archive
           </DropdownMenuItem>
-          <DropdownMenuItem className="text-red-600 focus:text-red-600" onClick={onDelete}>
+          <DropdownMenuItem className="text-error focus:text-error" onClick={onDelete}>
             <Trash2 className="w-4 h-4 mr-2" />
             Delete
           </DropdownMenuItem>

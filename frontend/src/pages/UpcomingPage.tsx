@@ -11,12 +11,12 @@ const UpcomingPage: React.FC = () => {
       </div>
       
       <div className="mb-6">
-        <p className="text-gray-600">Tasks scheduled for future dates.</p>
+        <p className="text-[var(--text-secondary)]">Tasks scheduled for future dates.</p>
       </div>
       
-      <div className="bg-white rounded-lg border border-gray-200 p-6">
-        <h2 className="text-lg font-medium text-gray-900 mb-4">Upcoming Tasks</h2>
-        <p className="text-gray-500">No upcoming tasks</p>
+      <div className="bg-card rounded-lg border border-[var(--border)] p-6">
+        <h2 className="text-lg font-medium text-foreground mb-4">Upcoming Tasks</h2>
+        <p className="text-muted-foreground">No upcoming tasks</p>
       </div>
     </div>
   );

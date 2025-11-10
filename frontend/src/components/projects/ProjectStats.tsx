@@ -22,10 +22,10 @@ const ProjectStats: React.FC<ProjectStatsProps> = ({
   const pendingTasks = stats.PENDING;
 
   const getProgressStatus = (rate: number) => {
-    if (rate >= 90) return { color: 'text-green-600', status: 'Excellent' };
-    if (rate >= 70) return { color: 'text-blue-600', status: 'Good' };
-    if (rate >= 50) return { color: 'text-yellow-600', status: 'Fair' };
-    return { color: 'text-red-600', status: 'Needs Attention' };
+    if (rate >= 90) return { color: 'text-success', status: 'Excellent' };
+    if (rate >= 70) return { color: 'text-info', status: 'Good' };
+    if (rate >= 50) return { color: 'text-warning', status: 'Fair' };
+    return { color: 'text-error', status: 'Needs Attention' };
   };
 
   const progressStatus = getProgressStatus(completionRate);

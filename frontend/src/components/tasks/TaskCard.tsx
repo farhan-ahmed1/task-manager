@@ -14,7 +14,9 @@ import type { Task } from '@/types/api';
 import { 
   formatDate, 
   getRelativeTime, 
-  isTaskOverdue 
+  isTaskOverdue,
+  getTaskStatusColor,
+  getTaskPriorityColor 
 } from '@/lib/taskUtils';
 
 interface TaskCardProps {
@@ -40,59 +42,33 @@ const TaskCard: React.FC<TaskCardProps> = ({
     onStatusChange(task, newStatus);
   };
 
-  // Get status icon and colors
+  // Get status icon and colors - Enhanced with better sizing and animations
   const getStatusIcon = (status: Task['status']) => {
     switch (status) {
       case 'COMPLETED':
-        return <CheckCircle2 className="h-4 w-4 text-green-600" />;
+        return <CheckCircle2 className="w-5 h-5 text-success icon-status icon-status-success transition-all duration-200" strokeWidth={2.5} />;
       case 'IN_PROGRESS':
-        return <PlayCircle className="h-4 w-4 text-blue-600" />;
+        return <PlayCircle className="w-5 h-5 text-info icon-status icon-status-info transition-all duration-200" strokeWidth={2.5} />;
       default:
-        return <PauseCircle className="h-4 w-4 text-slate-400" />;
+        return <PauseCircle className="w-5 h-5 text-muted-foreground icon-status transition-all duration-200" strokeWidth={2} />;
     }
   };
 
-  const getPriorityColor = (priority: Task['priority']) => {
+  const getPriorityBorderAndBg = (priority: Task['priority']) => {
     switch (priority) {
       case 'HIGH':
-        return 'border-l-red-500 bg-red-50/50';
+        return 'border-l-error bg-error-light/30';
       case 'MEDIUM':
-        return 'border-l-amber-500 bg-amber-50/50';
+        return 'border-l-warning bg-warning-light/30';
       case 'LOW':
-        return 'border-l-green-500 bg-green-50/50';
+        return 'border-l-success bg-success-light/30';
       default:
-        return 'border-l-slate-300 bg-slate-50/50';
-    }
-  };
-
-  const getStatusBadgeStyle = (status: Task['status']) => {
-    switch (status) {
-      case 'COMPLETED':
-        return 'bg-green-100 text-green-800 border-green-200';
-      case 'IN_PROGRESS':
-        return 'bg-blue-100 text-blue-800 border-blue-200';
-      case 'PENDING':
-        return 'bg-slate-100 text-slate-700 border-slate-200';
-      default:
-        return 'bg-slate-100 text-slate-700 border-slate-200';
-    }
-  };
-
-  const getPriorityBadgeStyle = (priority: Task['priority']) => {
-    switch (priority) {
-      case 'HIGH':
-        return 'bg-red-100 text-red-700 border-red-200';
-      case 'MEDIUM':
-        return 'bg-amber-100 text-amber-700 border-amber-200';
-      case 'LOW':
-        return 'bg-green-100 text-green-700 border-green-200';
-      default:
-        return 'bg-slate-100 text-slate-700 border-slate-200';
+        return 'border-l-border bg-muted/30';
     }
   };
 
   return (
-    <Card className={`group hover:shadow-lg hover:shadow-slate-200/50 transition-all duration-300 cursor-pointer border-l-4 ${getPriorityColor(task.priority)} backdrop-blur-sm bg-white/90 hover:bg-white border-slate-200/60 hover:border-slate-300/60 transform hover:-translate-y-0.5`}
+    <Card className={`group hover:shadow-lg transition-all duration-300 cursor-pointer border-l-4 ${getPriorityBorderAndBg(task.priority)} backdrop-blur-sm bg-card hover:bg-card/95 border-border hover:border-[var(--border-focus)] transform hover:-translate-y-0.5`}
           onClick={() => onView(task)}>
       <CardContent className="p-4 sm:p-6">
         <div className="space-y-4">
@@ -106,7 +82,7 @@ const TaskCard: React.FC<TaskCardProps> = ({
             {/* Title and Badges */}
             <div className="flex-1 min-w-0">
               <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 sm:gap-4">
-                <h3 className="font-semibold text-slate-900 group-hover:text-blue-700 transition-colors text-base sm:text-lg leading-tight">
+                <h3 className="font-semibold text-[var(--text-primary)] group-hover:text-primary transition-colors text-base sm:text-lg leading-tight">
                   {task.title}
                 </h3>
                 
@@ -114,7 +90,7 @@ const TaskCard: React.FC<TaskCardProps> = ({
                 <div className="flex items-center gap-2 flex-shrink-0">
                   <Badge 
                     variant="outline" 
-                    className={`text-xs font-medium border ${getStatusBadgeStyle(task.status)}`}
+                    className={`text-xs font-medium border ${getTaskStatusColor(task.status)}`}
                   >
                     {getStatusIcon(task.status)}
                     <span className="ml-1">{task.status.replace('_', ' ')}</span>
@@ -122,7 +98,7 @@ const TaskCard: React.FC<TaskCardProps> = ({
                   
                   <Badge 
                     variant="outline" 
-                    className={`text-xs font-medium border ${getPriorityBadgeStyle(task.priority)}`}
+                    className={`text-xs font-medium border ${getTaskPriorityColor(task.priority)}`}
                   >
                     {task.priority}
                   </Badge>
@@ -133,31 +109,31 @@ const TaskCard: React.FC<TaskCardProps> = ({
           
           {/* Description */}
           {task.description && (
-            <div className="pl-7 sm:pl-8">
-              <p className="text-sm text-slate-600 leading-relaxed line-clamp-2">
+            <div className="pl-7 sm:pl-9">
+              <p className="text-sm text-[var(--text-secondary)] leading-relaxed line-clamp-2">
                 {task.description}
               </p>
             </div>
           )}
           
           {/* Bottom Row - Due Date, Updated Time, and Actions */}
-          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 pl-7 sm:pl-8">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 pl-7 sm:pl-9">
             {/* Due Date and Time Info */}
             <div className="flex flex-wrap items-center gap-3 text-xs">
               {task.due_date && (
-                <div className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg font-medium ${
+                <div className={`flex items-center gap-2 px-3 py-2 rounded-lg font-medium transition-all duration-200 ${
                   isOverdue 
-                    ? 'bg-red-100 text-red-700 border border-red-200' 
-                    : 'bg-slate-100 text-slate-600 border border-slate-200'
+                    ? 'bg-error-light text-error border border-error icon-badge' 
+                    : 'bg-muted text-muted-foreground border border-border icon-badge'
                 }`}>
-                  {isOverdue && <AlertCircle className="h-3 w-3" />}
-                  <Calendar className="h-3 w-3" />
+                  {isOverdue && <AlertCircle className="w-4 h-4 icon-status-error icon-hover-pulse" strokeWidth={2.5} />}
+                  <Calendar className="w-4 h-4 icon-enhanced" strokeWidth={2} />
                   <span>Due {formatDate(task.due_date)}</span>
                 </div>
               )}
               
-              <div className="text-slate-500 flex items-center gap-1">
-                <Clock className="h-3 w-3" />
+              <div className="text-[var(--text-secondary)] flex items-center gap-1.5">
+                <Clock className="w-4 h-4 icon-enhanced" strokeWidth={2} />
                 <span>Updated {getRelativeTime(task.updated_at)}</span>
               </div>
             </div>
@@ -174,9 +150,9 @@ const TaskCard: React.FC<TaskCardProps> = ({
                     }}
                     size="sm"
                     variant="outline"
-                    className="h-8 px-3 bg-green-50 hover:bg-green-100 border-green-200 text-green-700 hover:text-green-800 rounded-lg text-xs font-medium"
+                    className="h-9 px-3 bg-success-light hover:bg-success/10 border-success text-success rounded-lg text-xs font-medium transition-all duration-200 hover:shadow-md hover:-translate-y-0.5 button-with-icon"
                   >
-                    <CheckCircle2 className="h-3 w-3 mr-1" />
+                    <CheckCircle2 className="w-4 h-4 mr-1.5 icon-enhanced icon-hover" strokeWidth={2.5} />
                     Complete
                   </Button>
                 )}
@@ -189,9 +165,9 @@ const TaskCard: React.FC<TaskCardProps> = ({
                     }}
                     size="sm"
                     variant="outline"
-                    className="h-8 px-3 bg-blue-50 hover:bg-blue-100 border-blue-200 text-blue-700 hover:text-blue-800 rounded-lg text-xs font-medium"
+                    className="h-9 px-3 bg-info-light hover:bg-info/10 border-info text-info rounded-lg text-xs font-medium transition-all duration-200 hover:shadow-md hover:-translate-y-0.5 button-with-icon"
                   >
-                    <PlayCircle className="h-3 w-3 mr-1" />
+                    <PlayCircle className="w-4 h-4 mr-1.5 icon-enhanced icon-hover" strokeWidth={2.5} />
                     Start
                   </Button>
                 )}
@@ -203,9 +179,9 @@ const TaskCard: React.FC<TaskCardProps> = ({
                   }}
                   size="sm"
                   variant="outline"
-                  className="h-8 px-3 bg-slate-50 hover:bg-slate-100 border-slate-200 text-slate-600 hover:text-slate-800 rounded-lg text-xs font-medium"
+                  className="h-9 px-3 bg-muted hover:bg-muted/80 border-border text-muted-foreground hover:text-foreground rounded-lg text-xs font-medium transition-all duration-200 hover:shadow-md hover:-translate-y-0.5 button-with-icon"
                 >
-                  <Edit className="h-3 w-3 mr-1" />
+                  <Edit className="w-4 h-4 mr-1.5 icon-enhanced icon-hover" strokeWidth={2} />
                   Edit
                 </Button>
               </div>
@@ -216,46 +192,46 @@ const TaskCard: React.FC<TaskCardProps> = ({
                   <Button 
                     variant="ghost" 
                     size="icon" 
-                    className="h-8 w-8 opacity-60 group-hover:opacity-100 transition-all duration-200 hover:bg-slate-100 rounded-lg flex-shrink-0"
+                    className="h-9 w-9 opacity-60 group-hover:opacity-100 transition-all duration-200 hover:bg-muted rounded-lg flex-shrink-0 icon-button"
                   >
-                    <MoreVertical className="h-4 w-4 text-slate-600" />
+                    <MoreVertical className="w-5 h-5 text-muted-foreground icon-enhanced dropdown-icon" strokeWidth={2} />
                     <span className="sr-only">Open menu</span>
                   </Button>
                 </DropdownMenuTrigger>
-                <DropdownMenuContent align="end" className="w-48 bg-white/95 backdrop-blur-sm border-slate-200/60">
-                  <DropdownMenuItem onClick={(e: React.MouseEvent) => { e.stopPropagation(); onView(task); }} className="text-slate-700 hover:bg-slate-50">
-                    <Eye className="h-4 w-4 mr-2" />
+                <DropdownMenuContent align="end" className="w-48 bg-white/95 backdrop-blur-sm border-[var(--border)]">
+                  <DropdownMenuItem onClick={(e: React.MouseEvent) => { e.stopPropagation(); onView(task); }} className="text-foreground hover:bg-muted cursor-pointer">
+                    <Eye className="w-4 h-4 mr-2 icon-enhanced" strokeWidth={2} />
                     View Details
                   </DropdownMenuItem>
-                  <DropdownMenuItem onClick={(e: React.MouseEvent) => { e.stopPropagation(); onEdit(task); }} className="text-slate-700 hover:bg-slate-50">
-                    <Edit className="h-4 w-4 mr-2" />
+                  <DropdownMenuItem onClick={(e: React.MouseEvent) => { e.stopPropagation(); onEdit(task); }} className="text-foreground hover:bg-muted cursor-pointer">
+                    <Edit className="w-4 h-4 mr-2 icon-enhanced" strokeWidth={2} />
                     Edit Task
                   </DropdownMenuItem>
                   <DropdownMenuSeparator />
                   {task.status !== 'COMPLETED' && (
                     <DropdownMenuItem 
                       onClick={(e: React.MouseEvent) => { e.stopPropagation(); handleStatusChange('COMPLETED'); }}
-                      className="text-green-700 hover:bg-green-50"
+                      className="text-success hover:bg-success-light cursor-pointer"
                     >
-                      <CheckCircle2 className="h-4 w-4 mr-2" />
+                      <CheckCircle2 className="w-4 h-4 mr-2 icon-enhanced icon-status-success" strokeWidth={2.5} />
                       Mark Complete
                     </DropdownMenuItem>
                   )}
                   {task.status !== 'IN_PROGRESS' && (
                     <DropdownMenuItem 
                       onClick={(e: React.MouseEvent) => { e.stopPropagation(); handleStatusChange('IN_PROGRESS'); }}
-                      className="text-blue-700 hover:bg-blue-50"
+                      className="text-info hover:bg-info-light cursor-pointer"
                     >
-                      <PlayCircle className="h-4 w-4 mr-2" />
+                      <PlayCircle className="w-4 h-4 mr-2 icon-enhanced icon-status-info" strokeWidth={2.5} />
                       Start Progress
                     </DropdownMenuItem>
                   )}
                   {task.status !== 'PENDING' && (
                     <DropdownMenuItem 
                       onClick={(e: React.MouseEvent) => { e.stopPropagation(); handleStatusChange('PENDING'); }}
-                      className="text-slate-700 hover:bg-slate-50"
+                      className="text-muted-foreground hover:bg-muted cursor-pointer"
                     >
-                      <PauseCircle className="h-4 w-4 mr-2" />
+                      <PauseCircle className="w-4 h-4 mr-2 icon-enhanced" strokeWidth={2} />
                       Mark Pending
                     </DropdownMenuItem>
                   )}
@@ -265,10 +241,10 @@ const TaskCard: React.FC<TaskCardProps> = ({
                       e.stopPropagation(); 
                       if (!isDeleting) onDelete(task); 
                     }}
-                    className="text-red-600 hover:bg-red-50 focus:text-red-700"
+                    className="text-error hover:bg-error-light focus:text-error cursor-pointer"
                     disabled={isDeleting}
                   >
-                    <Trash2 className="h-4 w-4 mr-2" />
+                    <Trash2 className="w-4 h-4 mr-2 icon-enhanced icon-status-error" strokeWidth={2.5} />
                     {isDeleting ? 'Deleting...' : 'Delete Task'}
                   </DropdownMenuItem>
                 </DropdownMenuContent>

@@ -14,39 +14,72 @@ export default {
     },
     extend: {
       colors: {
-        border: 'hsl(var(--border))',
-        input: 'hsl(var(--input))',
-        ring: 'hsl(var(--ring))',
-        background: 'hsl(var(--background))',
-        foreground: 'hsl(var(--foreground))',
+        border: 'var(--border)',
+        input: 'var(--border)',
+        ring: 'var(--border-focus)',
+        background: 'var(--background)',
+        foreground: 'var(--text-primary)',
         primary: {
-          DEFAULT: 'hsl(var(--primary))',
-          foreground: 'hsl(var(--primary-foreground))',
+          DEFAULT: 'var(--primary)',
+          foreground: '#FFFFFF',
+          dark: 'var(--primary-dark)',
+          light: 'var(--primary-light)',
+          subtle: 'var(--primary-subtle)',
         },
         secondary: {
-          DEFAULT: 'hsl(var(--secondary))',
-          foreground: 'hsl(var(--secondary-foreground))',
+          DEFAULT: 'var(--bg-secondary)',
+          foreground: 'var(--text-secondary)',
         },
         destructive: {
-          DEFAULT: 'hsl(var(--destructive))',
-          foreground: 'hsl(var(--destructive-foreground))',
+          DEFAULT: 'var(--error)',
+          foreground: '#FFFFFF',
         },
         muted: {
-          DEFAULT: 'hsl(var(--muted))',
-          foreground: 'hsl(var(--muted-foreground))',
+          DEFAULT: 'var(--bg-secondary)',
+          foreground: 'var(--text-secondary)',
         },
         accent: {
-          DEFAULT: 'hsl(var(--accent))',
-          foreground: 'hsl(var(--accent-foreground))',
+          DEFAULT: 'var(--accent)',
+          foreground: '#FFFFFF',
+          hover: 'var(--accent-hover)',
         },
         popover: {
-          DEFAULT: 'hsl(var(--popover))',
-          foreground: 'hsl(var(--popover-foreground))',
+          DEFAULT: 'var(--surface)',
+          foreground: 'var(--text-primary)',
         },
         card: {
-          DEFAULT: 'hsl(var(--card))',
-          foreground: 'hsl(var(--card-foreground))',
+          DEFAULT: 'var(--surface)',
+          foreground: 'var(--text-primary)',
         },
+        // Status colors using CSS variables
+        success: {
+          DEFAULT: 'var(--success)',
+          light: 'var(--success-light)',
+        },
+        warning: {
+          DEFAULT: 'var(--warning)',
+          light: 'var(--warning-light)',
+        },
+        error: {
+          DEFAULT: 'var(--error)',
+          light: 'var(--error-light)',
+        },
+        info: {
+          DEFAULT: 'var(--info)',
+          light: 'var(--info-light)',
+        },
+        // Text colors
+        'text-primary': 'var(--text-primary)',
+        'text-secondary': 'var(--text-secondary)',
+        'text-tertiary': 'var(--text-tertiary)',
+        'text-muted': 'var(--text-muted)',
+        // Background utilities
+        'bg-primary': 'var(--bg-primary)',
+        'bg-secondary': 'var(--bg-secondary)',
+        'bg-tertiary': 'var(--bg-tertiary)',
+        // Border utilities
+        'border-light': 'var(--border-light)',
+        'border-focus': 'var(--border-focus)',
       },
       borderRadius: {
         lg: 'var(--radius)',

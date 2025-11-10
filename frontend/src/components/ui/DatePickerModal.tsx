@@ -38,12 +38,16 @@ const DatePickerModal: React.FC<DatePickerModalProps> = ({
     };
 
     if (isOpen) {
-      document.addEventListener('mousedown', handleClickOutside);
-    }
+      // Small delay to prevent the opening click from immediately closing it
+      const timer = setTimeout(() => {
+        document.addEventListener('mousedown', handleClickOutside);
+      }, 50); // 50ms delay - enough to avoid race conditions
 
-    return () => {
-      document.removeEventListener('mousedown', handleClickOutside);
-    };
+      return () => {
+        clearTimeout(timer);
+        document.removeEventListener('mousedown', handleClickOutside);
+      };
+    }
   }, [isOpen, onClose]);
 
   const formatDate = (date: Date) => {
@@ -63,10 +67,10 @@ const DatePickerModal: React.FC<DatePickerModalProps> = ({
     nextWeekend.setDate(today.getDate() + daysUntilSaturday);
 
     return [
-      { label: 'Today', date: formatDate(today), shortLabel: 'Fri', icon: Sun, color: '#FF9500' },
-      { label: 'Tomorrow', date: formatDate(tomorrow), shortLabel: 'Sat', icon: Sunrise, color: '#34C759' },
-      { label: 'Next week', date: formatDate(nextWeek), shortLabel: 'Mon Oct 6', icon: CalendarDays, color: '#007AFF' },
-      { label: 'Next weekend', date: formatDate(nextWeekend), shortLabel: 'Sat Oct 4', icon: Coffee, color: '#AF52DE' }
+      { label: 'Today', date: formatDate(today), shortLabel: 'Fri', icon: Sun, color: 'var(--warning)' },
+      { label: 'Tomorrow', date: formatDate(tomorrow), shortLabel: 'Sat', icon: Sunrise, color: 'var(--success)' },
+      { label: 'Next week', date: formatDate(nextWeek), shortLabel: 'Mon Oct 6', icon: CalendarDays, color: 'var(--info)' },
+      { label: 'Next weekend', date: formatDate(nextWeekend), shortLabel: 'Sat Oct 4', icon: Coffee, color: 'var(--primary)' }
     ];
   };
 
@@ -86,15 +90,15 @@ const DatePickerModal: React.FC<DatePickerModalProps> = ({
            selected.getFullYear() === selectedYear;
   };
 
-  const handleDateSelection = (dateString: string) => {
-    setSelectedDate(dateString);
-    onDateSelect(dateString);
-    onClose();
-  };
-
   const handleCalendarDateClick = (day: number) => {
     const selectedDateObj = new Date(selectedYear, selectedMonth, day);
-    handleDateSelection(formatDate(selectedDateObj));
+    const dateString = formatDate(selectedDateObj);
+    setSelectedDate(dateString);
+    onDateSelect(dateString);
+    // Close after a short delay to show the selection
+    setTimeout(() => {
+      onClose();
+    }, 150);
   };
 
   const monthNames = [
@@ -107,10 +111,18 @@ const DatePickerModal: React.FC<DatePickerModalProps> = ({
   return (
     <div 
       ref={modalRef}
-      className="absolute top-full left-0 mt-2 w-80 bg-white rounded-xl shadow-lg border border-gray-200 z-50"
+      className="absolute top-full left-0 mt-2 w-80 bg-white rounded-xl border border-[var(--border)]"
+      style={{ 
+        zIndex: 99999,
+        boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.15), 0 10px 10px -5px rgba(0, 0, 0, 0.1)',
+        position: 'absolute',
+        isolation: 'isolate',
+        backgroundColor: '#ffffff' // Solid white background - no transparency
+      }}
       onClick={(e) => e.stopPropagation()}
+      onMouseDown={(e) => e.stopPropagation()}
     >
-      <div className="p-4">
+      <div className="p-4 relative bg-white" style={{ zIndex: 100000 }}>
         {/* Quick Date Options */}
         <div className="space-y-1 mb-4">
           {getQuickDateOptions().map((option) => {
@@ -118,18 +130,24 @@ const DatePickerModal: React.FC<DatePickerModalProps> = ({
             return (
               <button
                 key={option.label}
-                onClick={() => handleDateSelection(option.date)}
-                className="w-full flex items-center gap-3 px-3 py-2 text-sm hover:bg-gray-50 rounded-lg transition-colors text-left"
+                onClick={() => {
+                  setSelectedDate(option.date);
+                  onDateSelect(option.date);
+                  setTimeout(() => {
+                    onClose();
+                  }, 150);
+                }}
+                className="w-full flex items-center gap-3 px-3 py-2 text-sm rounded-lg transition-all duration-200 text-left cursor-pointer hover:bg-slate-50 active:bg-slate-100"
               >
                 <IconComponent 
                   className="w-4 h-4 flex-shrink-0" 
                   style={{ color: option.color }}
                 />
                 <div className="flex-1 flex items-center justify-between">
-                  <span className="font-medium" style={{ color: '#202124' }}>
+                  <span className="font-medium" style={{ color: 'var(--text-primary)' }}>
                     {option.label}
                   </span>
-                  <span className="text-gray-500 text-xs">
+                  <span className="text-[var(--text-secondary)] text-xs">
                     {option.shortLabel}
                   </span>
                 </div>
@@ -139,9 +157,10 @@ const DatePickerModal: React.FC<DatePickerModalProps> = ({
         </div>
 
         {/* Divider */}
-        <div className="border-t border-gray-200 my-4"></div>
+        <div className="border-t border-[var(--border)] my-4"></div>
 
         {/* Calendar Header */}
+                {/* Calendar Header */}
         <div className="flex items-center justify-between mb-4">
           <button
             onClick={() => {
@@ -152,14 +171,15 @@ const DatePickerModal: React.FC<DatePickerModalProps> = ({
                 setSelectedMonth(selectedMonth - 1);
               }
             }}
-            className="p-1 hover:bg-gray-100 rounded"
+            className="p-2 hover:bg-muted rounded-lg transition-colors"
+            aria-label="Previous month"
           >
             <ChevronLeft className="w-4 h-4" />
           </button>
           
-          <h3 className="font-semibold text-sm" style={{ color: '#202124' }}>
+          <div className="font-semibold" style={{ color: 'var(--text-primary)' }}>
             {monthNames[selectedMonth]} {selectedYear}
-          </h3>
+          </div>
           
           <button
             onClick={() => {
@@ -170,7 +190,8 @@ const DatePickerModal: React.FC<DatePickerModalProps> = ({
                 setSelectedMonth(selectedMonth + 1);
               }
             }}
-            className="p-1 hover:bg-gray-100 rounded"
+            className="p-2 hover:bg-muted rounded-lg transition-colors"
+            aria-label="Next month"
           >
             <ChevronRight className="w-4 h-4" />
           </button>
@@ -178,10 +199,10 @@ const DatePickerModal: React.FC<DatePickerModalProps> = ({
 
         {/* Calendar Grid */}
         <div className="grid grid-cols-7 gap-1 mb-2">
-          {['S', 'M', 'T', 'W', 'T', 'F', 'S'].map((day) => (
+          {['S', 'M', 'T', 'W', 'T', 'F', 'S'].map((day, index) => (
             <div
-              key={day}
-              className="h-8 flex items-center justify-center text-xs font-medium text-gray-500"
+              key={`day-${index}`}
+              className="h-8 flex items-center justify-center text-xs font-medium text-[var(--text-secondary)]"
             >
               {day}
             </div>
@@ -206,12 +227,12 @@ const DatePickerModal: React.FC<DatePickerModalProps> = ({
               <button
                 key={day}
                 onClick={() => handleCalendarDateClick(day)}
-                className={`h-8 flex items-center justify-center text-sm rounded-lg transition-colors ${
+                className={`h-8 flex items-center justify-center text-sm rounded-lg transition-all duration-200 cursor-pointer ${
                   isSelected
-                    ? 'bg-blue-500 text-white'
+                    ? 'bg-blue-600 text-white font-semibold shadow-sm hover:bg-blue-700'
                     : isToday
-                    ? 'bg-gray-100 font-semibold'
-                    : 'hover:bg-gray-100'
+                    ? 'bg-blue-50 font-semibold text-blue-700 ring-2 ring-blue-200 hover:bg-blue-100'
+                    : 'hover:bg-slate-50 text-foreground'
                 }`}
               >
                 {day}
@@ -221,12 +242,12 @@ const DatePickerModal: React.FC<DatePickerModalProps> = ({
         </div>
 
         {/* Time and Repeat buttons */}
-        <div className="space-y-1 mt-4 pt-4 border-t border-gray-200">
-          <button className="w-full flex items-center gap-2 px-3 py-2 text-sm font-medium text-gray-600 hover:bg-gray-50 rounded-lg transition-colors text-left">
+        <div className="space-y-1 mt-4 pt-4 border-t border-[var(--border)]">
+          <button className="w-full flex items-center gap-2 px-3 py-2 text-sm font-medium text-[var(--text-secondary)] hover:bg-slate-50 active:bg-slate-100 rounded-lg transition-all duration-200 text-left cursor-pointer">
             <Clock className="w-4 h-4" />
             <span>Time</span>
           </button>
-          <button className="w-full flex items-center gap-2 px-3 py-2 text-sm font-medium text-gray-600 hover:bg-gray-50 rounded-lg transition-colors text-left">
+          <button className="w-full flex items-center gap-2 px-3 py-2 text-sm font-medium text-[var(--text-secondary)] hover:bg-slate-50 active:bg-slate-100 rounded-lg transition-all duration-200 text-left cursor-pointer">
             <Repeat className="w-4 h-4" />
             <span>Repeat</span>
           </button>

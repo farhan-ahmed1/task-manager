@@ -528,18 +528,18 @@ const ProjectTasksLayout: React.FC<ProjectTasksLayoutProps> = ({
               <Button
                 variant="ghost"
                 size="sm"
-                className="p-1 h-auto hover:bg-green-50"
+                className="p-1 h-auto hover:bg-success-light"
                 onClick={handleSaveTitle}
               >
-                <Check className="w-4 h-4 text-green-600" />
+                <Check className="w-4 h-4 text-success" />
               </Button>
               <Button
                 variant="ghost"
                 size="sm"
-                className="p-1 h-auto hover:bg-red-50"
+                className="p-1 h-auto hover:bg-error-light"
                 onClick={handleCancelEdit}
               >
-                <X className="w-4 h-4 text-red-600" />
+                <X className="w-4 h-4 text-error" />
               </Button>
             </div>
           ) : (

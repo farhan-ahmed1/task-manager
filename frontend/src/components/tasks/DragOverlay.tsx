@@ -1,4 +1,5 @@
 import React from 'react';
+import { getPriorityColor } from '@/lib/colors';
 import type { Task } from '@/types/api';
 
 interface DragOverlayProps {
@@ -6,18 +7,7 @@ interface DragOverlayProps {
 }
 
 const DragOverlay: React.FC<DragOverlayProps> = ({ task }) => {
-  const getPriorityColor = (priority: Task['priority']) => {
-    switch (priority) {
-      case 'HIGH':
-        return '#EA4335';
-      case 'MEDIUM':
-        return '#FF9800';
-      case 'LOW':
-        return '#34A853';
-      default:
-        return '#9AA0A6';
-    }
-  };
+  // Removed local getPriorityColor - now using centralized version
 
   const isCompleted = task.status === 'COMPLETED';
 

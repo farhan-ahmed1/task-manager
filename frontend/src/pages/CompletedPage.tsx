@@ -91,8 +91,8 @@ const CompletedPage: React.FC = () => {
     return (
       <div className="W8rBu9M main-view-layout i_TMTDC main-view-layout--narrow _19abae45 a7c6de33 _1e47f652 d607c41c bfa58fdf d19e99ad">
         <div className="flex items-center justify-center py-12">
-          <div className="animate-spin h-8 w-8 border-2 border-blue-600 border-t-transparent rounded-full mx-auto mb-4"></div>
-          <p className="text-gray-600">Loading activity...</p>
+          <div className="animate-spin h-8 w-8 border-2 border-primary border-t-transparent rounded-full mx-auto mb-4"></div>
+          <p className="text-[var(--text-secondary)]">Loading activity...</p>
         </div>
       </div>
     );
@@ -103,7 +103,7 @@ const CompletedPage: React.FC = () => {
       <div className="W8rBu9M main-view-layout i_TMTDC main-view-layout--narrow _19abae45 a7c6de33 _1e47f652 d607c41c bfa58fdf d19e99ad">
         <div className="flex items-center justify-center py-12">
           <div className="text-center">
-            <p className="text-red-600 mb-4">{error}</p>
+            <p className="text-error mb-4">{error}</p>
             <Button onClick={() => window.location.reload()}>
               Try Again
             </Button>
@@ -133,13 +133,13 @@ const CompletedPage: React.FC = () => {
         <div id="activity_app">
           {dates.length === 0 ? (
             <div className="text-center py-12">
-              <div className="text-gray-400 mb-4">
+              <div className="text-[var(--text-tertiary)] mb-4">
                 <svg className="mx-auto h-16 w-16" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1}>
                   <path strokeLinecap="round" strokeLinejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                 </svg>
               </div>
-              <h3 className="text-lg font-medium text-gray-900 mb-2">No completed tasks yet</h3>
-              <p className="text-gray-600">Tasks you complete will appear here as activity history.</p>
+              <h3 className="text-lg font-medium text-foreground mb-2">No completed tasks yet</h3>
+              <p className="text-[var(--text-secondary)]">Tasks you complete will appear here as activity history.</p>
             </div>
           ) : (
             <>

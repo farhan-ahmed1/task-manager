@@ -5,6 +5,7 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSepara
 import { MoreHorizontal, Edit, Trash2, BarChart3, FolderOpen, Users } from 'lucide-react';
 import type { Project } from '@/types/api';
 import type { ProjectStats } from '@/services/projects';
+import { getProgressColor } from '@/lib/colors';
 
 interface ProjectCardProps {
   project: Project;
@@ -39,16 +40,9 @@ const ProjectCard: React.FC<ProjectCardProps> = ({
     });
   };
 
-  const getProgressColor = (rate: number) => {
-    if (rate >= 80) return 'bg-green-500';
-    if (rate >= 50) return 'bg-blue-500';
-    if (rate >= 25) return 'bg-yellow-500';
-    return 'bg-gray-300';
-  };
-
   return (
     <Card 
-      className="group hover:shadow-lg hover:shadow-slate-200/50 transition-all duration-300 cursor-pointer backdrop-blur-sm bg-white/90 hover:bg-white border-slate-200/60 hover:border-slate-300/60 transform hover:-translate-y-1 rounded-xl"
+      className="group hover:shadow-lg transition-all duration-300 cursor-pointer backdrop-blur-sm bg-card hover:bg-card/95 border-border hover:border-[var(--border-focus)] transform hover:-translate-y-1 rounded-xl"
       onClick={() => onNavigateToProject?.(project)}
     >
       <CardContent className="p-6">
@@ -58,23 +52,22 @@ const ProjectCard: React.FC<ProjectCardProps> = ({
             {/* Header Row */}
             <div className="flex items-start justify-between gap-4">
               <div className="flex-1 min-w-0">
-                <CardTitle className="text-lg font-semibold text-slate-900 group-hover:text-blue-700 transition-colors truncate">
+                <CardTitle className="text-lg font-semibold text-[var(--text-primary)] group-hover:text-primary transition-colors truncate">
                   {project.name}
                 </CardTitle>
-                <CardDescription className="text-sm text-slate-600 line-clamp-2 leading-relaxed mt-1">
+                <CardDescription className="text-sm text-[var(--text-secondary)] line-clamp-2 leading-relaxed mt-1">
                   {project.description || 'No description provided'}
                 </CardDescription>
               </div>
               
               {/* Completion Rate Badge */}
               {stats && totalTasks > 0 && (
-                <div className="flex items-center gap-2 bg-slate-50 px-3 py-1.5 rounded-lg border">
-                  <div className={`w-2 h-2 rounded-full ${
-                    completionRate >= 80 ? 'bg-green-500' : 
-                    completionRate >= 50 ? 'bg-blue-500' : 
-                    completionRate >= 25 ? 'bg-yellow-500' : 'bg-slate-300'
-                  }`} />
-                  <span className="text-sm font-medium text-slate-900">{completionRate}%</span>
+                <div className="flex items-center gap-2 bg-[var(--bg-secondary)] px-3 py-1.5 rounded-lg border">
+                  <div 
+                    className="w-2 h-2 rounded-full"
+                    style={{ backgroundColor: getProgressColor(completionRate) }}
+                  />
+                  <span className="text-sm font-medium text-[var(--text-primary)]">{completionRate}%</span>
                 </div>
               )}
             </div>
@@ -82,30 +75,33 @@ const ProjectCard: React.FC<ProjectCardProps> = ({
             {/* Progress Section */}
             {stats && totalTasks > 0 ? (
               <div className="space-y-3">
-                <div className="w-full bg-slate-100 rounded-full h-2 overflow-hidden">
+                <div className="w-full bg-[var(--bg-tertiary)] rounded-full h-2 overflow-hidden">
                   <div
-                    className={`h-2 rounded-full transition-all duration-300 ${getProgressColor(completionRate)}`}
-                    style={{ width: `${completionRate}%` }}
+                    className="h-2 rounded-full transition-all duration-300"
+                    style={{ 
+                      width: `${completionRate}%`,
+                      backgroundColor: getProgressColor(completionRate)
+                    }}
                   />
                 </div>
                 
                 {/* Task Status Badges - Horizontal Layout */}
                 <div className="flex items-center gap-3 text-xs">
                   {stats.COMPLETED > 0 && (
-                    <div className="flex items-center gap-1.5 px-2.5 py-1.5 bg-green-50 text-green-700 rounded-lg border border-green-200">
-                      <div className="w-2 h-2 bg-green-500 rounded-full" />
+                    <div className="flex items-center gap-1.5 px-2.5 py-1.5 bg-success-light text-success rounded-lg border border-success">
+                      <div className="w-2 h-2 bg-success rounded-full" />
                       <span className="font-medium">{stats.COMPLETED} Done</span>
                     </div>
                   )}
                   {stats.IN_PROGRESS > 0 && (
-                    <div className="flex items-center gap-1.5 px-2.5 py-1.5 bg-blue-50 text-blue-700 rounded-lg border border-blue-200">
-                      <div className="w-2 h-2 bg-blue-500 rounded-full" />
+                    <div className="flex items-center gap-1.5 px-2.5 py-1.5 bg-info-light text-info rounded-lg border border-info">
+                      <div className="w-2 h-2 bg-info rounded-full" />
                       <span className="font-medium">{stats.IN_PROGRESS} Active</span>
                     </div>
                   )}
                   {stats.PENDING > 0 && (
-                    <div className="flex items-center gap-1.5 px-2.5 py-1.5 bg-slate-50 text-slate-700 rounded-lg border border-slate-200">
-                      <div className="w-2 h-2 bg-slate-400 rounded-full" />
+                    <div className="flex items-center gap-1.5 px-2.5 py-1.5 bg-muted text-muted-foreground rounded-lg border border-border">
+                      <div className="w-2 h-2 bg-muted-foreground rounded-full" />
                       <span className="font-medium">{stats.PENDING} Pending</span>
                     </div>
                   )}
@@ -113,27 +109,27 @@ const ProjectCard: React.FC<ProjectCardProps> = ({
               </div>
             ) : (
               <div className="flex items-center gap-2 py-3">
-                <div className="text-slate-400">
+                <div className="text-[var(--text-tertiary)]">
                   <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1}>
                     <path strokeLinecap="round" strokeLinejoin="round" d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
                   </svg>
                 </div>
-                <span className="text-sm text-slate-500">No tasks yet - start by adding your first task</span>
+                <span className="text-sm text-[var(--text-secondary)]">No tasks yet - start by adding your first task</span>
               </div>
             )}
 
             {/* Project Metadata - Horizontal */}
-            <div className="flex items-center gap-4 text-xs text-slate-500 pt-2 border-t border-slate-100">
+            <div className="flex items-center gap-4 text-xs text-[var(--text-secondary)] pt-2 border-t border-[var(--border-light)]">
               <div className="flex items-center gap-1">
                 <span>Created</span>
-                <span className="font-medium text-slate-700">{formatDate(project.created_at)}</span>
+                <span className="font-medium text-[var(--text-primary)]">{formatDate(project.created_at)}</span>
               </div>
               {project.updated_at !== project.created_at && (
                 <>
-                  <div className="w-1 h-1 bg-slate-300 rounded-full" />
+                  <div className="w-1 h-1 bg-[var(--border)] rounded-full" />
                   <div className="flex items-center gap-1">
                     <span>Updated</span>
-                    <span className="font-medium text-slate-700">{formatDate(project.updated_at)}</span>
+                    <span className="font-medium text-[var(--text-primary)]">{formatDate(project.updated_at)}</span>
                   </div>
                 </>
               )}
@@ -152,9 +148,9 @@ const ProjectCard: React.FC<ProjectCardProps> = ({
                   }}
                   size="sm"
                   variant="outline"
-                  className="h-8 px-3 bg-blue-50 hover:bg-blue-100 border-blue-200 text-blue-700 hover:text-blue-800 rounded-lg text-xs font-medium opacity-80 group-hover:opacity-100 transition-all"
+                  className="h-9 px-3 bg-info-light hover:bg-info/10 border-info text-info rounded-lg text-xs font-medium opacity-80 group-hover:opacity-100 transition-all duration-200 hover:shadow-md hover:-translate-y-0.5 button-with-icon"
                 >
-                  <FolderOpen className="h-3 w-3 mr-1" />
+                  <FolderOpen className="w-4 h-4 mr-1.5 icon-enhanced icon-hover" strokeWidth={2} />
                   Tasks
                 </Button>
               )}
@@ -166,9 +162,9 @@ const ProjectCard: React.FC<ProjectCardProps> = ({
                   }}
                   size="sm"
                   variant="outline"
-                  className="h-8 px-3 bg-slate-50 hover:bg-slate-100 border-slate-200 text-slate-700 hover:text-slate-800 rounded-lg text-xs font-medium opacity-80 group-hover:opacity-100 transition-all"
+                  className="h-9 px-3 bg-muted hover:bg-muted/80 border-border text-muted-foreground hover:text-foreground rounded-lg text-xs font-medium opacity-80 group-hover:opacity-100 transition-all duration-200 hover:shadow-md hover:-translate-y-0.5 button-with-icon"
                 >
-                  <BarChart3 className="h-3 w-3 mr-1" />
+                  <BarChart3 className="w-4 h-4 mr-1.5 icon-enhanced icon-hover" strokeWidth={2} />
                   Stats
                 </Button>
               )}
@@ -180,43 +176,43 @@ const ProjectCard: React.FC<ProjectCardProps> = ({
                 <Button 
                   variant="ghost" 
                   size="icon" 
-                  className="h-8 w-8 opacity-60 group-hover:opacity-100 transition-all duration-200 hover:bg-slate-100 rounded-lg flex-shrink-0"
+                  className="h-9 w-9 opacity-60 group-hover:opacity-100 transition-all duration-200 hover:bg-muted rounded-lg flex-shrink-0 icon-button"
                 >
-                  <MoreHorizontal className="h-4 w-4 text-slate-600" />
+                  <MoreHorizontal className="w-5 h-5 text-muted-foreground icon-enhanced dropdown-icon" strokeWidth={2} />
                 </Button>
               </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="w-48 bg-white/95 backdrop-blur-sm border-slate-200/60 rounded-xl">
+              <DropdownMenuContent align="end" className="w-48 bg-white/95 backdrop-blur-sm border-[var(--border)] rounded-xl">
                 {onViewTasks && (
-                  <DropdownMenuItem onClick={() => onViewTasks(project)} className="text-slate-700 hover:bg-slate-50 rounded-lg">
-                    <FolderOpen className="h-4 w-4 mr-2" />
+                  <DropdownMenuItem onClick={() => onViewTasks(project)} className="text-foreground hover:bg-muted rounded-lg cursor-pointer">
+                    <FolderOpen className="w-4 h-4 mr-2 icon-enhanced" strokeWidth={2} />
                     View Tasks
                   </DropdownMenuItem>
                 )}
                 {onViewStats && (
-                  <DropdownMenuItem onClick={() => onViewStats(project)} className="text-slate-700 hover:bg-slate-50 rounded-lg">
-                    <BarChart3 className="h-4 w-4 mr-2" />
+                  <DropdownMenuItem onClick={() => onViewStats(project)} className="text-foreground hover:bg-muted rounded-lg cursor-pointer">
+                    <BarChart3 className="w-4 h-4 mr-2 icon-enhanced" strokeWidth={2} />
                     View Analytics
                   </DropdownMenuItem>
                 )}
                 {onShare && (
-                  <DropdownMenuItem onClick={() => onShare(project)} className="text-slate-700 hover:bg-slate-50 rounded-lg">
-                    <Users className="h-4 w-4 mr-2" />
+                  <DropdownMenuItem onClick={() => onShare(project)} className="text-foreground hover:bg-muted rounded-lg cursor-pointer">
+                    <Users className="w-4 h-4 mr-2 icon-enhanced" strokeWidth={2} />
                     Share Project
                   </DropdownMenuItem>
                 )}
                 <DropdownMenuSeparator />
                 {onEdit && (
-                  <DropdownMenuItem onClick={() => onEdit(project)} className="text-slate-700 hover:bg-slate-50 rounded-lg">
-                    <Edit className="h-4 w-4 mr-2" />
+                  <DropdownMenuItem onClick={() => onEdit(project)} className="text-foreground hover:bg-muted rounded-lg cursor-pointer">
+                    <Edit className="w-4 h-4 mr-2 icon-enhanced" strokeWidth={2} />
                     Edit Project
                   </DropdownMenuItem>
                 )}
                 {onDelete && (
                   <DropdownMenuItem 
                     onClick={() => onDelete(project)}
-                    className="text-red-600 hover:bg-red-50 focus:text-red-700 rounded-lg"
+                    className="text-error hover:bg-error-light focus:text-error rounded-lg cursor-pointer"
                   >
-                    <Trash2 className="h-4 w-4 mr-2" />
+                    <Trash2 className="w-4 h-4 mr-2 icon-enhanced icon-status-error" strokeWidth={2.5} />
                     Delete Project
                   </DropdownMenuItem>
                 )}

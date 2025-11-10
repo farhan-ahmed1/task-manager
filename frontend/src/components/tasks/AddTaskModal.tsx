@@ -236,7 +236,7 @@ const AddTaskModal: React.FC<AddTaskModalProps> = ({
           {/* Action Buttons Row */}
           <div className="flex items-center gap-2 py-1">
             {/* Date Button */}
-            <div className="relative">
+            <div className="relative z-50">
               <button 
                 className="flex items-center gap-2 px-3 py-2 bg-gray-25 hover:bg-gray-100 hover:border-gray-200 hover:shadow-sm border border-gray-100 rounded-lg text-sm font-medium transition-all duration-200"
                 style={{ color: '#374151', backgroundColor: '#FAFAFA' }}

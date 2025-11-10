@@ -108,10 +108,16 @@ const Sidebar: React.FC<SidebarProps> = ({ onClose, onToggle, className }) => {
     return user?.email?.[0]?.toUpperCase() || 'U';
   };
 
-  const getRandomColor = (isDark = false) => {
-    const colors = isDark 
-      ? ['#1A73E8', '#137333', '#B31412', '#8E24AA', '#E37400', '#C5221F']
-      : ['#4285F4', '#34A853', '#EA4335', '#9C27B0', '#FF9800', '#F44336'];
+  const getRandomColor = () => {
+    // Use CSS variable colors for consistency
+    const colors = [
+      'var(--primary)',
+      'var(--success)',
+      'var(--error)',
+      'var(--warning)',
+      '#9C27B0', // Purple
+      '#00BCD4', // Cyan
+    ];
     
     // Use user email or name to get consistent colors for the same user
     const seed = user?.email || user?.name || 'default';
@@ -419,15 +425,15 @@ const Sidebar: React.FC<SidebarProps> = ({ onClose, onToggle, className }) => {
              }}>
           <div className="w-8 h-8 rounded-full flex items-center justify-center text-white font-medium text-sm" 
                style={{ 
-                 background: `linear-gradient(135deg, ${getRandomColor()}, ${getRandomColor(true)})` 
+                 background: `linear-gradient(135deg, ${getRandomColor()}, ${getRandomColor()})` 
                }}>
             {getUserInitials()}
           </div>
           <div className="flex-1 min-w-0">
-            <p className="text-sm font-medium truncate" style={{ color: '#202124' }}>
+            <p className="text-sm font-medium truncate" style={{ color: 'var(--text-primary)' }}>
               {user?.name || 'Admin User'}
             </p>
-            <p className="text-xs truncate" style={{ color: '#5F6368' }}>
+            <p className="text-xs truncate" style={{ color: 'var(--text-secondary)' }}>
               {user?.email || 'admin@taskmanager.com'}
             </p>
           </div>

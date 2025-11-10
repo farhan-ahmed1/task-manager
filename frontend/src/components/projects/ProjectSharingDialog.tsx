@@ -169,15 +169,15 @@ const ProjectSharingDialog: React.FC<ProjectSharingDialogProps> = ({
   const getRoleIcon = (role: string) => {
     switch (role) {
       case 'OWNER':
-        return <Crown className="h-4 w-4 text-yellow-600" />;
+        return <Crown className="h-4 w-4 text-warning" />;
       case 'ADMIN':
-        return <Shield className="h-4 w-4 text-blue-600" />;
+        return <Shield className="h-4 w-4 text-info" />;
       case 'MEMBER':
-        return <User className="h-4 w-4 text-green-600" />;
+        return <User className="h-4 w-4 text-success" />;
       case 'VIEWER':
-        return <Eye className="h-4 w-4 text-gray-600" />;
+        return <Eye className="h-4 w-4 text-muted-foreground" />;
       default:
-        return <User className="h-4 w-4 text-gray-600" />;
+        return <User className="h-4 w-4 text-muted-foreground" />;
     }
   };
 
@@ -243,7 +243,7 @@ const ProjectSharingDialog: React.FC<ProjectSharingDialogProps> = ({
                   />
                 </div>
                 {errors.email && (
-                  <p className="text-sm text-red-600">{errors.email.message}</p>
+                  <p className="text-sm text-error">{errors.email.message}</p>
                 )}
               </div>
 
@@ -272,7 +272,7 @@ const ProjectSharingDialog: React.FC<ProjectSharingDialogProps> = ({
                     </SelectItem>
                     <SelectItem value="MEMBER">
                       <div className="flex items-center gap-2">
-                        <User className="h-4 w-4 text-green-600" />
+                        <User className="h-4 w-4 text-success" />
                         <div>
                           <div className="font-medium">Member</div>
                           <div className="text-xs text-gray-500">Can create and edit tasks</div>
@@ -281,7 +281,7 @@ const ProjectSharingDialog: React.FC<ProjectSharingDialogProps> = ({
                     </SelectItem>
                     <SelectItem value="ADMIN">
                       <div className="flex items-center gap-2">
-                        <Shield className="h-4 w-4 text-blue-600" />
+                        <Shield className="h-4 w-4 text-info" />
                         <div>
                           <div className="font-medium">Admin</div>
                           <div className="text-xs text-gray-500">Can manage project and members</div>
@@ -322,7 +322,7 @@ const ProjectSharingDialog: React.FC<ProjectSharingDialogProps> = ({
                 className="border-gray-300 text-gray-700 hover:bg-gray-50"
               >
                 {copySuccess ? (
-                  <Check className="h-4 w-4 text-green-600" />
+                  <Check className="h-4 w-4 text-success" />
                 ) : (
                   <Copy className="h-4 w-4" />
                 )}
@@ -381,7 +381,7 @@ const ProjectSharingDialog: React.FC<ProjectSharingDialogProps> = ({
                             variant="ghost"
                             size="sm"
                             onClick={() => handleRemoveMember(member)}
-                            className="h-6 w-6 p-0 text-red-600 hover:text-red-700 hover:bg-red-50"
+                            className="h-6 w-6 p-0 text-error hover:text-error hover:bg-error-light"
                           >
                             <Trash2 className="h-3 w-3" />
                           </Button>

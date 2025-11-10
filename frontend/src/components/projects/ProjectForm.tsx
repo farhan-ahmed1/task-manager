@@ -101,11 +101,11 @@ const ProjectForm: React.FC<ProjectFormProps> = ({
         <form onSubmit={handleSubmit(onFormSubmit)} className="space-y-6">
           {/* Error Alert */}
           {error && (
-            <Alert variant="destructive" className="bg-red-50/80 backdrop-blur-sm border-red-200 rounded-lg">
+            <Alert variant="destructive" className="bg-error-light/80 backdrop-blur-sm border-error rounded-lg">
               <AlertCircle className="h-4 w-4" />
               <div className="ml-2">
-                <p className="text-sm font-medium text-red-800">Error</p>
-                <p className="text-sm text-red-700">{error}</p>
+                <p className="text-sm font-medium text-error">Error</p>
+                <p className="text-sm text-error">{error}</p>
               </div>
             </Alert>
           )}
@@ -121,12 +121,12 @@ const ProjectForm: React.FC<ProjectFormProps> = ({
               placeholder="Enter a descriptive project name..."
               {...register('name')}
               disabled={isSubmitting}
-              className={`bg-white/90 border-slate-300 text-slate-900 placeholder-slate-400 rounded-lg transition-all duration-200 focus:bg-white focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 ${
-                errors.name ? 'border-red-400 focus:border-red-500 focus:ring-red-500/20' : ''
+              className={`bg-white/90 border-slate-300 text-slate-900 placeholder-slate-400 rounded-lg transition-all duration-200 focus:bg-white focus:border-primary focus:ring-2 focus:ring-primary/20 ${
+                errors.name ? 'border-error focus:border-error focus:ring-error/20' : ''
               }`}
             />
             {errors.name && (
-              <p className="text-sm text-red-600 flex items-center gap-1">
+              <p className="text-sm text-error flex items-center gap-1">
                 <AlertCircle className="h-3 w-3" />
                 {errors.name.message}
               </p>
@@ -144,12 +144,12 @@ const ProjectForm: React.FC<ProjectFormProps> = ({
               rows={3}
               {...register('description')}
               disabled={isSubmitting}
-              className={`bg-white/90 border-slate-300 text-slate-900 placeholder-slate-400 rounded-lg transition-all duration-200 focus:bg-white focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 resize-none ${
-                errors.description ? 'border-red-400 focus:border-red-500 focus:ring-red-500/20' : ''
+              className={`bg-white/90 border-slate-300 text-slate-900 placeholder-slate-400 rounded-lg transition-all duration-200 focus:bg-white focus:border-primary focus:ring-2 focus:ring-primary/20 resize-none ${
+                errors.description ? 'border-error focus:border-error focus:ring-error/20' : ''
               }`}
             />
             {errors.description && (
-              <p className="text-sm text-red-600 flex items-center gap-1">
+              <p className="text-sm text-error flex items-center gap-1">
                 <AlertCircle className="h-3 w-3" />
                 {errors.description.message}
               </p>
@@ -170,7 +170,7 @@ const ProjectForm: React.FC<ProjectFormProps> = ({
             <Button
               type="submit"
               disabled={isSubmitting || (!isDirty && isEditMode)}
-              className="bg-blue-600 text-white hover:bg-blue-700 rounded-lg px-6 py-2 shadow-sm hover:shadow-md transition-all duration-200"
+              className="bg-primary text-white hover:bg-primary-dark rounded-lg px-6 py-2 shadow-sm hover:shadow-md transition-all duration-200"
             >
               {isSubmitting && (
                 <Loader2 className="h-4 w-4 mr-2 animate-spin" />

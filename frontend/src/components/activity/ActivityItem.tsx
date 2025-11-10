@@ -18,18 +18,18 @@ const ActivityItem: React.FC<ActivityItemProps> = ({
   userName = "You"
 }) => {
   const getUserColor = (name: string) => {
-    // Generate a consistent color based on the user's name
+    // Generate a consistent color based on the user's name using CSS variables
     const colors = [
-      '#4285f4', // Blue
-      '#ea4335', // Red
-      '#34a853', // Green
-      '#fbbc04', // Yellow
-      '#ff6d01', // Orange
-      '#9c27b0', // Purple
-      '#00bcd4', // Cyan
-      '#795548', // Brown
-      '#607d8b', // Blue Grey
-      '#e91e63', // Pink
+      'var(--primary)',    // Blue
+      'var(--error)',      // Red
+      'var(--success)',    // Green
+      'var(--warning)',    // Amber
+      '#FF6D01',           // Orange
+      '#9C27B0',           // Purple
+      '#00BCD4',           // Cyan
+      '#795548',           // Brown
+      '#607D8B',           // Blue Grey
+      '#E91E63',           // Pink
     ];
     
     let hash = 0;

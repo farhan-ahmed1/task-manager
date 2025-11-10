@@ -278,8 +278,8 @@ const TaskList: React.FC = () => {
           <div className="bg-white/80 backdrop-blur-sm rounded-2xl p-8 border border-slate-200/60 shadow-lg">
             <div className="flex flex-col items-center space-y-4">
               <div className="relative">
-                <div className="h-12 w-12 rounded-full bg-blue-100 flex items-center justify-center">
-                  <Loader2 className="h-6 w-6 animate-spin text-blue-600" />
+                <div className="h-14 w-14 rounded-full bg-info-light flex items-center justify-center">
+                  <Loader2 className="w-7 h-7 animate-spin text-primary icon-loading" strokeWidth={2.5} />
                 </div>
               </div>
               <div className="text-center">
@@ -297,15 +297,15 @@ const TaskList: React.FC = () => {
     <div className="space-y-8">
       {/* Error Alert */}
       {error && (
-        <Alert variant="destructive">
-          <AlertCircle className="h-4 w-4" />
+        <Alert variant="destructive" className="border-error">
+          <AlertCircle className="w-5 h-5 icon-status-error" strokeWidth={2.5} />
           <AlertDescription>
             {error}
             <Button 
               variant="ghost" 
               size="sm" 
               onClick={() => setError(null)}
-              className="ml-2 h-auto p-0 text-xs underline"
+              className="ml-2 h-auto p-0 text-xs underline hover:no-underline"
             >
               Dismiss
             </Button>
@@ -318,9 +318,9 @@ const TaskList: React.FC = () => {
         <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6">
           <div className="space-y-3">
             <div className="flex items-center gap-3">
-              <div className="h-10 w-10 rounded-xl bg-blue-600 flex items-center justify-center">
-                <svg className="h-5 w-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+              <div className="h-12 w-12 rounded-xl bg-primary flex items-center justify-center shadow-lg shadow-primary/20">
+                <svg className="w-6 h-6 text-white icon-enhanced" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
                 </svg>
               </div>
               <div>
@@ -331,35 +331,35 @@ const TaskList: React.FC = () => {
             
             {/* Enhanced Stats Cards */}
             <div className="flex flex-wrap gap-3">
-              <div className="bg-white/80 backdrop-blur-sm rounded-lg px-3 py-2 border border-slate-200/60">
+              <div className="bg-white/80 backdrop-blur-sm rounded-lg px-4 py-2 border border-slate-200/60 hover:shadow-md transition-all duration-200">
                 <div className="flex items-center gap-2">
-                  <div className="h-2 w-2 rounded-full bg-slate-400"></div>
+                  <div className="h-2.5 w-2.5 rounded-full bg-slate-400"></div>
                   <span className="text-sm font-medium text-slate-700">{stats.total} Total</span>
                 </div>
               </div>
-              <div className="bg-white/80 backdrop-blur-sm rounded-lg px-3 py-2 border border-slate-200/60">
+              <div className="bg-white/80 backdrop-blur-sm rounded-lg px-4 py-2 border border-slate-200/60 hover:shadow-md transition-all duration-200">
                 <div className="flex items-center gap-2">
-                  <div className="h-2 w-2 rounded-full bg-green-500"></div>
+                  <div className="h-2.5 w-2.5 rounded-full bg-success"></div>
                   <span className="text-sm font-medium text-slate-700">{stats.completed} Completed</span>
                 </div>
               </div>
-              <div className="bg-white/80 backdrop-blur-sm rounded-lg px-3 py-2 border border-slate-200/60">
+              <div className="bg-white/80 backdrop-blur-sm rounded-lg px-4 py-2 border border-slate-200/60 hover:shadow-md transition-all duration-200">
                 <div className="flex items-center gap-2">
-                  <div className="h-2 w-2 rounded-full bg-blue-500"></div>
+                  <div className="h-2.5 w-2.5 rounded-full bg-info"></div>
                   <span className="text-sm font-medium text-slate-700">{stats.inProgress} In Progress</span>
                 </div>
               </div>
-              <div className="bg-white/80 backdrop-blur-sm rounded-lg px-3 py-2 border border-slate-200/60">
+              <div className="bg-white/80 backdrop-blur-sm rounded-lg px-4 py-2 border border-slate-200/60 hover:shadow-md transition-all duration-200">
                 <div className="flex items-center gap-2">
-                  <div className="h-2 w-2 rounded-full bg-amber-500"></div>
+                  <div className="h-2.5 w-2.5 rounded-full bg-warning"></div>
                   <span className="text-sm font-medium text-slate-700">{stats.pending} Pending</span>
                 </div>
               </div>
               {stats.overdue > 0 && (
-                <div className="bg-red-50/80 backdrop-blur-sm rounded-lg px-3 py-2 border border-red-200/60">
+                <div className="bg-error-light/80 backdrop-blur-sm rounded-lg px-4 py-2 border border-error/60 hover:shadow-md transition-all duration-200">
                   <div className="flex items-center gap-2">
-                    <div className="h-2 w-2 rounded-full bg-red-500 animate-pulse"></div>
-                    <span className="text-sm font-medium text-red-700">{stats.overdue} Overdue</span>
+                    <div className="h-2.5 w-2.5 rounded-full bg-error animate-pulse"></div>
+                    <span className="text-sm font-medium text-error">{stats.overdue} Overdue</span>
                   </div>
                 </div>
               )}
@@ -369,9 +369,9 @@ const TaskList: React.FC = () => {
           <Button 
             onClick={() => setShowTaskForm(true)}
             size="lg"
-            className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-xl shadow-lg hover:shadow-xl transition-all duration-200 transform hover:scale-105"
+            className="bg-primary hover:bg-primary-dark text-white px-6 py-3 rounded-xl shadow-lg hover:shadow-xl transition-all duration-200 transform hover:scale-105 button-with-icon"
           >
-            <Plus className="h-5 w-5 mr-2" />
+            <Plus className="w-5 h-5 mr-2 icon-enhanced icon-hover" strokeWidth={2.5} />
             Create New Task
           </Button>
         </div>
@@ -396,7 +396,7 @@ const TaskList: React.FC = () => {
         <div className="text-center py-16 bg-gradient-to-br from-slate-50 to-blue-50 rounded-2xl border border-slate-200/60">
           <div className="max-w-md mx-auto">
             <div className="text-slate-400 mb-6">
-              <svg className="mx-auto h-16 w-16" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1}>
+              <svg className="mx-auto w-20 h-20 icon-enhanced" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
                 <path strokeLinecap="round" strokeLinejoin="round" d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" />
               </svg>
             </div>
@@ -413,7 +413,7 @@ const TaskList: React.FC = () => {
               <Button 
                 onClick={() => setShowTaskForm(true)}
                 size="lg"
-                className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-3 rounded-xl shadow-lg hover:shadow-xl transition-all duration-200 transform hover:scale-105"
+                className="bg-primary hover:bg-primary-dark text-white px-8 py-3 rounded-xl shadow-lg hover:shadow-xl transition-all duration-200 transform hover:scale-105"
               >
                 <Plus className="h-5 w-5 mr-2" />
                 Create Your First Task

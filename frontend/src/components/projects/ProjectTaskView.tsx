@@ -7,6 +7,7 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import { Plus, Calendar, Clock, CheckCircle2, Circle, AlertCircle } from 'lucide-react';
 import type { Project, Task, TaskStatus } from '@/types/api';
 import { taskService } from '@/services/tasks';
+import { getTaskStatusColor, getTaskPriorityColor } from '@/lib/taskUtils';
 
 interface ProjectTaskViewProps {
   project: Project;
@@ -58,39 +59,13 @@ const ProjectTaskView: React.FC<ProjectTaskViewProps> = ({
   const getStatusIcon = (status: TaskStatus) => {
     switch (status) {
       case 'COMPLETED':
-        return <CheckCircle2 className="h-4 w-4 text-green-600" />;
+        return <CheckCircle2 className="h-4 w-4 text-success" />;
       case 'IN_PROGRESS':
-        return <Clock className="h-4 w-4 text-blue-600" />;
+        return <Clock className="h-4 w-4 text-info" />;
       case 'PENDING':
-        return <Circle className="h-4 w-4 text-gray-600" />;
+        return <Circle className="h-4 w-4 text-muted-foreground" />;
       default:
-        return <AlertCircle className="h-4 w-4 text-red-600" />;
-    }
-  };
-
-  const getStatusColor = (status: TaskStatus) => {
-    switch (status) {
-      case 'COMPLETED':
-        return 'bg-green-50 text-green-700 border-green-200';
-      case 'IN_PROGRESS':
-        return 'bg-blue-50 text-blue-700 border-blue-200';
-      case 'PENDING':
-        return 'bg-gray-50 text-gray-700 border-gray-200';
-      default:
-        return 'bg-red-50 text-red-700 border-red-200';
-    }
-  };
-
-  const getPriorityColor = (priority: string) => {
-    switch (priority) {
-      case 'HIGH':
-        return 'bg-red-100 text-red-800';
-      case 'MEDIUM':
-        return 'bg-yellow-100 text-yellow-800';
-      case 'LOW':
-        return 'bg-green-100 text-green-800';
-      default:
-        return 'bg-gray-100 text-gray-800';
+        return <AlertCircle className="h-4 w-4 text-error" />;
     }
   };
 
@@ -124,7 +99,7 @@ const ProjectTaskView: React.FC<ProjectTaskViewProps> = ({
               </div>
             </div>
             <div className="flex flex-col items-end space-y-1">
-              <Badge variant="outline" className={`text-xs ${getPriorityColor(task.priority)}`}>
+              <Badge variant="outline" className={`text-xs ${getTaskPriorityColor(task.priority)}`}>
                 {task.priority}
               </Badge>
             </div>
@@ -136,7 +111,7 @@ const ProjectTaskView: React.FC<ProjectTaskViewProps> = ({
               <Calendar className="h-3 w-3" />
               <span>{formatDate(task.due_date)}</span>
             </div>
-            <Badge variant="outline" className={`text-xs ${getStatusColor(task.status)}`}>
+            <Badge variant="outline" className={`text-xs ${getTaskStatusColor(task.status)}`}>
               {task.status.replace('_', ' ')}
             </Badge>
           </div>
@@ -148,13 +123,13 @@ const ProjectTaskView: React.FC<ProjectTaskViewProps> = ({
   const EmptyState: React.FC<{ title: string; description: string }> = ({ title, description }) => (
     <div className="text-center py-12">
       <AlertCircle className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
-      <h3 className="text-lg font-medium text-gray-900 mb-2">{title}</h3>
+      <h3 className="text-lg font-medium text-foreground mb-2">{title}</h3>
       <p className="text-muted-foreground mb-4">{description}</p>
       {onCreateTask && (
         <Button 
           onClick={onCreateTask} 
           size="sm"
-          className="bg-blue-600 hover:bg-blue-700 text-white"
+          className="bg-primary hover:bg-primary-dark text-white"
         >
           <Plus className="h-4 w-4 mr-2" />
           Create Task
@@ -180,7 +155,7 @@ const ProjectTaskView: React.FC<ProjectTaskViewProps> = ({
     return (
       <Card className={className}>
         <CardContent className="p-8">
-          <div className="text-center text-red-600">
+          <div className="text-center text-error">
             <AlertCircle className="h-8 w-8 mx-auto mb-4" />
             <p>{error}</p>
           </div>
@@ -208,7 +183,7 @@ const ProjectTaskView: React.FC<ProjectTaskViewProps> = ({
             <Button 
               onClick={onCreateTask} 
               size="sm"
-              className="bg-blue-600 hover:bg-blue-700 text-white"
+              className="bg-primary hover:bg-primary-dark text-white"
             >
               <Plus className="h-4 w-4 mr-2" />
               Add Task

@@ -11,12 +11,12 @@ const TodayPage: React.FC = () => {
       </div>
       
       <div className="mb-6">
-        <p className="text-gray-600">Tasks due today will be displayed here.</p>
+        <p className="text-[var(--text-secondary)]">Tasks due today will be displayed here.</p>
       </div>
       
-      <div className="bg-white rounded-lg border border-gray-200 p-6">
-        <h2 className="text-lg font-medium text-gray-900 mb-4">Today's Tasks</h2>
-        <p className="text-gray-500">No tasks due today</p>
+      <div className="bg-card rounded-lg border border-[var(--border)] p-6">
+        <h2 className="text-lg font-medium text-foreground mb-4">Today's Tasks</h2>
+        <p className="text-muted-foreground">No tasks due today</p>
       </div>
     </div>
   );

@@ -33,6 +33,25 @@ const InlineAddTask: React.FC<InlineAddTaskProps> = ({
   const containerRef = useRef<HTMLDivElement>(null);
   const priorityPickerRef = useRef<HTMLDivElement>(null);
   const projectPickerRef = useRef<HTMLDivElement>(null);
+  const datePickerRef = useRef<HTMLDivElement>(null);
+  
+  // Use refs to track state for event handler without causing re-renders
+  const stateRef = useRef({
+    showDatePicker,
+    taskTitle,
+    taskDescription,
+    currentProject
+  });
+
+  // Update ref when state changes
+  useEffect(() => {
+    stateRef.current = {
+      showDatePicker,
+      taskTitle,
+      taskDescription,
+      currentProject
+    };
+  }, [showDatePicker, taskTitle, taskDescription, currentProject]);
 
   // Load available projects when component mounts
   useEffect(() => {
@@ -74,25 +93,47 @@ const InlineAddTask: React.FC<InlineAddTaskProps> = ({
   // Handle click outside to close pickers
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
-      if (priorityPickerRef.current && !priorityPickerRef.current.contains(event.target as Node)) {
+      const target = event.target as Node;
+      
+      // Use ref to check if date picker is open - no dependency needed
+      if (stateRef.current.showDatePicker) {
+        return; // Don't interfere when date picker is managing itself
+      }
+      
+      // Close priority picker if clicking outside of it
+      if (priorityPickerRef.current && !priorityPickerRef.current.contains(target)) {
         setShowPriorityPicker(false);
       }
-      if (projectPickerRef.current && !projectPickerRef.current.contains(event.target as Node)) {
+      
+      // Close project picker if clicking outside of it
+      if (projectPickerRef.current && !projectPickerRef.current.contains(target)) {
         setShowProjectPicker(false);
       }
-      if (containerRef.current && !containerRef.current.contains(event.target as Node)) {
-        handleCancel();
+      
+      // Only handle clicks outside when date picker is NOT open
+      if (containerRef.current && !containerRef.current.contains(target)) {
+        // Use ref values to check content
+        if (!stateRef.current.taskTitle.trim() && !stateRef.current.taskDescription.trim()) {
+          setIsExpanded(false);
+          setTaskTitle('');
+          setTaskDescription('');
+          setPriority(null);
+          setDueDate('');
+          setShowDatePicker(false);
+          setShowPriorityPicker(false);
+          setShowProjectPicker(false);
+          setSelectedProject(stateRef.current.currentProject || null);
+        }
       }
     };
 
-    if (showPriorityPicker || showProjectPicker || isExpanded) {
-      document.addEventListener('mousedown', handleClickOutside);
-    }
-
+    // Add listener once on mount, never re-add
+    document.addEventListener('mousedown', handleClickOutside);
+    
     return () => {
       document.removeEventListener('mousedown', handleClickOutside);
     };
-  }, [showPriorityPicker, showProjectPicker, isExpanded, handleCancel]);
+  }, []); // Empty deps - listener never changes
 
   useEffect(() => {
     if (isExpanded && titleRef.current) {
@@ -154,10 +195,10 @@ const InlineAddTask: React.FC<InlineAddTaskProps> = ({
 
   const getPriorityOptions = () => {
     return [
-      { label: 'Priority 1', value: 'HIGH' as const, color: '#EA4335', description: 'High' },
-      { label: 'Priority 2', value: 'MEDIUM' as const, color: '#FF9800', description: 'Medium' },
-      { label: 'Priority 3', value: 'LOW' as const, color: '#34A853', description: 'Low' },
-      { label: 'Priority 4', value: null, color: '#9AA0A6', description: 'No priority' }
+      { label: 'Priority 1', value: 'HIGH' as const, color: 'var(--error)', description: 'High' },
+      { label: 'Priority 2', value: 'MEDIUM' as const, color: 'var(--warning)', description: 'Medium' },
+      { label: 'Priority 3', value: 'LOW' as const, color: 'var(--success)', description: 'Low' },
+      { label: 'Priority 4', value: null, color: 'var(--text-tertiary)', description: 'No priority' }
     ];
   };
 
@@ -171,19 +212,55 @@ const InlineAddTask: React.FC<InlineAddTaskProps> = ({
     setShowDatePicker(false);
   };
 
+  const handleDateButtonClick = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setShowDatePicker(!showDatePicker);
+  };
+
   if (!isExpanded) {
     return (
       <div className="px-6 py-4">
         <button
           onClick={() => setIsExpanded(true)}
-          className="group flex items-center w-full text-left py-3 hover:opacity-60"
+          className="group flex items-center w-full text-left py-3"
           style={{ 
-            backgroundColor: 'transparent',
-            color: 'var(--text-muted)'
+            backgroundColor: 'transparent'
+          }}
+          onMouseEnter={(e) => {
+            const iconBg = e.currentTarget.querySelector('.icon-bg') as HTMLElement;
+            const icon = e.currentTarget.querySelector('.plus-icon') as HTMLElement;
+            const text = e.currentTarget.querySelector('.add-text') as HTMLElement;
+            if (iconBg) iconBg.style.backgroundColor = '#2563EB';
+            if (icon) icon.style.color = 'white';
+            if (text) text.style.color = '#2563EB';
+          }}
+          onMouseLeave={(e) => {
+            const iconBg = e.currentTarget.querySelector('.icon-bg') as HTMLElement;
+            const icon = e.currentTarget.querySelector('.plus-icon') as HTMLElement;
+            const text = e.currentTarget.querySelector('.add-text') as HTMLElement;
+            if (iconBg) iconBg.style.backgroundColor = 'transparent';
+            if (icon) icon.style.color = '#2563EB';
+            if (text) text.style.color = 'var(--text-muted)';
           }}
         >
-          <Plus className="w-4 h-4 mr-4 opacity-50 group-hover:opacity-100" />
-          <span className="text-15 font-400">Add task</span>
+          <div 
+            className="icon-bg w-5 h-5 mr-3 flex items-center justify-center rounded-full transition-all"
+            style={{
+              backgroundColor: 'transparent'
+            }}
+          >
+            <Plus 
+              className="plus-icon w-4 h-4 transition-colors" 
+              style={{ color: '#2563EB' }}
+            />
+          </div>
+          <span 
+            className="add-text text-15 font-400 transition-colors"
+            style={{ color: 'var(--text-muted)' }}
+          >
+            Add task
+          </span>
         </button>
       </div>
     );
@@ -192,7 +269,7 @@ const InlineAddTask: React.FC<InlineAddTaskProps> = ({
   return (
     <div ref={containerRef} className="px-6 py-4">
       <div 
-        className="border border-gray-100 bg-white rounded-lg p-6 shadow-sm"
+        className="border border-[var(--border-light)] bg-card rounded-lg p-6 shadow-sm"
         onKeyDown={handleKeyDown}
       >
         {/* Main Task Input */}
@@ -229,7 +306,7 @@ const InlineAddTask: React.FC<InlineAddTaskProps> = ({
         {/* Action Buttons Row */}
         <div className="flex items-center gap-4 mb-8">
           {/* Date Button */}
-          <div className="relative">
+          <div className="relative z-50" ref={datePickerRef}>
             <button 
               type="button"
               className="flex items-center gap-2 py-2 text-sm hover:opacity-60"
@@ -237,7 +314,8 @@ const InlineAddTask: React.FC<InlineAddTaskProps> = ({
                 color: dueDate ? 'var(--text-primary)' : 'var(--text-muted)',
                 backgroundColor: 'transparent'
               }}
-              onClick={() => setShowDatePicker(true)}
+              onClick={handleDateButtonClick}
+              onMouseDown={(e) => e.stopPropagation()}
             >
               <Calendar className="w-4 h-4" />
               <span>{dueDate ? new Date(dueDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }) : 'Due date'}</span>
@@ -272,14 +350,14 @@ const InlineAddTask: React.FC<InlineAddTaskProps> = ({
 
             {/* Priority Picker Dropdown */}
             {showPriorityPicker && (
-              <div className="absolute top-full left-0 mt-2 w-48 bg-white border border-gray-200 rounded-lg shadow-lg z-50">
+              <div className="absolute top-full left-0 mt-2 w-48 bg-white border border-[var(--border)] rounded-lg shadow-lg z-50">
                 <div className="p-2">
                   {getPriorityOptions().map((option) => (
                     <button
                       key={option.value || 'none'}
                       type="button"
                       onClick={() => handlePrioritySelection(option.value)}
-                      className="w-full flex items-center gap-3 px-3 py-2 text-sm hover:bg-gray-50 text-left rounded-lg"
+                      className="w-full flex items-center gap-3 px-3 py-2 text-sm hover:bg-muted text-left rounded-lg"
                     >
                       <div 
                         className="w-2 h-2 rounded-full flex-shrink-0"
@@ -297,7 +375,7 @@ const InlineAddTask: React.FC<InlineAddTaskProps> = ({
         </div>
 
         {/* Footer Actions */}
-        <div className="flex items-center justify-between pt-4 border-t border-gray-100">
+        <div className="flex items-center justify-between pt-4 border-t border-[var(--border-light)]">
           {/* Left: Project selector */}
           <div className="relative" ref={projectPickerRef}>
             <button 
@@ -325,7 +403,7 @@ const InlineAddTask: React.FC<InlineAddTaskProps> = ({
 
             {/* Project Picker Dropdown */}
             {showProjectPicker && (
-              <div className="absolute bottom-full left-0 mb-2 w-64 bg-white border border-gray-200 rounded-lg shadow-lg z-50 max-h-48 overflow-y-auto">
+              <div className="absolute bottom-full left-0 mb-2 w-64 bg-white border border-[var(--border)] rounded-lg shadow-lg z-50 max-h-48 overflow-y-auto">
                 <div className="p-2">
                   {/* Inbox option */}
                   <button
@@ -334,8 +412,8 @@ const InlineAddTask: React.FC<InlineAddTaskProps> = ({
                       setSelectedProject(null);
                       setShowProjectPicker(false);
                     }}
-                    className={`w-full flex items-center gap-3 px-3 py-2 text-sm hover:bg-gray-50 text-left rounded-lg ${
-                      !selectedProject ? 'bg-gray-50' : ''
+                    className={`w-full flex items-center gap-3 px-3 py-2 text-sm hover:bg-muted text-left rounded-lg ${
+                      !selectedProject ? 'bg-muted' : ''
                     }`}
                   >
                     <Inbox className="w-4 h-4 flex-shrink-0" />
@@ -353,8 +431,8 @@ const InlineAddTask: React.FC<InlineAddTaskProps> = ({
                         setSelectedProject(project);
                         setShowProjectPicker(false);
                       }}
-                      className={`w-full flex items-center gap-3 px-3 py-2 text-sm hover:bg-gray-50 text-left rounded-lg ${
-                        selectedProject?.id === project.id ? 'bg-gray-50' : ''
+                      className={`w-full flex items-center gap-3 px-3 py-2 text-sm hover:bg-muted text-left rounded-lg ${
+                        selectedProject?.id === project.id ? 'bg-muted' : ''
                       }`}
                     >
                       <FolderOpen className="w-4 h-4 flex-shrink-0" />
@@ -392,11 +470,25 @@ const InlineAddTask: React.FC<InlineAddTaskProps> = ({
               type="button"
               onClick={handleSubmit}
               disabled={!taskTitle.trim() || isLoading}
-              className={`px-4 py-2 text-sm rounded-lg border-0 disabled:opacity-30 hover:opacity-90 ${
-                taskTitle.trim() 
-                  ? 'bg-gray-900 text-white' 
-                  : 'bg-gray-100 text-gray-400'
-              }`}
+              style={{
+                backgroundColor: 'var(--primary)',
+                color: '#ffffff',
+                opacity: taskTitle.trim() && !isLoading ? '1' : '0.4',
+                cursor: taskTitle.trim() && !isLoading ? 'pointer' : 'not-allowed',
+                border: 'none',
+                outline: 'none'
+              }}
+              className="px-4 py-2 text-sm font-medium rounded-lg transition-opacity duration-200"
+              onMouseEnter={(e) => {
+                if (taskTitle.trim() && !isLoading) {
+                  e.currentTarget.style.backgroundColor = 'var(--primary-dark)';
+                }
+              }}
+              onMouseLeave={(e) => {
+                if (taskTitle.trim() && !isLoading) {
+                  e.currentTarget.style.backgroundColor = 'var(--primary)';
+                }
+              }}
             >
               {isLoading ? 'Adding...' : 'Add task'}
             </button>
