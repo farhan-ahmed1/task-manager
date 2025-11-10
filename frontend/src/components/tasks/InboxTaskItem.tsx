@@ -105,7 +105,7 @@ const InboxTaskItem: React.FC<InboxTaskItemProps> = ({
       {...attributes}
     >
       {/* Drag handle - only visible on hover */}
-      <div className={`flex-shrink-0 mr-2 transition-all duration-200 ${
+      <div className={`flex-shrink-0 mr-2 transition-all duration-200 self-start ${
         isHovered ? 'opacity-100 translate-x-0' : 'opacity-0 -translate-x-2'
       }`}>
         <div {...listeners}>
@@ -114,22 +114,28 @@ const InboxTaskItem: React.FC<InboxTaskItemProps> = ({
       </div>
 
       {/* Priority-colored checkmark */}
-      <div className="flex-shrink-0 mr-4">
+      <div className="flex-shrink-0 mr-4 self-start">
         <button
           onClick={(e) => {
             e.stopPropagation();
             onToggleComplete(task);
           }}
-          className="relative w-5 h-5 rounded-full border-2 transition-all duration-200 hover:scale-110 flex items-center justify-center"
+          className="group relative w-5 h-5 rounded-full border-2 transition-all duration-200 flex items-center justify-center"
           style={{
             borderColor: isCompleted ? getPriorityColor(task.priority) : getPriorityColor(task.priority),
             backgroundColor: isCompleted ? getPriorityColor(task.priority) : 'transparent',
           }}
         >
-          {isCompleted && (
+          {isCompleted ? (
             <Check 
-              className="w-3 h-3 text-white" 
+              className="w-2.5 h-2.5 text-white" 
               strokeWidth={3}
+            />
+          ) : (
+            <Check 
+              className="w-2.5 h-2.5 opacity-0 group-hover:opacity-100 transition-opacity duration-200" 
+              strokeWidth={3}
+              style={{ color: 'var(--text-muted)' }}
             />
           )}
         </button>
@@ -199,7 +205,7 @@ const InboxTaskItem: React.FC<InboxTaskItemProps> = ({
       </div>
 
       {/* Hover actions - only visible on hover */}
-      <div className={`flex items-center space-x-1 transition-all duration-200 ${
+      <div className={`flex items-center space-x-1 transition-all duration-200 self-start ${
         isHovered ? 'opacity-100 translate-x-0' : 'opacity-0 translate-x-4'
       }`}>
         <Button
@@ -209,10 +215,11 @@ const InboxTaskItem: React.FC<InboxTaskItemProps> = ({
             e.stopPropagation();
             onEdit(task);
           }}
-          className="p-1.5 h-auto hover:bg-muted/80 rounded-md transition-colors duration-200"
+          className="p-1 h-auto hover:bg-gray-100 transition-colors duration-200"
+          style={{ borderRadius: '4px' }}
           title="Edit task"
         >
-          <Edit3 className="w-3.5 h-3.5" style={{ color: 'var(--text-muted)' }} />
+          <Edit3 className="size-5" style={{ color: 'var(--text-primary)', strokeWidth: 1.5 }} />
         </Button>
 
         <div className="relative z-50" ref={datePickerRef}>
@@ -223,10 +230,11 @@ const InboxTaskItem: React.FC<InboxTaskItemProps> = ({
               e.stopPropagation();
               setShowDatePicker(true);
             }}
-            className="p-1.5 h-auto hover:bg-muted/80 rounded-md transition-colors duration-200"
+            className="p-1 h-auto hover:bg-gray-100 transition-colors duration-200"
+            style={{ borderRadius: '4px' }}
             title="Set date"
           >
-            <Calendar className="w-3.5 h-3.5" style={{ color: 'var(--text-muted)' }} />
+            <Calendar className="size-5" style={{ color: 'var(--text-primary)', strokeWidth: 1.5 }} />
           </Button>
           
           <DatePickerModal
@@ -247,10 +255,11 @@ const InboxTaskItem: React.FC<InboxTaskItemProps> = ({
             e.stopPropagation();
             if (onComment) onComment(task);
           }}
-          className="p-1.5 h-auto hover:bg-muted/80 rounded-md transition-colors duration-200"
+          className="p-1 h-auto hover:bg-gray-100 transition-colors duration-200"
+          style={{ borderRadius: '4px' }}
           title="Add comment"
         >
-          <MessageCircle className="w-3.5 h-3.5" style={{ color: 'var(--text-muted)' }} />
+          <MessageCircle className="size-5" style={{ color: 'var(--text-primary)', strokeWidth: 1.5 }} />
         </Button>
 
         <Button
@@ -260,10 +269,11 @@ const InboxTaskItem: React.FC<InboxTaskItemProps> = ({
             e.stopPropagation();
             if (onOptions) onOptions(task);
           }}
-          className="p-1.5 h-auto hover:bg-muted/80 rounded-md transition-colors duration-200"
+          className="p-1 h-auto hover:bg-gray-100 transition-colors duration-200"
+          style={{ borderRadius: '4px' }}
           title="More options"
         >
-          <MoreHorizontal className="w-3.5 h-3.5" style={{ color: 'var(--text-muted)' }} />
+          <MoreHorizontal className="size-5" style={{ color: 'var(--text-primary)', strokeWidth: 1.5 }} />
         </Button>
       </div>
     </div>

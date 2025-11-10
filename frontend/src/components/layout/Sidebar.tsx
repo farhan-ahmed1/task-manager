@@ -164,18 +164,11 @@ const Sidebar: React.FC<SidebarProps> = ({ onClose, onToggle, onOpenSearch, clas
             </h2>
           </div>
           <button
-            onClick={(e) => {
-              e.preventDefault();
-              e.stopPropagation();
-              if (onToggle) {
-                onToggle();
-              }
-            }}
-            className="p-2 hover:opacity-60"
-            style={{ color: 'var(--text-muted)' }}
-            title="Collapse sidebar"
+            onClick={onToggle}
+            className="p-2 hover:bg-gray-100 rounded-md transition-colors"
           >
-            <PanelLeftClose className="w-4 h-4" />
+            <span className="sr-only">Close sidebar</span>
+            <PanelLeftClose className="w-6 h-6" />
           </button>
         </div>
       </div>
@@ -198,7 +191,7 @@ const Sidebar: React.FC<SidebarProps> = ({ onClose, onToggle, onOpenSearch, clas
             }}
             onClick={() => setIsAddTaskModalOpen(true)}
           >
-            <Plus className="w-4 h-4 mr-3" />
+            <Plus className="w-6 h-6 mr-3" />
             Add task
           </button>
         </div>
@@ -222,22 +215,18 @@ const Sidebar: React.FC<SidebarProps> = ({ onClose, onToggle, onOpenSearch, clas
                     }
                     onClose?.();
                   }}
-                  className="w-full flex items-center justify-between py-2 text-sm group hover:opacity-60"
+                  className="w-full flex items-center justify-between py-2 px-2 text-sm group transition-all duration-150 rounded-md hover:bg-gray-100"
                   style={{
                     color: 'var(--text-secondary)',
                     fontWeight: '400'
                   }}
                 >
                   <div className="flex items-center">
-                    <Icon className="w-4 h-4 mr-4 flex-shrink-0" style={{
+                    <Icon className="w-6 h-6 mr-3 flex-shrink-0 transition-colors duration-150" style={{
                       color: 'var(--text-muted)'
                     }} />
-                    <span>{item.name}</span>
+                    <span className="group-hover:text-[var(--text-primary)] transition-colors duration-150">{item.name}</span>
                   </div>
-                  <kbd className="hidden sm:flex items-center gap-0.5 px-1.5 py-0.5 text-xs font-medium text-gray-500 bg-gray-100 dark:bg-gray-700 dark:text-gray-400 rounded border border-gray-300 dark:border-gray-600">
-                    <span>⌘</span>
-                    <span>K</span>
-                  </kbd>
                 </button>
               );
             }
@@ -248,15 +237,39 @@ const Sidebar: React.FC<SidebarProps> = ({ onClose, onToggle, onOpenSearch, clas
                 key={item.name}
                 to={item.href!}
                 onClick={onClose}
-                className="flex items-center justify-between py-2 text-sm group hover:opacity-60"
+                className="flex items-center justify-between py-2 px-2 text-sm group transition-all duration-150 rounded-md"
                 style={{
-                  color: isActive ? 'var(--text-primary)' : 'var(--text-secondary)',
-                  fontWeight: isActive ? '500' : '400'
+                  fontWeight: isActive ? '500' : '400',
+                  backgroundColor: isActive ? 'rgba(59, 130, 246, 0.08)' : 'transparent'
+                }}
+                onMouseEnter={(e) => {
+                  if (!isActive) {
+                    e.currentTarget.style.backgroundColor = 'rgba(0, 0, 0, 0.03)';
+                    e.currentTarget.style.color = 'var(--primary)';
+                    // Color the icon on hover
+                    const icon = e.currentTarget.querySelector('svg');
+                    if (icon) {
+                      (icon as SVGElement).style.color = 'var(--primary)';
+                    }
+                  }
+                }}
+                onMouseLeave={(e) => {
+                  if (!isActive) {
+                    e.currentTarget.style.backgroundColor = 'transparent';
+                    e.currentTarget.style.color = 'var(--text-secondary)';
+                    // Reset icon color
+                    const icon = e.currentTarget.querySelector('svg');
+                    if (icon) {
+                      (icon as SVGElement).style.color = 'var(--text-muted)';
+                    }
+                  }
                 }}
               >
-                <div className="flex items-center">
-                  <Icon className="w-4 h-4 mr-4 flex-shrink-0" style={{
-                    color: isActive ? 'var(--text-primary)' : 'var(--text-muted)'
+                <div className="flex items-center" style={{
+                  color: isActive ? 'var(--text-primary)' : 'var(--text-secondary)'
+                }}>
+                  <Icon className="w-6 h-6 mr-3 flex-shrink-0 transition-colors duration-150" style={{
+                    color: isActive ? 'var(--primary)' : 'var(--text-muted)'
                   }} />
                   <span>{item.name}</span>
                 </div>
@@ -274,25 +287,24 @@ const Sidebar: React.FC<SidebarProps> = ({ onClose, onToggle, onOpenSearch, clas
         </nav>
 
         {/* More section */}
-        <div className="px-2 py-1">
+        <div className="px-6 space-y-1">
           <button 
-            className="flex items-center px-3 py-2 text-sm w-full transition-all duration-150"
+            className="flex items-center justify-between py-2 px-2 text-sm w-full transition-all duration-150 rounded-md group"
             style={{
-              borderRadius: 'var(--radius-sm)',
               color: 'var(--text-secondary)',
               backgroundColor: 'transparent'
             }}
             onMouseEnter={(e) => {
-              e.currentTarget.style.backgroundColor = 'var(--surface-hover)';
-              e.currentTarget.style.color = 'var(--text-primary)';
+              e.currentTarget.style.backgroundColor = 'rgba(0, 0, 0, 0.03)';
             }}
             onMouseLeave={(e) => {
               e.currentTarget.style.backgroundColor = 'transparent';
-              e.currentTarget.style.color = 'var(--text-secondary)';
             }}
           >
-            <MoreHorizontal className="w-4 h-4 mr-3" style={{ color: 'var(--text-muted)' }} />
-            More
+            <div className="flex items-center">
+              <MoreHorizontal className="w-6 h-6 mr-3 flex-shrink-0" style={{ color: 'var(--text-muted)' }} />
+              <span className="group-hover:text-[var(--text-primary)] transition-colors duration-150">More</span>
+            </div>
           </button>
         </div>
 
@@ -355,7 +367,7 @@ const Sidebar: React.FC<SidebarProps> = ({ onClose, onToggle, onOpenSearch, clas
                       }}
                     >
                       <div className="flex items-center">
-                        <Hash className="w-4 h-4 mr-3 flex-shrink-0" style={{
+                        <Hash className="w-6 h-6 mr-3 flex-shrink-0" style={{
                           color: isActive ? 'var(--primary)' : 'var(--info)'
                         }} />
                         <span className="truncate">{project.name}</span>
@@ -439,7 +451,7 @@ const Sidebar: React.FC<SidebarProps> = ({ onClose, onToggle, onOpenSearch, clas
                       }}
                     >
                       <div className="flex items-center">
-                        <Hash className="w-4 h-4 mr-3 flex-shrink-0" style={{
+                        <Hash className="w-6 h-6 mr-3 flex-shrink-0" style={{
                           color: isActive ? 'var(--primary)' : 'var(--primary)'
                         }} />
                         <span className="truncate">{project.name}</span>

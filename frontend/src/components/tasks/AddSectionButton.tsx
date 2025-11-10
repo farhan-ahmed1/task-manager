@@ -79,14 +79,14 @@ const AddSectionButton: React.FC<AddSectionButtonProps> = ({
   }
 
   return (
-    <div className={`py-2 ${className}`}>
+    <div className={className}>
       <button
         onClick={() => setIsAdding(true)}
         disabled={disabled}
         className="w-full relative flex items-center hover:opacity-80 transition-opacity duration-200 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
       >
         <div className="flex-grow border-t border-blue-300"></div>
-        <span className="flex-shrink-0 px-4 text-sm text-blue-600 bg-white">
+        <span className="flex-shrink-0 px-4 text-sm text-blue-600 bg-white font-semibold">
           Add section
         </span>
         <div className="flex-grow border-t border-blue-300"></div>

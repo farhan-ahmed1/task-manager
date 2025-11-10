@@ -280,10 +280,10 @@ const InlineAddTask: React.FC<InlineAddTaskProps> = ({
 
   if (!isExpanded) {
     return (
-      <div className="px-6 py-4">
+      <div className="px-6 py-2">
         <button
           onClick={() => setIsExpanded(true)}
-          className="group flex items-center w-full text-left py-3"
+          className="group flex items-center w-full text-left py-3 ml-2"
           style={{ 
             backgroundColor: 'transparent'
           }}
@@ -327,20 +327,20 @@ const InlineAddTask: React.FC<InlineAddTaskProps> = ({
   }
 
   return (
-    <div ref={containerRef} className="px-6 py-4">
+    <div ref={containerRef} className="px-6 py-2">
       <div 
-        className="border bg-card rounded-lg p-3"
+        className="border bg-card rounded-lg p-2"
         onKeyDown={handleKeyDown}
       >
         {/* Main Task Input */}
-        <div className="mb-2">
+        <div className="mb-1.5">
           <textarea
             ref={titleRef}
             value={taskTitle}
             onChange={(e) => setTaskTitle(e.target.value)}
             placeholder="Task name"
             rows={1}
-            className="w-full text-lg font-400 border-0 focus:outline-none resize-none bg-transparent block mb-1.5"
+            className="w-full text-lg font-400 border-0 focus:outline-none resize-none bg-transparent block mb-1"
             style={{
               color: 'var(--text-primary)',
               lineHeight: '1.4',
@@ -364,7 +364,7 @@ const InlineAddTask: React.FC<InlineAddTaskProps> = ({
         </div>
 
         {/* Action Buttons Row */}
-        <div className="flex items-center gap-4 mb-3">
+        <div className="flex items-center gap-4 mb-2">
           {/* Date Button */}
           <div className="relative z-50" ref={datePickerRef}>
             <button 
@@ -557,10 +557,17 @@ const InlineAddTask: React.FC<InlineAddTaskProps> = ({
                 handleCancel();
                 setShowProjectPicker(false);
               }}
-              className="py-2 text-sm hover:opacity-60"
+              className="px-4 py-2 text-sm rounded-lg transition-all duration-200"
               style={{
-                color: 'var(--text-secondary)',
-                backgroundColor: 'transparent'
+                color: 'var(--text-primary)',
+                backgroundColor: 'var(--surface-hover)',
+                border: '1px solid var(--border)'
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.backgroundColor = 'var(--border)';
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.backgroundColor = 'var(--surface-hover)';
               }}
               disabled={isLoading}
             >

@@ -602,7 +602,7 @@ const ProjectTasksLayout: React.FC<ProjectTasksLayoutProps> = ({
                 >
                   <div>
                     {/* Default tasks (no section) */}
-                    <div className="default-tasks-container group/default">
+                    <div className="default-tasks-container">
                       {(() => {
                         const defaultTasks = getDefaultTasks();
                         return (
@@ -635,7 +635,7 @@ const ProjectTasksLayout: React.FC<ProjectTasksLayoutProps> = ({
                             })()}
                             
                             {/* Inline add task for default tasks */}
-                            <div className="px-4 pt-3 pb-2">
+                            <div className="px-4 pt-0 pb-1">
                               <InlineAddTask 
                                 onSubmit={handleCreateTask}
                                 sectionId={undefined} // Default tasks have no section
@@ -643,10 +643,12 @@ const ProjectTasksLayout: React.FC<ProjectTasksLayoutProps> = ({
                             </div>
                             
                             {/* Subtle Add Section Button - appears on hover */}
-                            <div className="group-hover/default:opacity-100 opacity-0 transition-opacity duration-200">
-                              <AddSectionButton 
-                                onAddSection={handleAddSection}
-                              />
+                            <div className="group/default">
+                              <div className="group-hover/default:opacity-100 opacity-0 transition-opacity duration-200">
+                                <AddSectionButton 
+                                  onAddSection={handleAddSection}
+                                />
+                              </div>
                             </div>
                           </>
                         );
@@ -657,7 +659,7 @@ const ProjectTasksLayout: React.FC<ProjectTasksLayoutProps> = ({
                     {sections.map((section) => {
                       const sectionTasks = getTasksForSection(section.id);
                       return (
-                        <div key={section.id} className="section-container group/section">
+                        <div key={section.id} className="section-container">
                           <SectionHeader
                             section={section}
                             taskCount={sectionTasks.length}
@@ -694,7 +696,7 @@ const ProjectTasksLayout: React.FC<ProjectTasksLayoutProps> = ({
                               )}
                               
                               {/* Inline add task for this section */}
-                              <div className="px-4 pt-3 pb-2">
+                              <div className="px-4 pt-0 pb-1">
                                 <InlineAddTask 
                                   onSubmit={handleCreateTask}
                                   sectionId={section.id} // Pass section ID for section-specific tasks
@@ -702,10 +704,12 @@ const ProjectTasksLayout: React.FC<ProjectTasksLayoutProps> = ({
                               </div>
                               
                               {/* Subtle Add Section Button - appears on hover */}
-                              <div className="group-hover/section:opacity-100 opacity-0 transition-opacity duration-200">
-                                <AddSectionButton 
-                                  onAddSection={handleAddSection}
-                                />
+                              <div className="group/section">
+                                <div className="group-hover/section:opacity-100 opacity-0 transition-opacity duration-200">
+                                  <AddSectionButton 
+                                    onAddSection={handleAddSection}
+                                  />
+                                </div>
                               </div>
                             </div>
                           )}
