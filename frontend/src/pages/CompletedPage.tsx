@@ -118,69 +118,15 @@ const CompletedPage: React.FC = () => {
 
   return (
     <div className="W8rBu9M main-view-layout i_TMTDC main-view-layout--narrow _19abae45 a7c6de33 _1e47f652 d607c41c bfa58fdf d19e99ad">
-      {/* Header */}
-      <header className="otDtBXB" aria-label="Header: contains title, subtitle, actions and options related to the current view">
-
-        
-        {/* Large Header */}
-        <div aria-hidden="false" data-testid="large-header" className="U0ZGVo6 IN0iPob WNoOQ_4 _19abae45 a7c6de33 _194d8611 _8ad6a17c f88bdaf1">
-          <div className="_19abae45 a7c6de33 _1e47f652 bfa58fdf c68f8bf6 _8c75067a">
-            <div className="QmVfZZp _19abae45 a7c6de33 b0e6eab4 _194d8611 _8ad6a17c c68f8bf6 _8c75067a">
-              <h1 className="bff24867 b3e14969 _19abae45">Activity:</h1>
-              <button className="e3p1Yl1T9aYYJpx5LsAsoSBYH6RbDs_c Q89aac4azgwEO7P9k8KUBkDnuWXMgOSs">
-                <span className="simple_content">All projects</span>
-                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" viewBox="0 0 16 16" style={{ paddingTop: '4px' }}>
-                  <path fill="currentColor" d="M11.646 5.647a.5.5 0 0 1 .708.707l-4 4a.5.5 0 0 1-.708 0l-4-4a.5.5 0 1 1 .708-.707L8 9.294z"></path>
-                </svg>
-              </button>
-            </div>
-            
-            {/* Filter Buttons moved here to align with title */}
-            <div className="nttWE6W _19abae45 a7c6de33 _194d8611 _8ad6a17c _0315ed60">
-              {/* Collaborator Filter */}
-              <button 
-                className="_19abae45 _56a651f6 _3930afa0 aa19cb97 _7246d092" 
-                data-testid="person_picker__toggle" 
-                title="Filter by collaborator" 
-                aria-label="Filter by collaborator"
-              >
-                <div aria-hidden="true" className="_380e7c73 _19abae45 a7c6de33 _194d8611">
-                  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
-                    <path fill="currentColor" fillRule="evenodd" d="M12 13.5c3.323 0 5.803.697 7.427 2.119A2.5 2.5 0 0 1 17.78 20H6.22a2.5 2.5 0 0 1-1.647-4.381C6.197 14.197 8.677 13.5 12 13.5m0 1c-3.102 0-5.353.633-6.768 1.871A1.5 1.5 0 0 0 6.22 19h11.56a1.502 1.502 0 0 0 .989-2.629C17.352 15.133 15.101 14.5 12 14.5M12 4c2.21 0 4 1.79 4 4s-1.79 4-4 4-4-1.79-4-4 1.79-4 4-4m0 1a3 3 0 1 0 0 6 3 3 0 0 0 0-6"></path>
-                  </svg>
-                </div>
-                <span className="_90654824 _19abae45 b7f35b86 _47471e4e">Everyone</span>
-              </button>
-              
-              {/* Activity Type Filter */}
-              <button 
-                role="combobox" 
-                aria-expanded="false" 
-                type="button" 
-                aria-disabled="false" 
-                className="_19abae45 _56a651f6 _3930afa0 aa19cb97 _7246d092"
-              >
-                <div aria-hidden="true" className="_380e7c73 _19abae45 a7c6de33 _194d8611">
-                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" viewBox="0 0 16 16">
-                    <g clipPath="url(#task-completed-16_svg__a)">
-                      <rect width="16" height="16" fill="#058527" rx="8"></rect>
-                      <path stroke="#fff" strokeLinecap="round" strokeLinejoin="round" strokeMiterlimit="16" strokeWidth="1.2" d="m4.4 8.3 2.5 2.5 5-5"></path>
-                    </g>
-                    <defs>
-                      <clipPath id="task-completed-16_svg__a">
-                        <rect width="16" height="16" fill="#fff" rx="8"></rect>
-                      </clipPath>
-                    </defs>
-                  </svg>
-                </div>
-                <span className="_90654824 _19abae45 b7f35b86 _47471e4e">Completed tasks</span>
-              </button>
-            </div>
-          </div>
+      {/* Content - title integrated */}
+      <div className="px-6">
+        {/* Page Title */}
+        <div className="pt-12 pb-6">
+          <h1 className="text-2xl font-bold" style={{ color: 'var(--text-primary)' }}>
+            Completed
+          </h1>
         </div>
-        
-        <div className="AW6uxA5 _19abae45 a7c6de33 _1b0c2c53 _1e47f652 _8ad6a17c f88bdaf1 _8c75067a b50b47ee" style={{ top: '56px' }}></div>
-      </header>
+      </div>
 
       {/* Activity Content */}
       <div className="f_4GTlVaXcbEpesBv98J4ZPiL1naWuBg _19abae45 _213145b4">

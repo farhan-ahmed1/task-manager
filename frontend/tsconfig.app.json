@@ -23,6 +23,9 @@
     "noFallthroughCasesInSwitch": true,
     "noUncheckedSideEffectImports": true,
 
+    /* Deprecations */
+    "ignoreDeprecations": "6.0",
+
     /* Path Aliases */
     "baseUrl": ".",
     "paths": {

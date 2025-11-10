@@ -1,33 +1,10 @@
 import React from 'react';
-import { Outlet, useLocation } from 'react-router-dom';
-import { useAuth } from '@/context/AuthContext';
-import { Button } from '@/components/ui/button';
+import { Outlet } from 'react-router-dom';
 import { Menu, X, PanelLeftClose } from 'lucide-react';
 import Sidebar from './Sidebar';
 
 const AppLayout: React.FC = () => {
-  const { logout } = useAuth();
-  const location = useLocation();
   const [sidebarOpen, setSidebarOpen] = React.useState(true);
-
-  const handleLogout = () => {
-    logout();
-  };
-
-  const getPageTitle = () => {
-    const path = location.pathname.replace('/', '') || 'dashboard';
-    if (path === 'today') return 'Today';
-    if (path === 'inbox') return 'Inbox';
-    if (path === 'upcoming') return 'Upcoming';
-    if (path === 'completed') return 'Completed';
-    if (path === 'tasks') return 'Tasks';
-    if (path === 'search') return 'Search';
-    if (path === 'projects') return 'Projects';
-    if (path.startsWith('projects/')) return 'Project';
-    return path.charAt(0).toUpperCase() + path.slice(1);
-  };
-
-  const isProjectPage = location.pathname.startsWith('/projects/');
 
   return (
     <div className="h-screen flex overflow-hidden" style={{ 
@@ -87,74 +64,78 @@ const AppLayout: React.FC = () => {
       <div className={`flex flex-col w-0 flex-1 overflow-hidden transition-all duration-500 ease-out ${
         !sidebarOpen ? 'md:ml-16' : ''
       }`}>
-        {/* Mobile header */}
-        <div className="md:hidden">
-          <div className="flex items-center justify-between px-4 py-3" style={{ 
+        {/* Compact Header - 56px height, similar to Todoist */}
+        <header 
+          className="flex items-center justify-end px-4 gap-2"
+          style={{ 
+            height: '56px',
+            minHeight: '56px',
             borderBottom: '1px solid var(--border)',
-            backgroundColor: 'var(--surface)'
-          }}>
-            <button
-              type="button"
-              className="flex items-center justify-center h-8 w-8 transition-all duration-150"
-              style={{
-                borderRadius: 'var(--radius-sm)',
-                color: 'var(--text-muted)',
-                backgroundColor: 'transparent'
-              }}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.backgroundColor = 'var(--surface-hover)';
-                e.currentTarget.style.color = 'var(--text-primary)';
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.backgroundColor = 'transparent';
-                e.currentTarget.style.color = 'var(--text-muted)';
-              }}
-              onClick={() => setSidebarOpen(true)}
-            >
-              <span className="sr-only">Open sidebar</span>
-              <Menu className="h-5 w-5" />
-            </button>
-            <h1 className="text-lg font-semibold" style={{ color: 'var(--text-primary)' }}>
-              {getPageTitle()}
-            </h1>
-            <Button 
-              variant="ghost" 
-              size="sm" 
-              onClick={handleLogout}
-              className="text-sm"
-              style={{ color: 'var(--text-secondary)' }}
-            >
-              Logout
-            </Button>
-          </div>
-        </div>
+            backgroundColor: 'var(--background)'
+          }}
+        >
+          {/* Mobile menu button - only on mobile */}
+          <button
+            type="button"
+            className="md:hidden flex items-center justify-center h-8 w-8 transition-all duration-150 mr-auto"
+            style={{
+              borderRadius: 'var(--radius-sm)',
+              color: 'var(--text-muted)',
+              backgroundColor: 'transparent'
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.backgroundColor = 'var(--surface-hover)';
+              e.currentTarget.style.color = 'var(--text-primary)';
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.backgroundColor = 'transparent';
+              e.currentTarget.style.color = 'var(--text-muted)';
+            }}
+            onClick={() => setSidebarOpen(true)}
+          >
+            <span className="sr-only">Open sidebar</span>
+            <Menu className="h-5 w-5" />
+          </button>
 
-        {/* Desktop header - hidden for individual project pages */}
-        {!isProjectPage && (
-          <header className="hidden md:block" style={{ 
-            backgroundColor: 'var(--background)',
-            borderBottom: '1px solid var(--border-subtle)'
-          }}>
-            <div className="px-6 py-8">
-              <div className="flex justify-between items-center">
-                <h1 className="text-h1" style={{ color: 'var(--text-primary)' }}>
-                  {getPageTitle()}
-                </h1>
-                <button 
-                  onClick={handleLogout}
-                  className="py-2 px-4 text-sm hover:opacity-60"
-                  style={{
-                    color: 'var(--text-secondary)',
-                    backgroundColor: 'transparent',
-                    border: 'none'
-                  }}
-                >
-                  Logout
-                </button>
-              </div>
-            </div>
-          </header>
-        )}
+          {/* Filter buttons - placeholder for now, can be customized per page */}
+          <button 
+            className="flex items-center justify-center h-8 w-8 rounded transition-all duration-150"
+            style={{
+              color: 'var(--text-muted)',
+              backgroundColor: 'transparent'
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.backgroundColor = 'var(--surface-hover)';
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.backgroundColor = 'transparent';
+            }}
+            title="Filter by collaborator"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none">
+              <path fill="currentColor" fillRule="evenodd" d="M12 13.5c3.323 0 5.803.697 7.427 2.119A2.5 2.5 0 0 1 17.78 20H6.22a2.5 2.5 0 0 1-1.647-4.381C6.197 14.197 8.677 13.5 12 13.5m0 1c-3.102 0-5.353.633-6.768 1.871A1.5 1.5 0 0 0 6.22 19h11.56a1.502 1.502 0 0 0 .989-2.629C17.352 15.133 15.101 14.5 12 14.5M12 4c2.21 0 4 1.79 4 4s-1.79 4-4 4-4-1.79-4-4 1.79-4 4-4m0 1a3 3 0 1 0 0 6 3 3 0 0 0 0-6"></path>
+            </svg>
+          </button>
+
+          <button 
+            className="flex items-center justify-center h-8 w-8 rounded transition-all duration-150"
+            style={{
+              color: 'var(--text-muted)',
+              backgroundColor: 'transparent'
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.backgroundColor = 'var(--surface-hover)';
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.backgroundColor = 'transparent';
+            }}
+            title="Completed tasks"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" viewBox="0 0 24 24">
+              <path fill="currentColor" fillRule="evenodd" d="M12 21a9 9 0 1 1 0-18 9 9 0 0 1 0 18m0-1a8 8 0 1 0 0-16 8 8 0 0 0 0 16m-2.5-5a.5.5 0 0 0 0 1h5a.5.5 0 0 0 0-1zM8 12.5a.5.5 0 0 1 .5-.5h7a.5.5 0 0 1 0 1h-7a.5.5 0 0 1-.5-.5M7.5 9a.5.5 0 0 0 0 1h9a.5.5 0 0 0 0-1z" clipRule="evenodd"></path>
+            </svg>
+          </button>
+        </header>
 
         {/* Page content */}
         <main className="flex-1 relative overflow-y-auto focus:outline-none" style={{ 

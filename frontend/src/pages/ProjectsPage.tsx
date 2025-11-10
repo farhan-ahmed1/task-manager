@@ -579,10 +579,10 @@ const ProjectsPage: React.FC = () => {
   // Main dashboard view
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50/30 to-slate-50">
-      <div className="container mx-auto px-4 py-8 max-w-7xl">
+      <div className="container mx-auto px-4 max-w-7xl">
         {/* Error Alert */}
         {error && (
-          <Alert variant="destructive" className="mb-6">
+          <Alert variant="destructive" className="mb-6 mt-8">
             <AlertCircle className="h-4 w-4" />
             <div className="ml-2">
               <p className="font-medium">Error</p>
@@ -591,21 +591,12 @@ const ProjectsPage: React.FC = () => {
           </Alert>
         )}
 
-        {/* Header with Enhanced Design */}
-        <div className="bg-gradient-to-br from-slate-50 to-blue-50 rounded-2xl p-6 border border-slate-200/60 mb-8">
-          <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6">
-            <div className="space-y-3">
-              <div className="flex items-center gap-3">
-                <div className="h-10 w-10 rounded-xl bg-blue-600 flex items-center justify-center">
-                  <svg className="h-5 w-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
-                  </svg>
-                </div>
-                <div>
-                  <h1 className="text-2xl font-bold text-slate-900">Project Management</h1>
-                  <p className="text-slate-600">Organize and track your projects</p>
-                </div>
-              </div>
+        {/* Header with Enhanced Design - Title integrated into content */}
+        <div className="pt-12 pb-6">
+          <div className="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-6 mb-6">
+            <div className="space-y-4">
+              {/* Page Title */}
+              <h1 className="text-2xl font-bold text-slate-900">My Projects</h1>
               
               {/* Enhanced Stats Cards */}
               {projects.length > 0 && (

@@ -500,9 +500,9 @@ const ProjectTasksLayout: React.FC<ProjectTasksLayoutProps> = ({
 
   return (
     <div className="max-w-5xl mx-auto">
-      {/* Simplified project header - just title */}
+      {/* Title section - integrated into content, not a separate header */}
       <div 
-        className="px-6 py-8"
+        className="px-6 pt-12 pb-6"
         style={{ 
           backgroundColor: 'var(--background)',
         }}
@@ -514,7 +514,7 @@ const ProjectTasksLayout: React.FC<ProjectTasksLayoutProps> = ({
                 type="text"
                 value={editingTitle}
                 onChange={(e) => setEditingTitle(e.target.value)}
-                className="text-3xl font-semibold bg-transparent border-none outline-none focus:bg-white focus:border focus:border-blue-300 focus:rounded px-2 py-1"
+                className="text-2xl font-bold bg-transparent border-none outline-none focus:bg-white focus:border focus:border-blue-300 focus:rounded px-2 py-1"
                 style={{ color: 'var(--text-primary)' }}
                 onKeyDown={(e) => {
                   if (e.key === 'Enter') {
@@ -544,7 +544,7 @@ const ProjectTasksLayout: React.FC<ProjectTasksLayoutProps> = ({
             </div>
           ) : (
             <div className="flex items-center group">
-              <h1 className="text-3xl font-semibold" style={{ color: 'var(--text-primary)' }}>
+              <h1 className="text-2xl font-bold" style={{ color: 'var(--text-primary)' }}>
                 {title}
               </h1>
               {project && (
@@ -562,8 +562,8 @@ const ProjectTasksLayout: React.FC<ProjectTasksLayoutProps> = ({
         </div>
       </div>
       
-      {/* Content with top spacing for sticky header */}
-      <div className="px-6 pt-6">
+      {/* Content */}
+      <div className="px-6 pb-6">
         {/* Tasks container */}
         <div>
           {tasks.length === 0 ? (
