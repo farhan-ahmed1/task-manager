@@ -2,9 +2,12 @@ import React from 'react';
 import { Outlet } from 'react-router-dom';
 import { Menu, X, PanelLeftClose } from 'lucide-react';
 import Sidebar from './Sidebar';
+import { SearchModal } from '@/components/ui/SearchModal';
+import { useCommandPalette } from '@/hooks/useCommandPalette';
 
 const AppLayout: React.FC = () => {
   const [sidebarOpen, setSidebarOpen] = React.useState(true);
+  const { isOpen, close, open } = useCommandPalette();
 
   return (
     <div className="h-screen flex overflow-hidden" style={{ 
@@ -28,7 +31,11 @@ const AppLayout: React.FC = () => {
                 <X className="h-6 w-6 text-white" />
               </button>
             </div>
-            <Sidebar onClose={() => setSidebarOpen(false)} onToggle={() => setSidebarOpen(!sidebarOpen)} />
+            <Sidebar 
+              onClose={() => setSidebarOpen(false)} 
+              onToggle={() => setSidebarOpen(!sidebarOpen)}
+              onOpenSearch={open}
+            />
           </div>
         </div>
       )}
@@ -36,9 +43,12 @@ const AppLayout: React.FC = () => {
       {/* Desktop sidebar */}
       <div className={`transition-all duration-500 ease-out ${sidebarOpen ? 'md:flex md:flex-shrink-0' : 'md:w-0 md:overflow-hidden'} hidden md:block`}>
         <div className="flex flex-col w-[304px]">
-          <Sidebar onToggle={() => {
-            setSidebarOpen(!sidebarOpen);
-          }} />
+          <Sidebar 
+            onToggle={() => {
+              setSidebarOpen(!sidebarOpen);
+            }}
+            onOpenSearch={open}
+          />
         </div>
       </div>
 
@@ -146,6 +156,9 @@ const AppLayout: React.FC = () => {
           </div>
         </main>
       </div>
+
+      {/* Command Palette / Search Modal - Accessible globally with Cmd+K / Ctrl+K */}
+      <SearchModal isOpen={isOpen} onClose={close} />
     </div>
   );
 };

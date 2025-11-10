@@ -15,7 +15,6 @@ import TodayPage from '@/pages/TodayPage';
 import InboxPage from '@/pages/InboxPage';
 import UpcomingPage from '@/pages/UpcomingPage';
 import CompletedPage from '@/pages/CompletedPage';
-import SearchPage from '@/pages/SearchPage';
 
 // Import components
 import AppLayout from '@/components/layout/AppLayout';
@@ -38,7 +37,6 @@ function App() {
           }>
             <Route index element={<Navigate to="/inbox" replace />} />
             <Route path="dashboard" element={<DashboardPage />} />
-            <Route path="search" element={<SearchPage />} />
             <Route path="inbox" element={<InboxPage />} />
             <Route path="today" element={<TodayPage />} />
             <Route path="upcoming" element={<UpcomingPage />} />

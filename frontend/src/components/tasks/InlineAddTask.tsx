@@ -34,6 +34,9 @@ const InlineAddTask: React.FC<InlineAddTaskProps> = ({
   const priorityPickerRef = useRef<HTMLDivElement>(null);
   const projectPickerRef = useRef<HTMLDivElement>(null);
   const datePickerRef = useRef<HTMLDivElement>(null);
+  const priorityButtonRef = useRef<HTMLButtonElement>(null);
+  const projectButtonRef = useRef<HTMLButtonElement>(null);
+  const dateButtonRef = useRef<HTMLButtonElement>(null);
   
   // Use refs to track state for event handler without causing re-renders
   const stateRef = useRef({
@@ -207,6 +210,63 @@ const InlineAddTask: React.FC<InlineAddTaskProps> = ({
     setShowPriorityPicker(false);
   };
 
+  const calculatePriorityPickerPosition = () => {
+    if (!priorityButtonRef.current) return 'bottom';
+    
+    const buttonRect = priorityButtonRef.current.getBoundingClientRect();
+    const viewportHeight = window.innerHeight;
+    const spaceBelow = viewportHeight - buttonRect.bottom;
+    const spaceAbove = buttonRect.top;
+    
+    // Estimated height of priority picker dropdown (approx 200px)
+    const pickerHeight = 200;
+    
+    // If not enough space below but enough space above, show on top
+    if (spaceBelow < pickerHeight && spaceAbove > pickerHeight) {
+      return 'top';
+    } else {
+      return 'bottom';
+    }
+  };
+
+  const calculateDatePickerPosition = () => {
+    if (!dateButtonRef.current) return 'bottom';
+    
+    const buttonRect = dateButtonRef.current.getBoundingClientRect();
+    const viewportHeight = window.innerHeight;
+    const spaceBelow = viewportHeight - buttonRect.bottom;
+    const spaceAbove = buttonRect.top;
+    
+    // Estimated height of date picker dropdown (approx 400px)
+    const pickerHeight = 400;
+    
+    // If not enough space below but enough space above, show on top
+    if (spaceBelow < pickerHeight && spaceAbove > pickerHeight) {
+      return 'top';
+    } else {
+      return 'bottom';
+    }
+  };
+
+  const calculateProjectPickerPosition = () => {
+    if (!projectButtonRef.current) return 'bottom';
+    
+    const buttonRect = projectButtonRef.current.getBoundingClientRect();
+    const viewportHeight = window.innerHeight;
+    const spaceBelow = viewportHeight - buttonRect.bottom;
+    const spaceAbove = buttonRect.top;
+    
+    // Estimated height of project picker dropdown (approx 200px)
+    const pickerHeight = 200;
+    
+    // If not enough space below but enough space above, show on top
+    if (spaceBelow < pickerHeight && spaceAbove > pickerHeight) {
+      return 'top';
+    } else {
+      return 'bottom';
+    }
+  };
+
   const handleDateSelection = (dateString: string) => {
     setDueDate(dateString);
     setShowDatePicker(false);
@@ -241,7 +301,7 @@ const InlineAddTask: React.FC<InlineAddTaskProps> = ({
             const text = e.currentTarget.querySelector('.add-text') as HTMLElement;
             if (iconBg) iconBg.style.backgroundColor = 'transparent';
             if (icon) icon.style.color = '#2563EB';
-            if (text) text.style.color = 'var(--text-muted)';
+            if (text) text.style.color = 'var(--text-tertiary)';
           }}
         >
           <div 
@@ -257,7 +317,7 @@ const InlineAddTask: React.FC<InlineAddTaskProps> = ({
           </div>
           <span 
             className="add-text text-15 font-400 transition-colors"
-            style={{ color: 'var(--text-muted)' }}
+            style={{ color: 'var(--text-tertiary)' }}
           >
             Add task
           </span>
@@ -269,18 +329,18 @@ const InlineAddTask: React.FC<InlineAddTaskProps> = ({
   return (
     <div ref={containerRef} className="px-6 py-4">
       <div 
-        className="border border-[var(--border-light)] bg-card rounded-lg p-6 shadow-sm"
+        className="border bg-card rounded-lg p-3"
         onKeyDown={handleKeyDown}
       >
         {/* Main Task Input */}
-        <div className="mb-8">
+        <div className="mb-2">
           <textarea
             ref={titleRef}
             value={taskTitle}
             onChange={(e) => setTaskTitle(e.target.value)}
             placeholder="Task name"
             rows={1}
-            className="w-full text-lg font-400 border-0 focus:outline-none resize-none bg-transparent block mb-3"
+            className="w-full text-lg font-400 border-0 focus:outline-none resize-none bg-transparent block mb-1.5"
             style={{
               color: 'var(--text-primary)',
               lineHeight: '1.4',
@@ -293,7 +353,7 @@ const InlineAddTask: React.FC<InlineAddTaskProps> = ({
             value={taskDescription}
             onChange={(e) => setTaskDescription(e.target.value)}
             placeholder="Description"
-            rows={2}
+            rows={1}
             className="w-full text-sm font-400 border-0 focus:outline-none resize-none bg-transparent block"
             style={{
               color: 'var(--text-secondary)',
@@ -304,18 +364,28 @@ const InlineAddTask: React.FC<InlineAddTaskProps> = ({
         </div>
 
         {/* Action Buttons Row */}
-        <div className="flex items-center gap-4 mb-8">
+        <div className="flex items-center gap-4 mb-3">
           {/* Date Button */}
           <div className="relative z-50" ref={datePickerRef}>
             <button 
+              ref={dateButtonRef}
               type="button"
-              className="flex items-center gap-2 py-2 text-sm hover:opacity-60"
+              className="flex items-center gap-2 px-3 py-1.5 text-sm rounded-md border transition-all duration-200"
               style={{ 
-                color: dueDate ? 'var(--text-primary)' : 'var(--text-muted)',
-                backgroundColor: 'transparent'
+                color: dueDate ? 'var(--text-primary)' : 'var(--text-secondary)',
+                backgroundColor: 'var(--background)',
+                borderColor: 'var(--border)'
               }}
               onClick={handleDateButtonClick}
               onMouseDown={(e) => e.stopPropagation()}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.backgroundColor = 'var(--surface-hover)';
+                e.currentTarget.style.borderColor = 'var(--text-secondary)';
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.backgroundColor = 'var(--background)';
+                e.currentTarget.style.borderColor = 'var(--border)';
+              }}
             >
               <Calendar className="w-4 h-4" />
               <span>{dueDate ? new Date(dueDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }) : 'Due date'}</span>
@@ -329,6 +399,7 @@ const InlineAddTask: React.FC<InlineAddTaskProps> = ({
                 onDateSelect={handleDateSelection}
                 initialDate={dueDate}
                 title="Set Due Date"
+                position={calculateDatePickerPosition()}
               />
             )}
           </div>
@@ -336,13 +407,25 @@ const InlineAddTask: React.FC<InlineAddTaskProps> = ({
           {/* Priority Button */}
           <div className="relative" ref={priorityPickerRef}>
             <button 
+              ref={priorityButtonRef}
               type="button"
-              className="flex items-center gap-2 py-2 text-sm hover:opacity-60"
+              className="flex items-center gap-2 px-3 py-1.5 text-sm rounded-md border transition-all duration-200"
               style={{ 
-                color: priority ? 'var(--text-primary)' : 'var(--text-muted)',
-                backgroundColor: 'transparent'
+                color: priority ? 'var(--text-primary)' : 'var(--text-secondary)',
+                backgroundColor: 'var(--background)',
+                borderColor: 'var(--border)'
               }}
-              onClick={() => setShowPriorityPicker(!showPriorityPicker)}
+              onClick={() => {
+                setShowPriorityPicker(!showPriorityPicker);
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.backgroundColor = 'var(--surface-hover)';
+                e.currentTarget.style.borderColor = 'var(--text-secondary)';
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.backgroundColor = 'var(--background)';
+                e.currentTarget.style.borderColor = 'var(--border)';
+              }}
             >
               <Flag className="w-4 h-4" />
               <span>{priority ? `Priority ${priority === 'HIGH' ? '1' : priority === 'MEDIUM' ? '2' : '3'}` : 'Priority'}</span>
@@ -350,7 +433,14 @@ const InlineAddTask: React.FC<InlineAddTaskProps> = ({
 
             {/* Priority Picker Dropdown */}
             {showPriorityPicker && (
-              <div className="absolute top-full left-0 mt-2 w-48 bg-white border border-[var(--border)] rounded-lg shadow-lg z-50">
+              <div 
+                className="absolute left-0 w-48 bg-white border border-[var(--border)] rounded-lg shadow-lg z-50"
+                style={
+                  calculatePriorityPickerPosition() === 'top'
+                    ? { bottom: '100%', marginBottom: '0.5rem' }
+                    : { top: '100%', marginTop: '0.5rem' }
+                }
+              >
                 <div className="p-2">
                   {getPriorityOptions().map((option) => (
                     <button
@@ -375,12 +465,15 @@ const InlineAddTask: React.FC<InlineAddTaskProps> = ({
         </div>
 
         {/* Footer Actions */}
-        <div className="flex items-center justify-between pt-4 border-t border-[var(--border-light)]">
+        <div className="flex items-center justify-between pt-2.5 border-t border-[var(--border-light)]">
           {/* Left: Project selector */}
           <div className="relative" ref={projectPickerRef}>
             <button 
+              ref={projectButtonRef}
               type="button"
-              onClick={() => setShowProjectPicker(!showProjectPicker)}
+              onClick={() => {
+                setShowProjectPicker(!showProjectPicker);
+              }}
               className="flex items-center gap-2 py-2 text-sm hover:opacity-60"
               style={{ 
                 color: 'var(--text-secondary)',
@@ -403,7 +496,14 @@ const InlineAddTask: React.FC<InlineAddTaskProps> = ({
 
             {/* Project Picker Dropdown */}
             {showProjectPicker && (
-              <div className="absolute bottom-full left-0 mb-2 w-64 bg-white border border-[var(--border)] rounded-lg shadow-lg z-50 max-h-48 overflow-y-auto">
+              <div 
+                className="absolute left-0 w-64 bg-white border border-[var(--border)] rounded-lg shadow-lg z-50 max-h-48 overflow-y-auto"
+                style={
+                  calculateProjectPickerPosition() === 'top'
+                    ? { bottom: '100%', marginBottom: '0.5rem' }
+                    : { top: '100%', marginTop: '0.5rem' }
+                }
+              >
                 <div className="p-2">
                   {/* Inbox option */}
                   <button

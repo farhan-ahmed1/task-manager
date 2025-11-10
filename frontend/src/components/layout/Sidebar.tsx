@@ -21,13 +21,14 @@ import {
 } from 'lucide-react';
 import { projectService } from '@/services/projects';
 import type { Project } from '@/types/api';
+import { useCommandPalette } from '@/hooks/useCommandPalette';
 
 const mainNavigation = [
   { 
     name: 'Search', 
-    href: '/search', 
     icon: Search, 
-    variant: 'ghost' as const
+    variant: 'ghost' as const,
+    isCommand: true // Special flag for command palette
   },
   { 
     name: 'Inbox', 
@@ -61,12 +62,14 @@ interface SidebarProps {
   isOpen?: boolean;
   onClose?: () => void;
   onToggle?: () => void;
+  onOpenSearch?: () => void;
   className?: string;
 }
 
-const Sidebar: React.FC<SidebarProps> = ({ onClose, onToggle, className }) => {
+const Sidebar: React.FC<SidebarProps> = ({ onClose, onToggle, onOpenSearch, className }) => {
   const { user } = useAuth();
   const location = useLocation();
+  const { open: openCommandPalette } = useCommandPalette();
   const [projects, setProjects] = useState<Project[]>([]);
   const [favoriteProjects, setFavoriteProjects] = useState<Project[]>([]);
   const [isProjectsExpanded, setIsProjectsExpanded] = useState(true);
@@ -182,7 +185,17 @@ const Sidebar: React.FC<SidebarProps> = ({ onClose, onToggle, className }) => {
         <div className="p-4 pb-2">
           {/* Add Task Button */}
           <button 
-            className="w-full flex items-center px-4 py-3 text-sm font-normal cursor-pointer hover:opacity-90 mb-8 bg-gray-900 text-white rounded-lg border-0"
+            className="w-full flex items-center px-4 py-3 text-sm font-medium cursor-pointer transition-all duration-150 mb-8 rounded-lg border-0"
+            style={{
+              backgroundColor: 'rgba(59, 130, 246, 0.1)',
+              color: 'var(--text-primary)',
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.backgroundColor = 'rgba(59, 130, 246, 0.15)';
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.backgroundColor = 'rgba(59, 130, 246, 0.1)';
+            }}
             onClick={() => setIsAddTaskModalOpen(true)}
           >
             <Plus className="w-4 h-4 mr-3" />
@@ -193,12 +206,47 @@ const Sidebar: React.FC<SidebarProps> = ({ onClose, onToggle, className }) => {
         <nav className="px-6 space-y-1">
           {mainNavigation.map((item) => {
             const Icon = item.icon;
-            const isActive = isCurrentPath(item.href);
+            const isActive = item.href ? isCurrentPath(item.href) : false;
             
+            // Render Search as a button that opens the command palette
+            if (item.isCommand) {
+              return (
+                <button
+                  key={item.name}
+                  onClick={() => {
+                    // Use the prop if provided, otherwise fall back to the hook
+                    if (onOpenSearch) {
+                      onOpenSearch();
+                    } else {
+                      openCommandPalette();
+                    }
+                    onClose?.();
+                  }}
+                  className="w-full flex items-center justify-between py-2 text-sm group hover:opacity-60"
+                  style={{
+                    color: 'var(--text-secondary)',
+                    fontWeight: '400'
+                  }}
+                >
+                  <div className="flex items-center">
+                    <Icon className="w-4 h-4 mr-4 flex-shrink-0" style={{
+                      color: 'var(--text-muted)'
+                    }} />
+                    <span>{item.name}</span>
+                  </div>
+                  <kbd className="hidden sm:flex items-center gap-0.5 px-1.5 py-0.5 text-xs font-medium text-gray-500 bg-gray-100 dark:bg-gray-700 dark:text-gray-400 rounded border border-gray-300 dark:border-gray-600">
+                    <span>⌘</span>
+                    <span>K</span>
+                  </kbd>
+                </button>
+              );
+            }
+            
+            // Render normal navigation items
             return (
               <Link
                 key={item.name}
-                to={item.href}
+                to={item.href!}
                 onClick={onClose}
                 className="flex items-center justify-between py-2 text-sm group hover:opacity-60"
                 style={{

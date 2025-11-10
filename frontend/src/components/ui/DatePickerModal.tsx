@@ -7,13 +7,15 @@ interface DatePickerModalProps {
   onDateSelect: (date: string) => void;
   initialDate?: string;
   title?: string;
+  position?: 'top' | 'bottom';
 }
 
 const DatePickerModal: React.FC<DatePickerModalProps> = ({
   isOpen,
   onClose,
   onDateSelect,
-  initialDate
+  initialDate,
+  position = 'bottom'
 }) => {
   const [selectedDate, setSelectedDate] = useState<string>(initialDate || '');
   const [selectedMonth, setSelectedMonth] = useState(new Date().getMonth());
@@ -111,13 +113,17 @@ const DatePickerModal: React.FC<DatePickerModalProps> = ({
   return (
     <div 
       ref={modalRef}
-      className="absolute top-full left-0 mt-2 w-80 bg-white rounded-xl border border-[var(--border)]"
+      className="absolute left-0 w-80 bg-white rounded-xl border border-[var(--border)]"
       style={{ 
         zIndex: 99999,
         boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.15), 0 10px 10px -5px rgba(0, 0, 0, 0.1)',
         position: 'absolute',
         isolation: 'isolate',
-        backgroundColor: '#ffffff' // Solid white background - no transparency
+        backgroundColor: '#ffffff', // Solid white background - no transparency
+        ...(position === 'top' 
+          ? { bottom: '100%', marginBottom: '0.5rem' }
+          : { top: '100%', marginTop: '0.5rem' }
+        )
       }}
       onClick={(e) => e.stopPropagation()}
       onMouseDown={(e) => e.stopPropagation()}
