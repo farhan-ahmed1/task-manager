@@ -348,7 +348,7 @@ const Sidebar: React.FC<SidebarProps> = ({ onClose, onToggle, onOpenSearch, clas
                       style={{
                         borderRadius: 'var(--radius-sm)',
                         backgroundColor: isActive ? 'rgba(59, 130, 246, 0.08)' : 'transparent',
-                        color: isActive ? 'var(--text-primary)' : 'var(--text-secondary)',
+                        color: isActive ? '#2563eb' : 'var(--text-secondary)',
                         fontWeight: isActive ? '500' : '400'
                       }}
                       onMouseEnter={(e) => {
@@ -367,14 +367,15 @@ const Sidebar: React.FC<SidebarProps> = ({ onClose, onToggle, onOpenSearch, clas
                       }}
                     >
                       <div className="flex items-center">
-                        <Hash className="w-6 h-6 mr-3 flex-shrink-0" style={{
-                          color: isActive ? 'var(--primary)' : 'var(--info)'
-                        }} />
+                        <div className="w-6 h-6 flex items-center justify-center mr-3 flex-shrink-0">
+                          <Hash className="w-4 h-4" style={{
+                            color: isActive ? 'var(--primary)' : 'var(--text-secondary)'
+                          }} />
+                        </div>
                         <span className="truncate">{project.name}</span>
                       </div>
-                      <span className="text-xs px-2 py-1 rounded-full text-center min-w-[1.5rem]" style={{
-                        backgroundColor: isActive ? 'rgba(59, 130, 246, 0.15)' : 'rgba(0, 0, 0, 0.05)',
-                        color: isActive ? 'var(--text-primary)' : 'var(--text-muted)',
+                      <span className="text-xs text-center min-w-[1.5rem]" style={{
+                        color: isActive ? '#2563eb' : 'var(--text-muted)',
                         fontSize: '11px',
                         fontWeight: '500'
                       }}>
@@ -432,7 +433,7 @@ const Sidebar: React.FC<SidebarProps> = ({ onClose, onToggle, onOpenSearch, clas
                       style={{
                         borderRadius: 'var(--radius-sm)',
                         backgroundColor: isActive ? 'rgba(59, 130, 246, 0.08)' : 'transparent',
-                        color: isActive ? 'var(--text-primary)' : 'var(--text-secondary)',
+                        color: isActive ? '#2563eb' : 'var(--text-secondary)',
                         fontWeight: isActive ? '500' : '400'
                       }}
                       onMouseEnter={(e) => {
@@ -451,14 +452,15 @@ const Sidebar: React.FC<SidebarProps> = ({ onClose, onToggle, onOpenSearch, clas
                       }}
                     >
                       <div className="flex items-center">
-                        <Hash className="w-6 h-6 mr-3 flex-shrink-0" style={{
-                          color: isActive ? 'var(--primary)' : 'var(--primary)'
-                        }} />
+                        <div className="w-6 h-6 flex items-center justify-center mr-3 flex-shrink-0">
+                          <Hash className="w-4 h-4" style={{
+                            color: isActive ? 'var(--primary)' : 'var(--text-secondary)'
+                          }} />
+                        </div>
                         <span className="truncate">{project.name}</span>
                       </div>
-                      <span className="text-xs px-2 py-1 rounded-full text-center min-w-[1.5rem]" style={{
-                        backgroundColor: isActive ? 'rgba(59, 130, 246, 0.15)' : 'rgba(0, 0, 0, 0.05)',
-                        color: isActive ? 'var(--text-primary)' : 'var(--text-muted)',
+                      <span className="text-xs text-center min-w-[1.5rem]" style={{
+                        color: isActive ? '#2563eb' : 'var(--text-muted)',
                         fontSize: '11px',
                         fontWeight: '500'
                       }}>
