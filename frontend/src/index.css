@@ -205,23 +205,6 @@ button:focus-visible {
 }
 
 /* ==========================================
-   Button Styles - Keep Only Used Classes
-   ========================================== */
-.tm-btn-primary {
-  background: var(--primary);
-  color: white;
-  padding: var(--spacing-sm) var(--spacing-md);
-  border-radius: var(--radius-md);
-  font-weight: 400;
-  border: none;
-  cursor: pointer;
-  font-size: 15px;
-}
-
-.tm-btn-primary:hover {
-  opacity: 0.9;
-}
-/* ==========================================
    Form Inputs - Used in SearchPage
    ========================================== */
 .tm-input {
