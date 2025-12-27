@@ -1,5 +1,9 @@
 import React, { useMemo } from 'react';
+import { CheckCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { PageTitle } from '@/components/ui/page-title';
+import { PageSpinner } from '@/components/ui/spinner';
+import { EmptyState } from '@/components/ui/empty-state';
 import { useTasks } from '@/hooks/useTasks';
 import { useProjects } from '@/hooks/useProjects';
 import { useAuth } from '@/context/AuthContext';
@@ -63,21 +67,18 @@ const CompletedPage: React.FC = () => {
 
   if (isLoading) {
     return (
-      <div className="W8rBu9M main-view-layout i_TMTDC main-view-layout--narrow _19abae45 a7c6de33 _1e47f652 d607c41c bfa58fdf d19e99ad">
-        <div className="flex items-center justify-center py-12">
-          <div className="animate-spin h-8 w-8 border-2 border-primary border-t-transparent rounded-full mx-auto mb-4"></div>
-          <p className="text-[var(--text-secondary)]">Loading activity...</p>
-        </div>
+      <div className="main-view-layout main-view-layout--narrow">
+        <PageSpinner text="Loading activity..." />
       </div>
     );
   }
 
   if (tasksError) {
     return (
-      <div className="W8rBu9M main-view-layout i_TMTDC main-view-layout--narrow _19abae45 a7c6de33 _1e47f652 d607c41c bfa58fdf d19e99ad">
+      <div className="main-view-layout main-view-layout--narrow">
         <div className="flex items-center justify-center py-12">
           <div className="text-center">
-            <p className="text-error mb-4">Failed to load completed tasks</p>
+            <p className="text-[var(--error)] mb-4">Failed to load completed tasks</p>
             <Button onClick={() => window.location.reload()}>
               Try Again
             </Button>
@@ -91,30 +92,21 @@ const CompletedPage: React.FC = () => {
   const dates = sortedDates(groupedTasks);
 
   return (
-    <div className="W8rBu9M main-view-layout i_TMTDC main-view-layout--narrow _19abae45 a7c6de33 _1e47f652 d607c41c bfa58fdf d19e99ad">
-      {/* Content - title integrated */}
+    <div className="main-view-layout main-view-layout--narrow">
+      {/* Page Title */}
       <div className="px-6">
-        {/* Page Title */}
-        <div className="pt-12 pb-6">
-          <h1 className="text-2xl font-bold text-text-primary">
-            Completed
-          </h1>
-        </div>
+        <PageTitle icon={CheckCircle}>Completed</PageTitle>
       </div>
 
       {/* Activity Content */}
-      <div className="f_4GTlVaXcbEpesBv98J4ZPiL1naWuBg _19abae45 _213145b4">
+      <div className="activity-content-container">
         <div id="activity_app">
           {dates.length === 0 ? (
-            <div className="text-center py-12">
-              <div className="text-[var(--text-tertiary)] mb-4">
-                <svg className="mx-auto h-16 w-16" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1}>
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                </svg>
-              </div>
-              <h3 className="text-lg font-medium text-foreground mb-2">No completed tasks yet</h3>
-              <p className="text-[var(--text-secondary)]">Tasks you complete will appear here as activity history.</p>
-            </div>
+            <EmptyState
+              icon={CheckCircle}
+              title="No completed tasks yet"
+              description="Tasks you complete will appear here as activity history."
+            />
           ) : (
             <>
               {dates.map(date => (
@@ -129,9 +121,9 @@ const CompletedPage: React.FC = () => {
               ))}
               
               {/* End message */}
-              <div className="_19abae45 a7c6de33 _1e47f652 _43e5f8e9 _8c75067a">
-                <hr className="b6f67ff8 _19abae45" />
-                <div className="_19abae45 a7c6de33 _194d8611 f88bdaf1">
+              <div className="activity-end-message">
+                <hr className="activity-end-divider" />
+                <div className="activity-end-text">
                   <p className="no_more_results">That's it. No more history to load.</p>
                 </div>
               </div>

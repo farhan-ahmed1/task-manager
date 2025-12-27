@@ -1,6 +1,9 @@
 import React, { useMemo } from 'react';
 import { Calendar, Plus } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { PageTitle } from '@/components/ui/page-title';
+import { PageSpinner } from '@/components/ui/spinner';
+import { EmptyState } from '@/components/ui/empty-state';
 import InboxTaskItem from '@/components/tasks/InboxTaskItem';
 import AddTaskModal from '@/components/tasks/AddTaskModal';
 import { useTasks, useCreateTask, useUpdateTask } from '@/hooks/useTasks';
@@ -57,10 +60,7 @@ const TodayPage: React.FC = () => {
   if (isLoading) {
     return (
       <div className="max-w-4xl mx-auto px-6">
-        <div className="flex items-center justify-center py-12">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2" 
-               style={{ borderColor: 'var(--primary)' }} />
-        </div>
+        <PageSpinner text="Loading today's tasks..." />
       </div>
     );
   }
@@ -68,36 +68,25 @@ const TodayPage: React.FC = () => {
   return (
     <div className="max-w-4xl mx-auto px-6">
       {/* Page Title */}
-      <div className="pt-12 pb-6">
-        <h1 className="text-2xl font-bold flex items-center text-text-primary">
-          <Calendar className="w-6 h-6 mr-2" />
-          Today
-        </h1>
-        <p className="text-[var(--text-secondary)] mt-2">
-          {new Date().toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' })}
-        </p>
-      </div>
+      <PageTitle 
+        icon={Calendar}
+        subtitle={new Date().toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' })}
+      >
+        Today
+      </PageTitle>
       
       <div className="mb-6">
         {todayTasks.length === 0 ? (
-          <div className="text-center py-12">
-            <div className="flex items-center justify-center w-16 h-16 rounded-xl mb-4 bg-border-light mx-auto">
-              <Calendar className="w-8 h-8 text-text-muted" />
-            </div>
-            <h3 className="text-h3 mb-2 text-text-primary">
-              No tasks due today
-            </h3>
-            <p className="text-body mb-4 text-text-muted">
-              Add tasks with today's date to see them here.
-            </p>
-            <Button 
-              onClick={() => setShowAddTaskModal(true)}
-              className="tm-btn-primary"
-            >
-              <Plus className="w-4 h-4 mr-2" />
-              Add task
-            </Button>
-          </div>
+          <EmptyState
+            icon={Calendar}
+            title="No tasks due today"
+            description="Add tasks with today's date to see them here."
+            action={{
+              label: "Add task",
+              onClick: () => setShowAddTaskModal(true),
+              icon: Plus
+            }}
+          />
         ) : (
           <div className="bg-card rounded-lg border border-[var(--border)]">
             {todayTasks.map((task, index) => (

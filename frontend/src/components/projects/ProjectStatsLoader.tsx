@@ -1,5 +1,5 @@
 import { useProjectStats } from '@/hooks/useProjects';
-import { Loader2 } from 'lucide-react';
+import { Spinner } from '@/components/ui/spinner';
 
 interface ProjectStatsLoaderProps {
   projectId: string;
@@ -15,7 +15,7 @@ export function ProjectStatsLoader({ projectId, children }: ProjectStatsLoaderPr
   if (isLoading) {
     return (
       <div className="flex items-center justify-center py-4">
-        <Loader2 className="h-4 w-4 animate-spin text-slate-400" />
+        <Spinner size="sm" className="text-slate-400" />
       </div>
     );
   }

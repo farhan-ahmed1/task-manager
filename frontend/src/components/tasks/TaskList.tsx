@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
-import { Plus, AlertCircle, Loader2 } from 'lucide-react';
+import { Plus, AlertCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Alert, AlertDescription } from '@/components/ui/alert';
+import { Spinner } from '@/components/ui/spinner';
 import TaskCard from './TaskCard';
 import TaskForm from './TaskForm';
 import TaskFilters from './TaskFilters';
@@ -188,17 +189,7 @@ const TaskList: React.FC = () => {
       <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50/30 to-slate-50">
         <div className="flex flex-col items-center justify-center py-20">
           <div className="bg-white/80 backdrop-blur-sm rounded-2xl p-8 border border-slate-200/60 shadow-lg">
-            <div className="flex flex-col items-center space-y-4">
-              <div className="relative">
-                <div className="h-14 w-14 rounded-full bg-info-light flex items-center justify-center">
-                  <Loader2 className="w-7 h-7 animate-spin text-primary icon-loading" strokeWidth={2.5} />
-                </div>
-              </div>
-              <div className="text-center">
-                <h3 className="font-semibold text-slate-900 mb-1">Loading your tasks</h3>
-                <p className="text-sm text-slate-600">Getting everything ready for you...</p>
-              </div>
-            </div>
+            <Spinner size="lg" text="Loading your tasks..." />
           </div>
         </div>
       </div>

@@ -7,10 +7,10 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Alert } from '@/components/ui/alert';
 import { Badge } from '@/components/ui/badge';
 import { ScrollArea } from '@/components/ui/scroll-area';
+import { ButtonSpinner, Spinner } from '@/components/ui/spinner';
 // import { Separator } from '@/components/ui/separator'; // Component doesn't exist yet
 import { 
   AlertCircle, 
-  Loader2, 
   Mail, 
   UserPlus, 
   Crown, 
@@ -299,7 +299,7 @@ const ProjectSharingDialog: React.FC<ProjectSharingDialogProps> = ({
               className="w-full bg-gray-900 text-white hover:bg-gray-800"
               disabled={isInviting}
             >
-              {isInviting && <Loader2 className="h-4 w-4 mr-2 animate-spin" />}
+              {isInviting && <ButtonSpinner />}
               Send Invitation
             </Button>
           </form>
@@ -341,8 +341,7 @@ const ProjectSharingDialog: React.FC<ProjectSharingDialogProps> = ({
             
             {isLoadingMembers ? (
               <div className="flex items-center justify-center py-4">
-                <Loader2 className="h-5 w-5 animate-spin text-gray-400" />
-                <span className="ml-2 text-sm text-gray-500">Loading members...</span>
+                <Spinner size="sm" text="Loading members..." />
               </div>
             ) : membersError ? (
               <Alert variant="destructive">

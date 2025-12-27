@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Alert } from '@/components/ui/alert';
+import { Spinner } from '@/components/ui/spinner';
 import ConfirmDialog from '@/components/ui/ConfirmDialog';
 import { 
   ProjectForm, 
@@ -8,7 +9,7 @@ import {
   ProjectStatsView, 
   ProjectTasksView 
 } from '@/components/projects';
-import { AlertCircle, Loader2 } from 'lucide-react';
+import { AlertCircle } from 'lucide-react';
 import { useProjects } from '@/hooks/useProjects';
 import { useProjectOperations, useProjectFilters } from '@/hooks';
 import type { Project } from '@/types/api';
@@ -67,17 +68,7 @@ const ProjectsPage: React.FC = () => {
       <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50/30 to-slate-50">
         <div className="flex flex-col items-center justify-center py-20">
           <div className="bg-white/80 backdrop-blur-sm rounded-2xl p-8 border border-slate-200/60 shadow-lg">
-            <div className="flex flex-col items-center space-y-4">
-              <div className="relative">
-                <div className="h-12 w-12 rounded-full bg-blue-100 flex items-center justify-center">
-                  <Loader2 className="h-6 w-6 animate-spin text-blue-600" />
-                </div>
-              </div>
-              <div className="text-center">
-                <h3 className="font-semibold text-slate-900 mb-1">Loading your projects</h3>
-                <p className="text-sm text-slate-600">Getting everything ready for you...</p>
-              </div>
-            </div>
+            <Spinner size="lg" text="Loading your projects..." />
           </div>
         </div>
       </div>
