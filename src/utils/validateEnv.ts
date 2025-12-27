@@ -32,9 +32,7 @@ class EnvironmentValidationError extends Error {
 function requireEnv(key: string): string {
   const value = process.env[key];
   if (!value || value.trim() === '') {
-    throw new EnvironmentValidationError(
-      `Missing required environment variable: ${key}`
-    );
+    throw new EnvironmentValidationError(`Missing required environment variable: ${key}`);
   }
   return value;
 }
@@ -51,12 +49,10 @@ function optionalEnv(key: string, defaultValue: string): string {
  */
 function validatePort(key: string, required: boolean = true): number {
   const value = process.env[key];
-  
+
   if (!value) {
     if (required) {
-      throw new EnvironmentValidationError(
-        `Missing required environment variable: ${key}`
-      );
+      throw new EnvironmentValidationError(`Missing required environment variable: ${key}`);
     }
     return 0;
   }
@@ -64,7 +60,7 @@ function validatePort(key: string, required: boolean = true): number {
   const port = parseInt(value, 10);
   if (isNaN(port) || port < 1 || port > 65535) {
     throw new EnvironmentValidationError(
-      `Invalid port number for ${key}: ${value}. Must be between 1 and 65535.`
+      `Invalid port number for ${key}: ${value}. Must be between 1 and 65535.`,
     );
   }
 
@@ -78,7 +74,7 @@ function validateJWTSecret(secret: string): void {
   if (secret.length < 32) {
     throw new EnvironmentValidationError(
       'JWT_SECRET must be at least 32 characters long for security. ' +
-      'Generate one with: openssl rand -base64 32'
+        'Generate one with: openssl rand -base64 32',
     );
   }
 
@@ -92,10 +88,10 @@ function validateJWTSecret(secret: string): void {
     'jwt-secret',
   ];
 
-  if (weakSecrets.some(weak => secret.toLowerCase().includes(weak))) {
+  if (weakSecrets.some((weak) => secret.toLowerCase().includes(weak))) {
     throw new EnvironmentValidationError(
       'JWT_SECRET appears to use a weak or default value. ' +
-      'Generate a strong secret with: openssl rand -base64 32'
+        'Generate a strong secret with: openssl rand -base64 32',
     );
   }
 }
@@ -105,10 +101,10 @@ function validateJWTSecret(secret: string): void {
  */
 function validateNodeEnv(env: string): void {
   const validEnvironments = ['development', 'production', 'test', 'staging'];
-  
+
   if (!validEnvironments.includes(env)) {
     throw new EnvironmentValidationError(
-      `Invalid NODE_ENV: ${env}. Must be one of: ${validEnvironments.join(', ')}`
+      `Invalid NODE_ENV: ${env}. Must be one of: ${validEnvironments.join(', ')}`,
     );
   }
 }
@@ -124,13 +120,13 @@ export function validateEnvironment(): EnvConfig {
     validateNodeEnv(NODE_ENV);
 
     const PORT = validatePort('PORT');
-    
+
     const POSTGRES_HOST = requireEnv('POSTGRES_HOST');
     const POSTGRES_PORT = validatePort('POSTGRES_PORT');
     const POSTGRES_DB = requireEnv('POSTGRES_DB');
     const POSTGRES_USER = requireEnv('POSTGRES_USER');
     const POSTGRES_PASSWORD = requireEnv('POSTGRES_PASSWORD');
-    
+
     const JWT_SECRET = requireEnv('JWT_SECRET');
     validateJWTSecret(JWT_SECRET);
 
@@ -138,10 +134,10 @@ export function validateEnvironment(): EnvConfig {
     const JWT_EXPIRES = optionalEnv('JWT_EXPIRES', '1h');
     const CORS_ORIGIN = optionalEnv('CORS_ORIGIN', '*');
     const LOG_LEVEL = optionalEnv('LOG_LEVEL', 'info');
-    
+
     // Optional numeric values
-    const PG_MAX_CLIENTS = process.env.PG_MAX_CLIENTS 
-      ? parseInt(process.env.PG_MAX_CLIENTS, 10) 
+    const PG_MAX_CLIENTS = process.env.PG_MAX_CLIENTS
+      ? parseInt(process.env.PG_MAX_CLIENTS, 10)
       : 10;
 
     const DISABLE_RATE_LIMITING = process.env.DISABLE_RATE_LIMITING || 'false';
@@ -151,14 +147,14 @@ export function validateEnvironment(): EnvConfig {
       if (CORS_ORIGIN === '*') {
         console.warn(
           'WARNING: CORS_ORIGIN is set to "*" in production. ' +
-          'This is insecure. Set it to your frontend domain.'
+            'This is insecure. Set it to your frontend domain.',
         );
       }
 
       if (POSTGRES_PASSWORD.length < 16) {
         console.warn(
           'WARNING: POSTGRES_PASSWORD is shorter than 16 characters. ' +
-          'Consider using a stronger password for production.'
+            'Consider using a stronger password for production.',
         );
       }
     }
@@ -184,7 +180,7 @@ export function validateEnvironment(): EnvConfig {
       if (process.env.NODE_ENV === 'test' || process.env.JEST_WORKER_ID !== undefined) {
         throw error;
       }
-      
+
       console.error('\nEnvironment Validation Error:\n');
       console.error(error.message);
       console.error('\nPlease check your .env file and ensure all required variables are set.');

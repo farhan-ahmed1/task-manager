@@ -37,7 +37,9 @@ describe('Environment Validation', () => {
       process.env.POSTGRES_PASSWORD = 'test_password';
       process.env.JWT_SECRET = 'a'.repeat(32);
 
-      expect(() => validateEnvironment()).toThrow('Missing required environment variable: NODE_ENV');
+      expect(() => validateEnvironment()).toThrow(
+        'Missing required environment variable: NODE_ENV',
+      );
     });
 
     it('should throw error when JWT_SECRET is missing', () => {
@@ -50,7 +52,9 @@ describe('Environment Validation', () => {
       process.env.POSTGRES_PASSWORD = 'test_password';
       delete process.env.JWT_SECRET;
 
-      expect(() => validateEnvironment()).toThrow('Missing required environment variable: JWT_SECRET');
+      expect(() => validateEnvironment()).toThrow(
+        'Missing required environment variable: JWT_SECRET',
+      );
     });
 
     it('should throw error when PORT is missing', () => {
@@ -133,13 +137,17 @@ describe('Environment Validation', () => {
     it('should reject weak JWT_SECRET values', () => {
       process.env.JWT_SECRET = 'your-secret-here-' + 'x'.repeat(20);
 
-      expect(() => validateEnvironment()).toThrow('JWT_SECRET appears to use a weak or default value');
+      expect(() => validateEnvironment()).toThrow(
+        'JWT_SECRET appears to use a weak or default value',
+      );
     });
 
     it('should reject JWT_SECRET with "password"', () => {
       process.env.JWT_SECRET = 'password' + 'x'.repeat(30);
 
-      expect(() => validateEnvironment()).toThrow('JWT_SECRET appears to use a weak or default value');
+      expect(() => validateEnvironment()).toThrow(
+        'JWT_SECRET appears to use a weak or default value',
+      );
     });
   });
 
@@ -157,7 +165,7 @@ describe('Environment Validation', () => {
     it('should accept valid NODE_ENV values', () => {
       const validEnvs = ['development', 'production', 'test', 'staging'];
 
-      validEnvs.forEach(env => {
+      validEnvs.forEach((env) => {
         process.env.NODE_ENV = env;
         expect(() => validateEnvironment()).not.toThrow();
       });
@@ -218,7 +226,7 @@ describe('Environment Validation', () => {
       process.env.POSTGRES_DB = 'test_db';
       process.env.POSTGRES_USER = 'test_user';
       process.env.JWT_SECRET = 'a'.repeat(32);
-      
+
       // Spy on console.warn and clear any previous calls
       consoleWarnSpy = jest.spyOn(console, 'warn').mockImplementation();
     });
@@ -234,7 +242,7 @@ describe('Environment Validation', () => {
       validateEnvironment();
 
       expect(consoleWarnSpy).toHaveBeenCalledWith(
-        expect.stringContaining('CORS_ORIGIN is set to "*" in production')
+        expect.stringContaining('CORS_ORIGIN is set to "*" in production'),
       );
     });
 
@@ -245,7 +253,7 @@ describe('Environment Validation', () => {
       validateEnvironment();
 
       expect(consoleWarnSpy).toHaveBeenCalledWith(
-        expect.stringContaining('POSTGRES_PASSWORD is shorter than 16 characters')
+        expect.stringContaining('POSTGRES_PASSWORD is shorter than 16 characters'),
       );
     });
 

@@ -20,6 +20,7 @@ import {
   readRateLimit,
   rateLimitHealthCheck,
 } from './middleware/rateLimiting';
+import { requestTimeout } from './middleware/timeout';
 import { validateEnvironment } from './utils/validateEnv';
 
 dotenv.config();
@@ -28,6 +29,12 @@ dotenv.config();
 validateEnvironment();
 
 const app = express();
+
+// Request timeout (30 seconds default, configurable via env)
+const timeoutMs = process.env.REQUEST_TIMEOUT_MS
+  ? parseInt(process.env.REQUEST_TIMEOUT_MS, 10)
+  : 30000;
+app.use(requestTimeout(timeoutMs));
 
 // Security middleware
 app.use(
