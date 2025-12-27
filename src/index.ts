@@ -22,6 +22,7 @@ import {
 } from './middleware/rateLimiting';
 import { requestTimeout } from './middleware/timeout';
 import { validateEnvironment } from './utils/validateEnv';
+import { validateCorsOrigin } from './utils/validateCors';
 
 dotenv.config();
 
@@ -50,13 +51,9 @@ app.use(
   }),
 );
 
-// CORS configuration
-app.use(
-  cors({
-    origin: process.env.CORS_ORIGIN || '*',
-    credentials: true,
-  }),
-);
+// CORS configuration with validation
+const corsConfig = validateCorsOrigin(process.env.CORS_ORIGIN, process.env.NODE_ENV);
+app.use(cors(corsConfig));
 
 // Compression middleware
 app.use(compression());
