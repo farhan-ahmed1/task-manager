@@ -4,6 +4,7 @@ import DatePickerModal from '@/components/ui/DatePickerModal';
 import { projectService } from '@/services/projects';
 import { useAuth } from '@/context/AuthContext';
 import { handleError } from '@/utils/errorHandling';
+import { safeQuerySelector } from '@/utils/typeGuards';
 import type { CreateTaskRequest, TaskPriority, Project } from '@/types/api';
 
 interface InlineAddTaskProps {
@@ -293,17 +294,17 @@ const InlineAddTask: React.FC<InlineAddTaskProps> = ({
             backgroundColor: 'transparent'
           }}
           onMouseEnter={(e) => {
-            const iconBg = e.currentTarget.querySelector('.icon-bg') as HTMLElement;
-            const icon = e.currentTarget.querySelector('.plus-icon') as HTMLElement;
-            const text = e.currentTarget.querySelector('.add-text') as HTMLElement;
+            const iconBg = safeQuerySelector(e.currentTarget, '.icon-bg');
+            const icon = safeQuerySelector(e.currentTarget, '.plus-icon');
+            const text = safeQuerySelector(e.currentTarget, '.add-text');
             if (iconBg) iconBg.style.backgroundColor = '#2563EB';
             if (icon) icon.style.color = 'white';
             if (text) text.style.color = '#2563EB';
           }}
           onMouseLeave={(e) => {
-            const iconBg = e.currentTarget.querySelector('.icon-bg') as HTMLElement;
-            const icon = e.currentTarget.querySelector('.plus-icon') as HTMLElement;
-            const text = e.currentTarget.querySelector('.add-text') as HTMLElement;
+            const iconBg = safeQuerySelector(e.currentTarget, '.icon-bg');
+            const icon = safeQuerySelector(e.currentTarget, '.plus-icon');
+            const text = safeQuerySelector(e.currentTarget, '.add-text');
             if (iconBg) iconBg.style.backgroundColor = 'transparent';
             if (icon) icon.style.color = '#2563EB';
             if (text) text.style.color = 'var(--text-tertiary)';

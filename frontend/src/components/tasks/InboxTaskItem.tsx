@@ -6,6 +6,7 @@ import DragHandle from '@/components/ui/DragHandle';
 import { useSortable } from '@dnd-kit/sortable';
 import { getPriorityColor } from '@/lib/colors';
 import { formatDueDate, isDateOverdue } from '@/lib/taskUtils';
+import { hasHTMLRelatedTarget } from '@/utils/typeGuards';
 import type { Task } from '@/types/api';
 
 interface InboxTaskItemProps {
@@ -51,8 +52,7 @@ const InboxTaskItem: React.FC<InboxTaskItemProps> = ({
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={(e) => {
         // Don't hide if mouse is moving to the date picker
-        const relatedTarget = e.relatedTarget as HTMLElement;
-        if (datePickerRef.current && datePickerRef.current.contains(relatedTarget)) {
+        if (hasHTMLRelatedTarget(e) && datePickerRef.current?.contains(e.relatedTarget)) {
           return;
         }
         setIsHovered(false);

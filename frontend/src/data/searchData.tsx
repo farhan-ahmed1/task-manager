@@ -20,7 +20,17 @@ import {
 } from 'lucide-react';
 import type { SearchGroup } from '../types/search';
 
-export const createSearchGroups = (navigate: (path: string) => void): SearchGroup[] => [
+/**
+ * Navigation function type for routing
+ */
+type NavigateFunction = (path: string) => void;
+
+/**
+ * Creates search groups with navigation actions
+ * @param navigate - Navigation function to handle route changes
+ * @returns Array of search groups with items
+ */
+export const createSearchGroups = (navigate: NavigateFunction): SearchGroup[] => [
   {
     id: 'navigation',
     label: 'Navigation',

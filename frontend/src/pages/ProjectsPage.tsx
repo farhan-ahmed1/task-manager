@@ -13,6 +13,12 @@ import { useProjects } from '@/hooks/useProjects';
 import { useProjectOperations, useProjectFilters } from '@/hooks';
 import type { Project } from '@/types/api';
 
+/**
+ * View modes for the projects page
+ * - dashboard: Main grid view of all projects
+ * - stats: Detailed statistics view for a single project
+ * - tasks: Task management view for a single project
+ */
 type ViewMode = 'dashboard' | 'stats' | 'tasks';
 
 const ProjectsPage: React.FC = () => {
