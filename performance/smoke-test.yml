@@ -1,0 +1,96 @@
+config:
+  target: 'http://localhost:3000'
+  phases:
+    # Quick smoke test - single user
+    - duration: 30
+      arrivalRate: 1
+      name: "Smoke test"
+  
+scenarios:
+  - name: "Health Check"
+    weight: 20
+    flow:
+      - get:
+          url: "/health"
+          expect:
+            - statusCode: 200
+            - hasProperty: "status"
+            - contentType: json
+
+  - name: "User Login and Basic Operations"
+    weight: 80
+    flow:
+      # Register a test user
+      - post:
+          url: "/auth/register"
+          json:
+            email: "smoketest-{{ $randomString() }}@example.com"
+            password: "password123"
+            name: "Smoke Test User"
+          capture:
+            - json: "$.token"
+              as: "authToken"
+          expect:
+            - statusCode: 201
+      
+      # Create a task
+      - post:
+          url: "/api/tasks"
+          headers:
+            Authorization: "Bearer {{ authToken }}"
+          json:
+            title: "Smoke Test Task"
+            description: "Testing basic task creation"
+            priority: "MEDIUM"
+            status: "PENDING"
+          capture:
+            - json: "$.data.id"
+              as: "taskId"
+          expect:
+            - statusCode: 201
+      
+      # Get all tasks
+      - get:
+          url: "/api/tasks"
+          headers:
+            Authorization: "Bearer {{ authToken }}"
+          expect:
+            - statusCode: 200
+      
+      # Create a project
+      - post:
+          url: "/api/projects"
+          headers:
+            Authorization: "Bearer {{ authToken }}"
+          json:
+            name: "Smoke Test Project"
+            description: "Testing basic project creation"
+          capture:
+            - json: "$.data.id"
+              as: "projectId"
+          expect:
+            - statusCode: 201
+      
+      # Get all projects
+      - get:
+          url: "/api/projects"
+          headers:
+            Authorization: "Bearer {{ authToken }}"
+          expect:
+            - statusCode: 200
+      
+      # Clean up - delete task
+      - delete:
+          url: "/api/tasks/{{ taskId }}"
+          headers:
+            Authorization: "Bearer {{ authToken }}"
+          expect:
+            - statusCode: 204
+
+plugins:
+  expect: {}
+
+expect:
+  thresholds:
+    - http.response_time.p95: 1000   # More relaxed for smoke tests
+    - http.response_time.max: 3000

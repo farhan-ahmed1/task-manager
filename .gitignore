@@ -73,6 +73,11 @@ pgdata/
 jest-cache/
 jest-report.json
 
+### Performance / Load Testing ###
+performance/report.json
+performance/report.json.html
+performance/*.html
+
 ### Misc ###
 coverage/
 *.tgz

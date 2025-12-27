@@ -56,11 +56,11 @@ scenarios:
             email: "{{ email }}"
             password: "{{ password }}"
           capture:
-            - json: "$.data.token"
+            - json: "$.token"
               as: "authToken"
           expect:
             - statusCode: 200
-            - hasProperty: "data.token"
+            - hasProperty: "token"
 
   - name: "Authenticated Task Operations"
     weight: 40
@@ -72,7 +72,7 @@ scenarios:
             email: "{{ testUserEmail }}"
             password: "{{ testUserPassword }}"
           capture:
-            - json: "$.data.token"
+            - json: "$.token"
               as: "authToken"
       # Create a task
       - post:
@@ -83,7 +83,7 @@ scenarios:
             title: "{{ taskTitle }}"
             description: "Load test task"
             priority: "MEDIUM"
-            status: "TODO"
+            status: "PENDING"
           capture:
             - json: "$.data.id"
               as: "taskId"
@@ -130,7 +130,7 @@ scenarios:
             email: "{{ testUserEmail }}"
             password: "{{ testUserPassword }}"
           capture:
-            - json: "$.data.token"
+            - json: "$.token"
               as: "authToken"
       # Create a project
       - post:
