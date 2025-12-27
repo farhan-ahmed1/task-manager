@@ -1,6 +1,7 @@
 import React from 'react';
 import { Button } from '@/components/ui/button';
 import { ProjectCard, ProjectFilters } from '@/components/projects';
+import { PageTitle } from '@/components/ui/page-title';
 import { Plus, FolderOpen } from 'lucide-react';
 import type { Project } from '@/types/api';
 
@@ -53,26 +54,10 @@ const ProjectGrid: React.FC<ProjectGridProps> = ({
   return (
     <>
       {/* Header Section */}
-      <div className="pt-12 pb-6">
-        <div className="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-6 mb-6">
-          <div className="space-y-4">
-            <h1 className="text-2xl font-bold text-slate-900">My Projects</h1>
-            
-            {/* Stats Cards */}
-            {projects.length > 0 && (
-              <div className="flex flex-wrap gap-3">
-                <div className="bg-white/80 backdrop-blur-sm rounded-lg px-3 py-2 border border-slate-200/60">
-                  <div className="flex items-center gap-2">
-                    <div className="h-2 w-2 rounded-full bg-slate-400"></div>
-                    <span className="text-sm font-medium text-slate-700">
-                      {projects.length} Projects
-                    </span>
-                  </div>
-                </div>
-              </div>
-            )}
-          </div>
-          
+      <PageTitle
+        icon={FolderOpen}
+        className="pt-8 pb-2"
+        actions={
           <Button 
             onClick={onCreateProject}
             size="lg"
@@ -81,8 +66,24 @@ const ProjectGrid: React.FC<ProjectGridProps> = ({
             <Plus className="h-5 w-5 mr-2" />
             Create New Project
           </Button>
+        }
+      >
+        My Projects
+      </PageTitle>
+
+      {/* Stats Cards */}
+      {projects.length > 0 && (
+        <div className="flex flex-wrap gap-3 mb-6">
+          <div className="bg-white/80 backdrop-blur-sm rounded-lg px-3 py-2 border border-slate-200/60">
+            <div className="flex items-center gap-2">
+              <div className="h-2 w-2 rounded-full bg-slate-400"></div>
+              <span className="text-sm font-medium text-slate-700">
+                {projects.length} Projects
+              </span>
+            </div>
+          </div>
         </div>
-      </div>
+      )}
 
       {/* Filters */}
       {projects.length > 0 && (

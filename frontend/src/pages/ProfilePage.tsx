@@ -3,6 +3,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
+import { PageTitle } from '@/components/ui/page-title';
 import { User, Mail, Lock, Save, AlertCircle, CheckCircle, Shield } from 'lucide-react';
 import { useAuth } from '@/context/AuthContext';
 import { authService } from '@/services/auth';
@@ -181,15 +182,14 @@ const ProfilePage: React.FC = () => {
   };
 
   return (
-    <div className="container mx-auto py-8 px-4 max-w-4xl">
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold tracking-tight text-foreground mb-2">
-          Account Settings
-        </h1>
-        <p className="text-lg text-muted-foreground">
-          Manage your account information and security settings
-        </p>
-      </div>
+    <div className="container mx-auto px-4 max-w-4xl">
+      <PageTitle 
+        icon={User}
+        subtitle="Manage your account information and security settings"
+        className="pt-8 pb-4"
+      >
+        Account Settings
+      </PageTitle>
 
       <div className="grid gap-8 md:grid-cols-1 lg:grid-cols-2">
         {/* Profile Information Card */}

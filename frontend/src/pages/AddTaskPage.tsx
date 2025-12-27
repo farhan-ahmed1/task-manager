@@ -1,24 +1,27 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
-import { ArrowLeft } from 'lucide-react';
+import { PageTitle } from '@/components/ui/page-title';
+import { ArrowLeft, Plus } from 'lucide-react';
 
 const AddTaskPage: React.FC = () => {
   const navigate = useNavigate();
 
   return (
     <div className="max-w-2xl mx-auto p-6">
-      <div className="flex items-center space-x-4 mb-6">
-        <Button 
-          variant="ghost" 
-          size="sm"
-          onClick={() => navigate(-1)}
-          className="p-2"
-        >
-          <ArrowLeft className="w-4 h-4" />
-        </Button>
-        <h1 className="text-2xl font-semibold text-gray-900">Add Task</h1>
-      </div>
+      <Button 
+        variant="ghost" 
+        size="sm"
+        onClick={() => navigate(-1)}
+        className="mb-4"
+      >
+        <ArrowLeft className="w-4 h-4 mr-2" />
+        Back
+      </Button>
+      
+      <PageTitle icon={Plus} className="pt-0 pb-6">
+        Add Task
+      </PageTitle>
       
       <div className="bg-white rounded-lg border border-gray-200 p-6">
         <p className="text-gray-600">

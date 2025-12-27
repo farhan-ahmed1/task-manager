@@ -1,5 +1,6 @@
 import React from 'react';
 import { Badge } from '@/components/ui/badge';
+import { SectionTitle } from '@/components/ui/page-title';
 import { TrendingUp, Clock, CheckCircle2, AlertCircle } from 'lucide-react';
 import type { Project } from '@/types/api';
 import type { ProjectStats as ProjectStatsType } from '@/services/projects';
@@ -84,8 +85,8 @@ const ProjectStats: React.FC<ProjectStatsProps> = ({
       <div className="bg-gradient-to-br from-white to-slate-50 rounded-2xl p-6 border border-slate-200/60 shadow-sm">
         <div className="space-y-4">
           <div>
-            <h2 className="text-xl font-semibold text-slate-900">{project.name} Analytics</h2>
-            <p className="text-slate-600 mt-1">
+            <SectionTitle className="mb-1">{project.name} Analytics</SectionTitle>
+            <p style={{ color: 'var(--text-secondary)' }} className="mt-1">
               {project.description || 'Project analytics and progress tracking'}
             </p>
           </div>

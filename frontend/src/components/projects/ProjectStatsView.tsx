@@ -1,5 +1,6 @@
 import React from 'react';
 import { Button } from '@/components/ui/button';
+import { SectionTitle } from '@/components/ui/page-title';
 import { ArrowLeft, BarChart3 } from 'lucide-react';
 import type { Project } from '@/types/api';
 
@@ -34,10 +35,10 @@ const ProjectStatsView: React.FC<ProjectStatsViewProps> = ({
             </Button>
             <div className="h-4 w-px bg-slate-300" />
             <div>
-              <h1 className="text-xl font-semibold text-slate-900">
+              <div className="text-xl font-semibold" style={{ color: 'var(--text-primary)' }}>
                 {project.name}
-              </h1>
-              <p className="text-sm text-slate-600">Project Analytics</p>
+              </div>
+              <p className="text-sm" style={{ color: 'var(--text-secondary)' }}>Project Analytics</p>
             </div>
           </div>
         </div>
@@ -46,10 +47,10 @@ const ProjectStatsView: React.FC<ProjectStatsViewProps> = ({
         <div className="text-center py-16 bg-gradient-to-br from-slate-50 to-blue-50 rounded-2xl border border-slate-200/60">
           <div className="max-w-md mx-auto">
             <BarChart3 className="h-16 w-16 text-slate-400 mx-auto mb-4" />
-            <h3 className="text-xl font-semibold text-slate-900 mb-2">
+            <SectionTitle className="justify-center mb-2">
               Project Analytics
-            </h3>
-            <p className="text-slate-600">
+            </SectionTitle>
+            <p style={{ color: 'var(--text-secondary)' }}>
               Stats view will be available soon with React Query
             </p>
           </div>

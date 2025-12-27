@@ -6,6 +6,7 @@ import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Spinner } from '@/components/ui/spinner';
+import { PageTitle } from '@/components/ui/page-title';
 import { 
   Plus, 
   TrendingUp, 
@@ -73,13 +74,14 @@ const DashboardPage: React.FC = () => {
   }
 
   return (
-    <div className="container mx-auto px-4 py-8">
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold tracking-tight">Dashboard</h1>
-        <p className="text-muted-foreground">
-          Welcome back! Here's an overview of your tasks and projects.
-        </p>
-      </div>
+    <div className="container mx-auto px-4">
+      <PageTitle 
+        icon={BarChart3}
+        subtitle="Welcome back! Here's an overview of your tasks and projects."
+        className="pt-8 pb-4"
+      >
+        Dashboard
+      </PageTitle>
 
       {/* Stats Overview */}
       <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4 mb-8">

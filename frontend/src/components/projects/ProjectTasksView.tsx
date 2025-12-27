@@ -58,10 +58,10 @@ const ProjectTasksView: React.FC<ProjectTasksViewProps> = ({
             </Button>
             <div className="h-4 w-px bg-slate-300" />
             <div>
-              <h1 className="text-xl font-semibold text-slate-900">
+              <div className="text-xl font-semibold" style={{ color: 'var(--text-primary)' }}>
                 {project.name}
-              </h1>
-              <p className="text-sm text-slate-600">Project Tasks</p>
+              </div>
+              <p className="text-sm" style={{ color: 'var(--text-secondary)' }}>Project Tasks</p>
             </div>
           </div>
         </div>

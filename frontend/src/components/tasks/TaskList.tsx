@@ -3,6 +3,7 @@ import { Plus, AlertCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Spinner } from '@/components/ui/spinner';
+import { SectionTitle } from '@/components/ui/page-title';
 import TaskCard from './TaskCard';
 import TaskForm from './TaskForm';
 import TaskFilters from './TaskFilters';
@@ -227,8 +228,8 @@ const TaskList: React.FC = () => {
                 </svg>
               </div>
               <div>
-                <h1 className="text-2xl font-bold text-slate-900">Task Management</h1>
-                <p className="text-slate-600">Stay organized and productive</p>
+                <SectionTitle className="mb-1">Task Management</SectionTitle>
+                <p style={{ color: 'var(--text-secondary)' }}>Stay organized and productive</p>
               </div>
             </div>
             
