@@ -3,6 +3,7 @@ import { Plus, Calendar, Flag, Inbox, FolderOpen, ChevronDown } from 'lucide-rea
 import DatePickerModal from '@/components/ui/DatePickerModal';
 import { projectService } from '@/services/projects';
 import { useAuth } from '@/context/AuthContext';
+import { handleError } from '@/utils/errorHandling';
 import type { CreateTaskRequest, TaskPriority, Project } from '@/types/api';
 
 interface InlineAddTaskProps {
@@ -67,7 +68,10 @@ const InlineAddTask: React.FC<InlineAddTaskProps> = ({
           setAvailableProjects(result.data);
         }
       } catch (error) {
-        console.error('Failed to load projects:', error);
+        handleError(error, {
+          toastMessage: 'Failed to load projects',
+          logToConsole: true
+        });
       }
     };
 
@@ -172,9 +176,10 @@ const InlineAddTask: React.FC<InlineAddTaskProps> = ({
       setIsExpanded(false);
       setSelectedProject(currentProject || null); // Reset to original project
     } catch (error) {
-      console.error('Failed to create task:', error);
-      // TODO: Show user-friendly error message (toast/notification)
-      alert('Failed to create task. Please check your connection and try again.');
+      handleError(error, {
+        toastMessage: 'Failed to create task. Please try again.',
+        context: { title: taskTitle, sectionId, projectId: selectedProject?.id }
+      });
     } finally {
       setIsLoading(false);
     }

@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Calendar, Flag, Inbox, FolderOpen, ChevronDown } from 'lucide-react';
+import { handleError } from '@/utils/errorHandling';
 import {
   Dialog,
   DialogContent,
@@ -50,7 +51,10 @@ const AddTaskModal: React.FC<AddTaskModalProps> = ({
             setProjects(result.data);
           }
         } catch (error) {
-          console.error('Failed to load projects:', error);
+          handleError(error, {
+            toastMessage: 'Failed to load projects',
+            logToConsole: true
+          });
         } finally {
           setProjectsLoading(false);
         }
@@ -86,7 +90,10 @@ const AddTaskModal: React.FC<AddTaskModalProps> = ({
       setShowProjectPicker(false);
       onClose();
     } catch (error) {
-      console.error('Failed to create task:', error);
+      handleError(error, {
+        toastMessage: 'Failed to create task',
+        context: { title: taskTitle, projectId: selectedProjectId }
+      });
     } finally {
       setIsLoading(false);
     }

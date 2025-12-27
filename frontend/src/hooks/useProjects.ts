@@ -1,4 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { toast } from 'sonner';
 import { projectService } from '@/services/projects';
 import type { Project, CreateProjectRequest, UpdateProjectRequest } from '@/types/api';
 
@@ -102,6 +103,9 @@ export function useCreateProject() {
       
       // Add the new project to cache
       queryClient.setQueryData<Project>(projectKeys.detail(newProject.id), newProject);
+      
+      // Show success notification
+      toast.success('Project created successfully');
     },
   });
 }
@@ -149,6 +153,9 @@ export function useUpdateProject() {
       
       // Invalidate lists to show the updated project
       queryClient.invalidateQueries({ queryKey: projectKeys.lists() });
+      
+      // Show success notification
+      toast.success('Project updated successfully');
     },
   });
 }
@@ -173,6 +180,9 @@ export function useDeleteProject() {
       
       // Invalidate lists to refetch without the deleted project
       queryClient.invalidateQueries({ queryKey: projectKeys.lists() });
+      
+      // Show success notification
+      toast.success('Project deleted successfully');
     },
   });
 }

@@ -1,4 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { toast } from 'sonner';
 import { taskService } from '@/services/tasks';
 import type { Task, CreateTaskRequest, UpdateTaskRequest, TaskStatus } from '@/types/api';
 
@@ -66,6 +67,9 @@ export function useCreateTask() {
       
       // Optionally add the new task to cache optimistically
       queryClient.setQueryData<Task>(taskKeys.detail(newTask.id), newTask);
+      
+      // Show success notification
+      toast.success('Task created successfully');
     },
   });
 }
@@ -114,6 +118,9 @@ export function useUpdateTask() {
       
       // Invalidate lists to show the updated task
       queryClient.invalidateQueries({ queryKey: taskKeys.lists() });
+      
+      // Show success notification
+      toast.success('Task updated successfully');
     },
   });
 }
@@ -138,6 +145,9 @@ export function useDeleteTask() {
       
       // Invalidate lists to refetch without the deleted task
       queryClient.invalidateQueries({ queryKey: taskKeys.lists() });
+      
+      // Show success notification
+      toast.success('Task deleted successfully');
     },
   });
 }

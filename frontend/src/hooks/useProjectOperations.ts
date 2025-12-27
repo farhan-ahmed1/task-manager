@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useCreateProject, useUpdateProject, useDeleteProject } from './useProjects';
 import { useCreateTask, useUpdateTask } from './useTasks';
 import { projectService } from '@/services/projects';
+import { handleError } from '@/utils/errorHandling';
 import type { Project, CreateProjectRequest, UpdateProjectRequest, Task, CreateTaskRequest } from '@/types/api';
 import type { CreateTaskFormData } from '@/validation/task';
 
@@ -78,7 +79,10 @@ export function useProjectOperations() {
       setDeleteDialog({ isOpen: false, project: null });
       return selectedProjectId === project.id; // Return true if deleted project was selected
     } catch (err: unknown) {
-      console.error('Failed to delete project:', err);
+      handleError(err, {
+        toastMessage: 'Failed to delete project',
+        context: { projectId: project.id, projectName: project.name }
+      });
       setDeleteDialog({ isOpen: false, project: null });
       return false;
     }
@@ -165,12 +169,15 @@ export function useProjectOperations() {
       setEditingTask(null);
       setTaskFormProjectId(undefined);
     } catch (error) {
-      console.error('Task operation failed:', error);
-      setTaskFormError(
-        error instanceof Error 
-          ? error.message 
-          : 'An unexpected error occurred. Please try again.'
-      );
+      const errorMessage = error instanceof Error 
+        ? error.message 
+        : 'An unexpected error occurred. Please try again.';
+      
+      setTaskFormError(errorMessage);
+      handleError(error, {
+        toastMessage: editingTask ? 'Failed to update task' : 'Failed to create task',
+        context: { taskTitle: data.title, projectId: data.project_id }
+      });
     }
   };
 
@@ -205,10 +212,20 @@ export function useProjectOperations() {
         role
       );
       if (!result.success) {
-        setSharingError(result.error.message);
+        const errorMsg = result.error.message;
+        setSharingError(errorMsg);
+        handleError(result.error, {
+          toastMessage: 'Failed to invite user',
+          context: { projectId: sharingProject.id, email, role }
+        });
       }
-    } catch {
-      setSharingError('Failed to invite user');
+    } catch (error) {
+      const errorMsg = 'Failed to invite user';
+      setSharingError(errorMsg);
+      handleError(error, {
+        toastMessage: errorMsg,
+        context: { projectId: sharingProject.id, email, role }
+      });
     } finally {
       setIsInvitingUser(false);
     }
@@ -222,10 +239,20 @@ export function useProjectOperations() {
         userId
       );
       if (!result.success) {
-        setSharingError(result.error.message);
+        const errorMsg = result.error.message;
+        setSharingError(errorMsg);
+        handleError(result.error, {
+          toastMessage: 'Failed to remove member',
+          context: { projectId: sharingProject.id, userId }
+        });
       }
-    } catch {
-      setSharingError('Failed to remove member');
+    } catch (error) {
+      const errorMsg = 'Failed to remove member';
+      setSharingError(errorMsg);
+      handleError(error, {
+        toastMessage: errorMsg,
+        context: { projectId: sharingProject.id, userId }
+      });
     }
   };
 

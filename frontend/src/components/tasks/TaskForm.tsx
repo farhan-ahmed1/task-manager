@@ -24,6 +24,7 @@ import {
 import { createTaskSchema, updateTaskSchema, type CreateTaskFormData, type UpdateTaskFormData } from '@/validation/task';
 import type { Task, Project } from '@/types/api';
 import { projectService } from '@/services/projects';
+import { handleError } from '@/utils/errorHandling';
 
 interface TaskFormProps {
   open: boolean;
@@ -90,7 +91,10 @@ const TaskForm: React.FC<TaskFormProps> = ({
             setProjects(result.data);
           }
         } catch (error) {
-          console.error('Failed to load projects:', error);
+          handleError(error, {
+            toastMessage: 'Failed to load projects',
+            logToConsole: true
+          });
         } finally {
           setProjectsLoading(false);
         }

@@ -9,6 +9,7 @@ import DragOverlay from '@/components/tasks/DragOverlay';
 import DropIndicator from '@/components/tasks/DropIndicator';
 import SectionHeader from '@/components/tasks/SectionHeader';
 import type { ProjectLayoutConfig } from '@/types/layout';
+import { handleError } from '@/utils/errorHandling';
 
 import AddSectionButton from '@/components/tasks/AddSectionButton';
 import { type ViewOptions } from '@/components/tasks/ViewOptionsMenu';
@@ -124,7 +125,10 @@ const ProjectTasksLayout: React.FC<ProjectTasksLayoutProps> = ({
         setSections(result.data);
       }
     } catch (error) {
-      console.error('Error loading sections:', error);
+      handleError(error, {
+        toastMessage: 'Failed to load sections',
+        context: { projectId: project?.id }
+      });
     } finally {
       setLoading(false);
     }
@@ -255,11 +259,16 @@ const ProjectTasksLayout: React.FC<ProjectTasksLayoutProps> = ({
       if (result.success) {
         setSections(prev => [...prev, result.data]);
       } else {
-        alert('Failed to create section: ' + result.error.message);
+        handleError(result.error, {
+          toastMessage: 'Failed to create section',
+          context: { name, projectId: project?.id }
+        });
       }
     } catch (error) {
-      console.error('Error creating section:', error);
-      alert('Failed to create section. Please try again.');
+      handleError(error, {
+        toastMessage: 'Failed to create section',
+        context: { name, projectId: project?.id }
+      });
     }
   };
 
@@ -278,7 +287,10 @@ const ProjectTasksLayout: React.FC<ProjectTasksLayoutProps> = ({
         ));
       }
     } catch (error) {
-      console.error('Error toggling section collapse:', error);
+      handleError(error, {
+        toastMessage: 'Failed to toggle section',
+        context: { sectionId }
+      });
     }
   };
 
@@ -291,11 +303,16 @@ const ProjectTasksLayout: React.FC<ProjectTasksLayoutProps> = ({
           section.id === sectionId ? result.data : section
         ));
       } else {
-        alert('Failed to rename section: ' + result.error.message);
+        handleError(result.error, {
+          toastMessage: 'Failed to rename section',
+          context: { sectionId, newName }
+        });
       }
     } catch (error) {
-      console.error('Error renaming section:', error);
-      alert('Failed to rename section. Please try again.');
+      handleError(error, {
+        toastMessage: 'Failed to rename section',
+        context: { sectionId, newName }
+      });
     }
   };
 
@@ -307,11 +324,16 @@ const ProjectTasksLayout: React.FC<ProjectTasksLayoutProps> = ({
         // Sections will be reloaded, React Query will handle task updates
         setSections(prev => prev.filter(section => section.id !== sectionId));
       } else {
-        alert('Failed to delete section: ' + result.error.message);
+        handleError(result.error, {
+          toastMessage: 'Failed to delete section',
+          context: { sectionId }
+        });
       }
     } catch (error) {
-      console.error('Error deleting section:', error);
-      alert('Failed to delete section. Please try again.');
+      handleError(error, {
+        toastMessage: 'Failed to delete section',
+        context: { sectionId }
+      });
     }
   };
 
