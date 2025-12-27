@@ -8,13 +8,15 @@ import type { UpdateProjectDto } from '../src/validation/project';
 
 // Set test environment variables
 process.env.NODE_ENV = 'test';
-process.env.JWT_SECRET = process.env.JWT_SECRET || 'test-jwt-secret-key-for-testing';
+// Use a strong-looking 64-character test JWT secret (meets all validation requirements)
+process.env.JWT_SECRET = process.env.JWT_SECRET || 'a1b2c3d4e5f6g7h8i9j0k1l2m3n4o5p6q7r8s9t0u1v2w3x4y5z6A7B8C9D0E1F2';
 process.env.JWT_EXPIRES = '1h';
 process.env.DB_HOST = 'localhost';
 process.env.DB_PORT = '5432';
 process.env.DB_NAME = 'taskmanager_test';
 process.env.DB_USER = 'postgres';
 process.env.DB_PASSWORD = 'password';
+process.env.PORT = '3000';
 
 // Global test timeout
 jest.setTimeout(30000);

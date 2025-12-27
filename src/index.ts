@@ -20,8 +20,12 @@ import {
   readRateLimit,
   rateLimitHealthCheck,
 } from './middleware/rateLimiting';
+import { validateEnvironment } from './utils/validateEnv';
 
 dotenv.config();
+
+// Validate environment variables before starting the application
+validateEnvironment();
 
 const app = express();
 
