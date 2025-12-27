@@ -116,10 +116,10 @@ const DatePickerModal: React.FC<DatePickerModalProps> = ({
       className="absolute left-0 w-80 bg-white rounded-xl border border-[var(--border)]"
       style={{ 
         zIndex: 99999,
-        boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.15), 0 10px 10px -5px rgba(0, 0, 0, 0.1)',
+        boxShadow: 'var(--shadow-card)',
         position: 'absolute',
         isolation: 'isolate',
-        backgroundColor: '#ffffff', // Solid white background - no transparency
+        backgroundColor: 'var(--surface)', // Solid white background - no transparency
         ...(position === 'top' 
           ? { bottom: '100%', marginBottom: '0.5rem' }
           : { top: '100%', marginTop: '0.5rem' }

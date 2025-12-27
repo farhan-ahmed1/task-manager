@@ -64,6 +64,22 @@
     --spacing-xl: 48px;
     --spacing-2xl: 64px;
     
+    /* Shadows & Effects */
+    --shadow-focus: 0 0 0 3px rgba(59, 130, 246, 0.1);
+    --shadow-drop-sm: 0 0 4px rgba(59, 130, 246, 0.6);
+    --shadow-drop-md: 0 0 8px rgba(59, 130, 246, 0.4);
+    --shadow-card: 0 20px 25px -5px rgba(0, 0, 0, 0.15), 0 10px 10px -5px rgba(0, 0, 0, 0.1);
+    --shadow-card-hover: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 
+                         0 10px 10px -5px rgba(0, 0, 0, 0.04);
+    
+    /* Gradients & Overlays */
+    --overlay-light: rgba(255, 255, 255, 0.95);
+    --overlay-subtle: rgba(248, 250, 252, 0.95);
+    --overlay-border: rgba(148, 163, 184, 0.2);
+    --overlay-shadow-inner: rgba(255, 255, 255, 0.5);
+    --overlay-shadow-main: rgba(0, 0, 0, 0.1);
+    --bg-hover-subtle: rgba(0, 0, 0, 0.03);
+    
     /* Note: Tailwind and components use hex values directly from the root variables above */
   }
 
@@ -221,7 +237,7 @@ button:focus-visible {
 
 .tm-input:focus {
   border-color: var(--primary);
-  box-shadow: 0 0 0 3px rgba(66, 133, 244, 0.1);
+  box-shadow: var(--shadow-focus);
   outline: none;
 }
 
@@ -240,8 +256,7 @@ button:focus-visible {
 .card-hover:hover {
   transform: translateY(-4px) scale(1.01);
   box-shadow: 
-    0 20px 25px -5px rgb(0 0 0 / 0.1), 
-    0 10px 10px -5px rgb(0 0 0 / 0.04),
+    var(--shadow-card-hover),
     0 0 0 1px hsl(var(--primary)/0.1);
   border-color: hsl(var(--primary)/0.2);
 }
@@ -249,13 +264,13 @@ button:focus-visible {
 .auth-form-container {
   backdrop-filter: blur(12px);
   background: linear-gradient(145deg, 
-    rgba(255, 255, 255, 0.95), 
-    rgba(248, 250, 252, 0.95)
+    var(--overlay-light), 
+    var(--overlay-subtle)
   );
-  border: 1px solid rgba(148, 163, 184, 0.2);
+  border: 1px solid var(--overlay-border);
   box-shadow: 
-    0 10px 25px -5px rgba(0, 0, 0, 0.1),
-    0 0 0 1px rgba(255, 255, 255, 0.5) inset;
+    0 10px 25px -5px var(--overlay-shadow-main),
+    0 0 0 1px var(--overlay-shadow-inner) inset;
 }
 
 /* ==========================================
@@ -321,7 +336,7 @@ button:focus-visible {
 
 /* Status icon styles */
 .icon-status-error {
-  color: #ef4444;
+  color: var(--error);
   stroke-width: 2.5;
 }
 
@@ -342,19 +357,19 @@ svg[class*="lucide"] {
 
 /* Sidebar container */
 .sidebar-container {
-  background-color: #fafbff;
+  background-color: var(--bg-secondary);
   border-right: 1px solid var(--border-subtle);
 }
 
 /* Add Task Button */
 .sidebar-add-task {
-  background-color: rgba(59, 130, 246, 0.1);
+  background-color: var(--surface-hover);
   color: var(--text-primary);
   transition: background-color 0.15s ease;
 }
 
 .sidebar-add-task:hover {
-  background-color: rgba(59, 130, 246, 0.15);
+  background-color: var(--surface-active);
 }
 
 /* Navigation Item Base */
@@ -376,7 +391,7 @@ svg[class*="lucide"] {
 }
 
 .sidebar-nav-item[data-active="false"]:hover {
-  background-color: rgba(0, 0, 0, 0.03);
+  background-color: var(--bg-hover-subtle);
   color: var(--primary);
 }
 
@@ -386,7 +401,7 @@ svg[class*="lucide"] {
 
 /* Navigation Item - Active State */
 .sidebar-nav-item[data-active="true"] {
-  background-color: rgba(59, 130, 246, 0.08);
+  background-color: var(--surface-active);
   color: var(--text-primary);
   font-weight: 500;
 }
@@ -457,14 +472,14 @@ svg[class*="lucide"] {
 }
 
 .sidebar-project-link[data-active="false"]:hover {
-  background-color: rgba(0, 0, 0, 0.03);
+  background-color: var(--bg-hover-subtle);
   color: var(--text-primary);
   padding-left: 1.25rem;
 }
 
 .sidebar-project-link[data-active="true"] {
-  background-color: rgba(59, 130, 246, 0.08);
-  color: #2563eb;
+  background-color: var(--surface-active);
+  color: var(--primary);
   font-weight: 500;
 }
 
@@ -496,12 +511,12 @@ svg[class*="lucide"] {
 }
 
 .sidebar-project-link[data-active="true"] .sidebar-project-count {
-  color: #2563eb;
+  color: var(--primary);
 }
 
 /* User Section */
 .sidebar-user-section {
-  border-top: 1px solid #DADCE0;
+  border-top: 1px solid var(--border);
 }
 
 .sidebar-user-button {
@@ -517,12 +532,12 @@ svg[class*="lucide"] {
 }
 
 .sidebar-user-button:hover {
-  background-color: #F1F3F4;
+  background-color: var(--bg-tertiary);
 }
 
 /* Section Dividers */
 .sidebar-divider {
-  border-top: 1px solid #DADCE0;
+  border-top: 1px solid var(--border);
 }
 
 /* Smooth transitions for all sidebar elements */
