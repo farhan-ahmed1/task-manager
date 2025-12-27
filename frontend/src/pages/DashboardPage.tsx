@@ -7,6 +7,7 @@ import { Progress } from '@/components/ui/progress';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Spinner } from '@/components/ui/spinner';
 import { PageTitle } from '@/components/ui/page-title';
+import { EmptyState } from '@/components/ui/empty-state';
 import { 
   Plus, 
   TrendingUp, 
@@ -188,16 +189,17 @@ const DashboardPage: React.FC = () => {
           </CardHeader>
           <CardContent>
             {recentTasks.length === 0 ? (
-              <div className="text-center py-8">
-                <AlertCircle className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
-                <p className="text-muted-foreground mb-4">
-                  No tasks yet. Create your first task to get started!
-                </p>
-                <Button onClick={() => navigate('/tasks')}>
-                  <Plus className="h-4 w-4 mr-2" />
-                  Create Task
-                </Button>
-              </div>
+              <EmptyState
+                icon={AlertCircle}
+                title="No tasks yet"
+                description="Create your first task to get started!"
+                action={{
+                  label: "Create Task",
+                  onClick: () => navigate('/tasks'),
+                  icon: Plus
+                }}
+                iconSize="md"
+              />
             ) : (
               <ScrollArea className="h-[300px]">
                 <div className="space-y-3">
@@ -256,16 +258,17 @@ const DashboardPage: React.FC = () => {
           </CardHeader>
           <CardContent>
             {projects.length === 0 ? (
-              <div className="text-center py-8">
-                <FolderOpen className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
-                <p className="text-muted-foreground mb-4">
-                  No projects yet. Create your first project to organize your tasks!
-                </p>
-                <Button onClick={() => navigate('/projects')}>
-                  <Plus className="h-4 w-4 mr-2" />
-                  Create Project
-                </Button>
-              </div>
+              <EmptyState
+                icon={FolderOpen}
+                title="No projects yet"
+                description="Create your first project to organize your tasks!"
+                action={{
+                  label: "Create Project",
+                  onClick: () => navigate('/projects'),
+                  icon: Plus
+                }}
+                iconSize="md"
+              />
             ) : (
               <ScrollArea className="h-[300px]">
                 <div className="space-y-3">

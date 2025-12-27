@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Plus, Edit2, Check, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { EmptyState } from '@/components/ui/empty-state';
 import InboxTaskItem from '@/components/tasks/InboxTaskItem';
 import InlineAddTask from '@/components/tasks/InlineAddTask';
 import AddTaskModal from '@/components/tasks/AddTaskModal';
@@ -49,7 +50,7 @@ const ProjectTasksLayout: React.FC<ProjectTasksLayoutProps> = ({
   config,
   onProjectUpdate,
 }) => {
-  const { title, icon, emptyState } = config;
+  const { title, emptyState } = config;
   // React Query hooks - single source of truth
   const filters = project ? { project_id: project.id } : {};
   const { data: allTasks = [], isLoading: tasksLoading } = useTasks(filters);
@@ -508,25 +509,16 @@ const ProjectTasksLayout: React.FC<ProjectTasksLayoutProps> = ({
         {/* Tasks container */}
         <div>
           {tasks.length === 0 ? (
-            <div className="text-center py-16">
-              <div className="w-16 h-16 mx-auto mb-4 rounded-full flex items-center justify-center" 
-                   style={{ backgroundColor: 'var(--border-light)' }}>
-                {icon}
-              </div>
-              <h3 className="text-h3 mb-2" style={{ color: 'var(--text-primary)' }}>
-                {emptyState.title}
-              </h3>
-              <p className="text-body mb-4" style={{ color: 'var(--text-muted)' }}>
-                {emptyState.description}
-              </p>
-              <Button 
-                onClick={() => setShowAddTaskModal(true)}
-                className="tm-btn-primary"
-              >
-                <Plus className="w-4 h-4 mr-2" />
-                {emptyState.buttonText}
-              </Button>
-            </div>
+            <EmptyState
+              title={emptyState.title}
+              description={emptyState.description}
+              action={{
+                label: emptyState.buttonText,
+                onClick: () => setShowAddTaskModal(true),
+                icon: Plus
+              }}
+              iconSize="lg"
+            />
           ) : (
             <div>
               <DndContext 

@@ -3,6 +3,7 @@ import { Plus, AlertCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Spinner } from '@/components/ui/spinner';
+import { EmptyState } from '@/components/ui/empty-state';
 import { SectionTitle } from '@/components/ui/page-title';
 import TaskCard from './TaskCard';
 import TaskForm from './TaskForm';
@@ -297,34 +298,22 @@ const TaskList: React.FC = () => {
 
       {/* Task Grid */}
       {filteredAndSortedTasks.length === 0 ? (
-        <div className="text-center py-16 bg-gradient-to-br from-slate-50 to-blue-50 rounded-2xl border border-slate-200/60">
-          <div className="max-w-md mx-auto">
-            <div className="text-slate-400 mb-6">
-              <svg className="mx-auto w-20 h-20 icon-enhanced" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
-                <path strokeLinecap="round" strokeLinejoin="round" d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" />
-              </svg>
-            </div>
-            <h3 className="text-xl font-semibold text-slate-900 mb-3">
-              {allTasks.length === 0 ? 'No tasks yet' : 'No tasks match your filters'}
-            </h3>
-            <p className="text-slate-600 mb-6 leading-relaxed">
-              {allTasks.length === 0 
-                ? 'Ready to get productive? Create your first task and start organizing your work.'
-                : 'Try adjusting your search terms or filter criteria to find what you\'re looking for.'
-              }
-            </p>
-            {allTasks.length === 0 && (
-              <Button 
-                onClick={() => setShowTaskForm(true)}
-                size="lg"
-                className="bg-primary hover:bg-primary-dark text-white px-8 py-3 rounded-xl shadow-lg hover:shadow-xl transition-all duration-200 transform hover:scale-105"
-              >
-                <Plus className="h-5 w-5 mr-2" />
-                Create Your First Task
-              </Button>
-            )}
-          </div>
-        </div>
+        <EmptyState
+          icon={ListTodo}
+          title={allTasks.length === 0 ? 'No tasks yet' : 'No tasks match your filters'}
+          description={
+            allTasks.length === 0 
+              ? 'Ready to get productive? Create your first task and start organizing your work.'
+              : 'Try adjusting your search terms or filter criteria to find what you\'re looking for.'
+          }
+          action={allTasks.length === 0 ? {
+            label: "Create Your First Task",
+            onClick: () => setShowTaskForm(true),
+            icon: Plus
+          } : undefined}
+          iconSize="lg"
+          card
+        />
       ) : (
         <div className="space-y-4">
           {filteredAndSortedTasks.map((task) => (

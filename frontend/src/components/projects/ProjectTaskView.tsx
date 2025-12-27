@@ -4,6 +4,7 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { ScrollArea } from '@/components/ui/scroll-area';
+import { EmptyState } from '@/components/ui/empty-state';
 import { Plus, Calendar, Clock, CheckCircle2, Circle, AlertCircle } from 'lucide-react';
 import type { Project, Task, TaskStatus } from '@/types/api';
 import { taskService } from '@/services/tasks';
@@ -111,24 +112,6 @@ const ProjectTaskView: React.FC<ProjectTaskViewProps> = ({
     </Card>
   );
 
-  const EmptyState: React.FC<{ title: string; description: string }> = ({ title, description }) => (
-    <div className="text-center py-12">
-      <AlertCircle className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
-      <h3 className="text-lg font-medium text-foreground mb-2">{title}</h3>
-      <p className="text-muted-foreground mb-4">{description}</p>
-      {onCreateTask && (
-        <Button 
-          onClick={onCreateTask} 
-          size="sm"
-          className="bg-primary hover:bg-primary-dark text-white"
-        >
-          <Plus className="h-4 w-4 mr-2" />
-          Create Task
-        </Button>
-      )}
-    </div>
-  );
-
   if (isLoading) {
     return (
       <Card className={className}>
@@ -185,9 +168,16 @@ const ProjectTaskView: React.FC<ProjectTaskViewProps> = ({
       
       <CardContent>
         {allTasks.length === 0 ? (
-          <EmptyState 
-            title="No tasks found" 
-            description="This project doesn't have any tasks yet. Create your first task to get started." 
+          <EmptyState
+            icon={AlertCircle}
+            title="No tasks found"
+            description="This project doesn't have any tasks yet. Create your first task to get started."
+            action={onCreateTask ? {
+              label: "Create Task",
+              onClick: onCreateTask,
+              icon: Plus
+            } : undefined}
+            iconSize="md"
           />
         ) : (
           <Tabs defaultValue="all" className="w-full">
@@ -211,9 +201,16 @@ const ProjectTaskView: React.FC<ProjectTaskViewProps> = ({
             <TabsContent value="pending" className="mt-4">
               <ScrollArea className="h-[400px]">
                 {pendingTasks.length === 0 ? (
-                  <EmptyState 
-                    title="No pending tasks" 
-                    description="All tasks in this project have been started or completed." 
+                  <EmptyState
+                    icon={Circle}
+                    title="No pending tasks"
+                    description="All tasks in this project have been started or completed."
+                    action={onCreateTask ? {
+                      label: "Create Task",
+                      onClick: onCreateTask,
+                      icon: Plus
+                    } : undefined}
+                    iconSize="sm"
                   />
                 ) : (
                   <div className="space-y-3">
@@ -228,9 +225,16 @@ const ProjectTaskView: React.FC<ProjectTaskViewProps> = ({
             <TabsContent value="in-progress" className="mt-4">
               <ScrollArea className="h-[400px]">
                 {inProgressTasks.length === 0 ? (
-                  <EmptyState 
-                    title="No tasks in progress" 
-                    description="No tasks are currently being worked on." 
+                  <EmptyState
+                    icon={Clock}
+                    title="No tasks in progress"
+                    description="No tasks are currently being worked on."
+                    action={onCreateTask ? {
+                      label: "Create Task",
+                      onClick: onCreateTask,
+                      icon: Plus
+                    } : undefined}
+                    iconSize="sm"
                   />
                 ) : (
                   <div className="space-y-3">
@@ -245,9 +249,16 @@ const ProjectTaskView: React.FC<ProjectTaskViewProps> = ({
             <TabsContent value="completed" className="mt-4">
               <ScrollArea className="h-[400px]">
                 {completedTasks.length === 0 ? (
-                  <EmptyState 
-                    title="No completed tasks" 
-                    description="No tasks have been completed yet." 
+                  <EmptyState
+                    icon={CheckCircle2}
+                    title="No completed tasks"
+                    description="No tasks have been completed yet."
+                    action={onCreateTask ? {
+                      label: "Create Task",
+                      onClick: onCreateTask,
+                      icon: Plus
+                    } : undefined}
+                    iconSize="sm"
                   />
                 ) : (
                   <div className="space-y-3">
