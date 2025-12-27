@@ -1,6 +1,43 @@
 import type { Task, TaskStatus, TaskPriority } from '@/types/api';
 
-// Format date helper
+/**
+ * ============================================================================
+ * DATE FORMATTING UTILITIES
+ * ============================================================================
+ * Centralized date formatting functions to ensure consistency across the app.
+ * All date formatting should use these utilities instead of local implementations.
+ */
+
+/**
+ * Normalizes a date to midnight (00:00:00) for date-only comparisons.
+ * Useful when comparing dates without considering time.
+ * 
+ * @param date - The date to normalize
+ * @returns A new Date object set to midnight
+ */
+const getDateOnly = (date: Date): Date => {
+  return new Date(date.getFullYear(), date.getMonth(), date.getDate());
+};
+
+/**
+ * Formats a date string for display with smart relative formatting.
+ * 
+ * Rules:
+ * - Shows "Today" or "Yesterday/Tomorrow" for dates within 1 day
+ * - Shows day of week for dates within 7 days
+ * - Shows "Month Day" for dates within current year
+ * - Shows "Month Day, Year" for dates in other years
+ * 
+ * @param dateString - ISO date string to format
+ * @returns Formatted date string, or empty string if invalid
+ * 
+ * @example
+ * formatDate('2024-12-26') // "Today" (if today is 2024-12-26)
+ * formatDate('2024-12-27') // "Tomorrow" 
+ * formatDate('2024-12-30') // "Monday"
+ * formatDate('2024-11-15') // "Nov 15"
+ * formatDate('2023-06-20') // "Jun 20, 2023"
+ */
 export const formatDate = (dateString?: string): string => {
   if (!dateString) return '';
   
@@ -8,7 +45,10 @@ export const formatDate = (dateString?: string): string => {
   if (isNaN(date.getTime())) return '';
   
   const now = new Date();
-  const diffTime = Math.abs(now.getTime() - date.getTime());
+  const dateOnly = getDateOnly(date);
+  const todayOnly = getDateOnly(now);
+  
+  const diffTime = Math.abs(dateOnly.getTime() - todayOnly.getTime());
   const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
   
   if (diffDays === 0) return 'Today';
@@ -22,7 +62,122 @@ export const formatDate = (dateString?: string): string => {
   });
 };
 
-// Get relative time (e.g., "2 hours ago")
+/**
+ * Formats a due date with overdue detection.
+ * Similar to formatDate but adds "Overdue" for past due dates.
+ * 
+ * @param dateString - ISO date string to format
+ * @returns Formatted date string with overdue indicator
+ * 
+ * @example
+ * formatDueDate('2024-12-26') // "Today"
+ * formatDueDate('2024-12-25') // "Overdue" (if today is 2024-12-26)
+ * formatDueDate('2024-12-27') // "Tomorrow"
+ */
+export const formatDueDate = (dateString?: string): string => {
+  if (!dateString) return '';
+  
+  const date = new Date(dateString);
+  if (isNaN(date.getTime())) return '';
+  
+  const today = new Date();
+  const dateOnly = getDateOnly(date);
+  const todayOnly = getDateOnly(today);
+  
+  // Check if overdue (before today, excluding today)
+  if (dateOnly < todayOnly) {
+    return 'Overdue';
+  }
+  
+  // Check for today
+  if (dateOnly.getTime() === todayOnly.getTime()) {
+    return 'Today';
+  }
+  
+  // Check for tomorrow
+  const tomorrow = new Date(todayOnly);
+  tomorrow.setDate(tomorrow.getDate() + 1);
+  if (dateOnly.getTime() === tomorrow.getTime()) {
+    return 'Tomorrow';
+  }
+  
+  // Show day of week for this week
+  const daysDiff = Math.ceil((dateOnly.getTime() - todayOnly.getTime()) / (1000 * 60 * 60 * 24));
+  if (daysDiff <= 7) {
+    return date.toLocaleDateString('en-US', { weekday: 'long' });
+  }
+  
+  // Show date for further dates
+  return date.toLocaleDateString('en-US', { 
+    month: 'short', 
+    day: 'numeric',
+    year: date.getFullYear() !== today.getFullYear() ? 'numeric' : undefined
+  });
+};
+
+/**
+ * Formats a date for the upcoming page with extended formatting.
+ * Shows more detailed information for dates within the week.
+ * 
+ * @param dateString - ISO date string to format
+ * @returns Formatted date string
+ * 
+ * @example
+ * formatUpcomingDate('2024-12-27') // "Tomorrow"
+ * formatUpcomingDate('2024-12-30') // "Monday"
+ * formatUpcomingDate('2025-01-15') // "Wednesday, January 15"
+ */
+export const formatUpcomingDate = (dateString: string): string => {
+  const date = new Date(dateString);
+  const today = new Date();
+  const dateOnly = getDateOnly(date);
+  const todayOnly = getDateOnly(today);
+  
+  const tomorrow = new Date(todayOnly);
+  tomorrow.setDate(tomorrow.getDate() + 1);
+  
+  const diffDays = Math.floor((dateOnly.getTime() - todayOnly.getTime()) / (1000 * 60 * 60 * 24));
+  
+  if (diffDays === 1) return 'Tomorrow';
+  if (diffDays <= 7) return date.toLocaleDateString('en-US', { weekday: 'long' });
+  
+  return date.toLocaleDateString('en-US', { 
+    weekday: 'long', 
+    month: 'long', 
+    day: 'numeric' 
+  });
+};
+
+/**
+ * Formats a date as a simple calendar date.
+ * Always shows: "Month Day, Year"
+ * 
+ * @param dateString - ISO date string to format
+ * @returns Formatted date string
+ * 
+ * @example
+ * formatSimpleDate('2024-12-26') // "Dec 26, 2024"
+ */
+export const formatSimpleDate = (dateString: string): string => {
+  return new Date(dateString).toLocaleDateString('en-US', {
+    year: 'numeric',
+    month: 'short',
+    day: 'numeric',
+  });
+};
+
+/**
+ * Gets relative time from now (e.g., "2 hours ago", "Just now").
+ * Used for activity feeds and timestamps.
+ * 
+ * @param dateString - ISO date string
+ * @returns Relative time string
+ * 
+ * @example
+ * getRelativeTime('2024-12-26T10:00:00') // "2h ago" (if current time is 12:00)
+ * getRelativeTime('2024-12-26T11:59:00') // "Just now" (if current time is 12:00)
+ * getRelativeTime('2024-12-25T12:00:00') // "Yesterday"
+ */
 export const getRelativeTime = (dateString: string): string => {
   const date = new Date(dateString);
   const now = new Date();
@@ -35,12 +190,43 @@ export const getRelativeTime = (dateString: string): string => {
   if (diffMinutes < 1) return 'Just now';
   if (diffMinutes < 60) return `${diffMinutes}m ago`;
   if (diffHours < 24) return `${diffHours}h ago`;
+  if (diffDays === 1) return 'Yesterday';
   if (diffDays < 7) return `${diffDays}d ago`;
   
   return date.toLocaleDateString();
 };
 
-// Get task status color
+/**
+ * ============================================================================
+ * TASK UTILITY FUNCTIONS
+ * ============================================================================
+ */
+
+/**
+ * Checks if a date is overdue (before today at midnight).
+ * 
+ * @param dueDate - Optional ISO date string
+ * @returns true if the date is in the past, false otherwise
+ */
+export const isDateOverdue = (dueDate?: string): boolean => {
+  if (!dueDate) return false;
+  
+  const date = new Date(dueDate);
+  if (isNaN(date.getTime())) return false;
+  
+  const dateOnly = getDateOnly(date);
+  const todayOnly = getDateOnly(new Date());
+  
+  return dateOnly < todayOnly;
+};
+
+/**
+ * Gets Tailwind CSS classes for task status badges.
+ * Returns background, text, and border color classes.
+ * 
+ * @param status - Task status
+ * @returns Tailwind class string
+ */
 export const getTaskStatusColor = (status: TaskStatus): string => {
   switch (status) {
     case 'PENDING':
@@ -54,7 +240,13 @@ export const getTaskStatusColor = (status: TaskStatus): string => {
   }
 };
 
-// Get task priority color
+/**
+ * Gets Tailwind CSS classes for task priority badges.
+ * Returns background, text, and border color classes.
+ * 
+ * @param priority - Task priority
+ * @returns Tailwind class string
+ */
 export const getTaskPriorityColor = (priority: TaskPriority): string => {
   switch (priority) {
     case 'HIGH':
@@ -68,15 +260,21 @@ export const getTaskPriorityColor = (priority: TaskPriority): string => {
   }
 };
 
-// Check if task is overdue
+/**
+ * @deprecated Use isDateOverdue instead for better date-only comparison
+ */
 export const isTaskOverdue = (dueDate?: string): boolean => {
-  if (!dueDate) return false;
-  const due = new Date(dueDate);
-  const now = new Date();
-  return due < now;
+  return isDateOverdue(dueDate);
 };
 
-// Sort tasks by different criteria
+/**
+ * Sorts an array of tasks by various criteria.
+ * 
+ * @param tasks - Array of tasks to sort
+ * @param sortBy - Sort criterion
+ * @param sortOrder - Sort direction (ascending or descending)
+ * @returns New sorted array (original array is not modified)
+ */
 export const sortTasks = (
   tasks: Task[], 
   sortBy: 'created_at' | 'updated_at' | 'due_date' | 'title' | 'priority',
@@ -114,7 +312,14 @@ export const sortTasks = (
   });
 };
 
-// Filter tasks based on criteria
+/**
+ * Filters tasks based on multiple criteria.
+ * All filters are AND'd together (task must match all provided filters).
+ * 
+ * @param tasks - Array of tasks to filter
+ * @param filters - Filter criteria object
+ * @returns Filtered array of tasks
+ */
 export const filterTasks = (
   tasks: Task[],
   filters: {
@@ -153,13 +358,18 @@ export const filterTasks = (
   });
 };
 
-// Get task statistics
+/**
+ * Calculates statistics for an array of tasks.
+ * 
+ * @param tasks - Array of tasks to analyze
+ * @returns Object containing task counts and completion rate
+ */
 export const getTaskStats = (tasks: Task[]) => {
   const total = tasks.length;
   const completed = tasks.filter(t => t.status === 'COMPLETED').length;
   const inProgress = tasks.filter(t => t.status === 'IN_PROGRESS').length;
   const pending = tasks.filter(t => t.status === 'PENDING').length;
-  const overdue = tasks.filter(t => isTaskOverdue(t.due_date)).length;
+  const overdue = tasks.filter(t => isDateOverdue(t.due_date)).length;
   
   return {
     total,

@@ -19,7 +19,7 @@ import {
 } from 'lucide-react';
 import { useProjects } from '@/hooks/useProjects';
 import { useTasks } from '@/hooks/useTasks';
-import { getTaskStatusColor, getTaskPriorityColor } from '@/lib/taskUtils';
+import { getTaskStatusColor, getTaskPriorityColor, getRelativeTime } from '@/lib/taskUtils';
 
 interface DashboardStats {
   totalTasks: number;
@@ -62,17 +62,6 @@ const DashboardPage: React.FC = () => {
       .sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
       .slice(0, 5);
   }, [tasks]);
-
-  const formatDate = (dateString: string) => {
-    const date = new Date(dateString);
-    const now = new Date();
-    const diffInHours = Math.floor((now.getTime() - date.getTime()) / (1000 * 60 * 60));
-    
-    if (diffInHours < 1) return 'Just now';
-    if (diffInHours < 24) return `${diffInHours}h ago`;
-    if (diffInHours < 48) return 'Yesterday';
-    return date.toLocaleDateString();
-  };
 
   if (isLoading) {
     return (
@@ -237,7 +226,7 @@ const DashboardPage: React.FC = () => {
                       <div className="flex flex-col items-end text-xs text-muted-foreground">
                         <div className="flex items-center gap-1">
                           <Calendar className="h-3 w-3" />
-                          <span>{formatDate(task.created_at)}</span>
+                          <span>{getRelativeTime(task.created_at)}</span>
                         </div>
                         {task.due_date && (
                           <div className="text-xs text-orange-600 mt-1">

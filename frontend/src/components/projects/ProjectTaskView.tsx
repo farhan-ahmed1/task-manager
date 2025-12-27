@@ -7,7 +7,7 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import { Plus, Calendar, Clock, CheckCircle2, Circle, AlertCircle } from 'lucide-react';
 import type { Project, Task, TaskStatus } from '@/types/api';
 import { taskService } from '@/services/tasks';
-import { getTaskStatusColor, getTaskPriorityColor } from '@/lib/taskUtils';
+import { getTaskStatusColor, getTaskPriorityColor, formatDate } from '@/lib/taskUtils';
 
 interface ProjectTaskViewProps {
   project: Project;
@@ -69,15 +69,6 @@ const ProjectTaskView: React.FC<ProjectTaskViewProps> = ({
     }
   };
 
-  const formatDate = (dateString?: string) => {
-    if (!dateString) return 'No due date';
-    return new Date(dateString).toLocaleDateString('en-US', {
-      month: 'short',
-      day: 'numeric',
-      year: 'numeric',
-    });
-  };
-
   const TaskItem: React.FC<{ task: Task }> = ({ task }) => (
     <Card 
       className="cursor-pointer hover:bg-gray-50 transition-colors"
@@ -109,7 +100,7 @@ const ProjectTaskView: React.FC<ProjectTaskViewProps> = ({
           <div className="flex items-center justify-between text-xs text-muted-foreground">
             <div className="flex items-center space-x-1">
               <Calendar className="h-3 w-3" />
-              <span>{formatDate(task.due_date)}</span>
+              <span>{task.due_date ? formatDate(task.due_date) : 'No due date'}</span>
             </div>
             <Badge variant="outline" className={`text-xs ${getTaskStatusColor(task.status)}`}>
               {task.status.replace('_', ' ')}

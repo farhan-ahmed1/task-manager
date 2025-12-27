@@ -6,6 +6,7 @@ import { MoreHorizontal, Edit, Trash2, BarChart3, FolderOpen, Users } from 'luci
 import type { Project } from '@/types/api';
 import type { ProjectStats } from '@/services/projects';
 import { getProgressColor } from '@/lib/colors';
+import { formatSimpleDate } from '@/lib/taskUtils';
 
 interface ProjectCardProps {
   project: Project;
@@ -31,14 +32,6 @@ const ProjectCard: React.FC<ProjectCardProps> = ({
   const totalTasks = stats ? stats.PENDING + stats.IN_PROGRESS + stats.COMPLETED : 0;
   const completedTasks = stats?.COMPLETED || 0;
   const completionRate = totalTasks > 0 ? Math.round((completedTasks / totalTasks) * 100) : 0;
-
-  const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString('en-US', {
-      year: 'numeric',
-      month: 'short',
-      day: 'numeric',
-    });
-  };
 
   return (
     <Card 
@@ -122,14 +115,14 @@ const ProjectCard: React.FC<ProjectCardProps> = ({
             <div className="flex items-center gap-4 text-xs text-[var(--text-secondary)] pt-2 border-t border-[var(--border-light)]">
               <div className="flex items-center gap-1">
                 <span>Created</span>
-                <span className="font-medium text-[var(--text-primary)]">{formatDate(project.created_at)}</span>
+                <span className="font-medium text-[var(--text-primary)]">{formatSimpleDate(project.created_at)}</span>
               </div>
               {project.updated_at !== project.created_at && (
                 <>
                   <div className="w-1 h-1 bg-[var(--border)] rounded-full" />
                   <div className="flex items-center gap-1">
                     <span>Updated</span>
-                    <span className="font-medium text-[var(--text-primary)]">{formatDate(project.updated_at)}</span>
+                    <span className="font-medium text-[var(--text-primary)]">{formatSimpleDate(project.updated_at)}</span>
                   </div>
                 </>
               )}

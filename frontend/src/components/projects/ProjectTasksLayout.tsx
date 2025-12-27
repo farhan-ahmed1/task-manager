@@ -229,14 +229,6 @@ const ProjectTasksLayout: React.FC<ProjectTasksLayoutProps> = ({
     setSelectedTask(null);
   };
 
-  const handleComment = () => {
-    // Placeholder for comment functionality
-  };
-
-  const handleOptions = () => {
-    // Placeholder for options menu
-  };
-
   // Title editing functions
   const handleSaveTitle = async () => {
     if (!project || !editingTitle.trim()) return;
@@ -548,8 +540,6 @@ const ProjectTasksLayout: React.FC<ProjectTasksLayoutProps> = ({
                                   onEdit={handleEditTask}
                                   onDateUpdate={handleDateUpdate}
                                   onToggleComplete={handleToggleComplete}
-                                  onComment={() => handleComment()}
-                                  onOptions={() => handleOptions()}
                                   showDescription={viewOptions.showDescriptions}
                                   showDueDate={viewOptions.showDueDates}
                                 />
@@ -612,8 +602,6 @@ const ProjectTasksLayout: React.FC<ProjectTasksLayoutProps> = ({
                                     onEdit={handleEditTask}
                                     onDateUpdate={handleDateUpdate}
                                     onToggleComplete={handleToggleComplete}
-                                    onComment={() => handleComment()}
-                                    onOptions={() => handleOptions()}
                                     showDescription={viewOptions.showDescriptions}
                                     showDueDate={viewOptions.showDueDates}
                                   />

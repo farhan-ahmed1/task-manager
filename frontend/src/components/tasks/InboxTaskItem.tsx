@@ -1,10 +1,11 @@
 import React, { useState, useRef } from 'react';
-import { Edit3, Calendar, MessageCircle, MoreHorizontal, Check } from 'lucide-react';
+import { Calendar, Check, Edit3 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import DatePickerModal from '@/components/ui/DatePickerModal';
 import DragHandle from '@/components/ui/DragHandle';
 import { useSortable } from '@dnd-kit/sortable';
 import { getPriorityColor } from '@/lib/colors';
+import { formatDueDate, isDateOverdue } from '@/lib/taskUtils';
 import type { Task } from '@/types/api';
 
 interface InboxTaskItemProps {
@@ -12,8 +13,6 @@ interface InboxTaskItemProps {
   onEdit: (task: Task) => void;
   onDateUpdate: (task: Task, date: string) => void;
   onToggleComplete: (task: Task) => void;
-  onComment?: (task: Task) => void;
-  onOptions?: (task: Task) => void;
   showDescription?: boolean;
   showDueDate?: boolean;
 }
@@ -23,8 +22,6 @@ const InboxTaskItem: React.FC<InboxTaskItemProps> = ({
   onEdit,
   onDateUpdate,
   onToggleComplete,
-  onComment,
-  onOptions,
   showDescription = true,
   showDueDate = true
 }) => {
@@ -38,48 +35,6 @@ const InboxTaskItem: React.FC<InboxTaskItemProps> = ({
     setNodeRef,
     isDragging,
   } = useSortable({ id: task.id });
-
-  // Removed local getPriorityColor - now using centralized version from lib/colors
-
-  const formatDueDate = (dueDate: string) => {
-    const date = new Date(dueDate);
-    const today = new Date();
-    const tomorrow = new Date(today);
-    tomorrow.setDate(tomorrow.getDate() + 1);
-    
-    // Reset time to compare dates only
-    const dueDateOnly = new Date(date.getFullYear(), date.getMonth(), date.getDate());
-    const todayOnly = new Date(today.getFullYear(), today.getMonth(), today.getDate());
-    const tomorrowOnly = new Date(tomorrow.getFullYear(), tomorrow.getMonth(), tomorrow.getDate());
-    
-    if (dueDateOnly.getTime() === todayOnly.getTime()) {
-      return 'Today';
-    } else if (dueDateOnly.getTime() === tomorrowOnly.getTime()) {
-      return 'Tomorrow';
-    } else if (dueDateOnly < todayOnly) {
-      return 'Overdue';
-    } else {
-      // Show day of week for this week, otherwise show date
-      const daysDiff = Math.ceil((dueDateOnly.getTime() - todayOnly.getTime()) / (1000 * 60 * 60 * 24));
-      if (daysDiff <= 7) {
-        return date.toLocaleDateString('en-US', { weekday: 'long' });
-      } else {
-        return date.toLocaleDateString('en-US', { 
-          month: 'short', 
-          day: 'numeric',
-          year: date.getFullYear() !== today.getFullYear() ? 'numeric' : undefined
-        });
-      }
-    }
-  };
-
-  const isOverdue = (dueDate: string) => {
-    const date = new Date(dueDate);
-    const today = new Date();
-    const dueDateOnly = new Date(date.getFullYear(), date.getMonth(), date.getDate());
-    const todayOnly = new Date(today.getFullYear(), today.getMonth(), today.getDate());
-    return dueDateOnly < todayOnly;
-  };
 
   const isCompleted = task.status === 'COMPLETED';
 
@@ -186,13 +141,13 @@ const InboxTaskItem: React.FC<InboxTaskItemProps> = ({
             <div className="mt-1">
               <span 
                 className={`text-xs px-2 py-0.5 rounded-md ${
-                  isOverdue(task.due_date) && !isCompleted ? 'font-medium' : ''
+                  isDateOverdue(task.due_date) && !isCompleted ? 'font-medium' : ''
                 }`}
                 style={{ 
-                  backgroundColor: isOverdue(task.due_date) && !isCompleted 
+                  backgroundColor: isDateOverdue(task.due_date) && !isCompleted 
                     ? 'var(--error-light)' 
                     : 'var(--primary-light)',
-                  color: isOverdue(task.due_date) && !isCompleted 
+                  color: isDateOverdue(task.due_date) && !isCompleted 
                     ? 'var(--error)' 
                     : 'var(--primary-dark)'
                 }}
@@ -248,33 +203,7 @@ const InboxTaskItem: React.FC<InboxTaskItemProps> = ({
           />
         </div>
 
-        <Button
-          variant="ghost"
-          size="sm"
-          onClick={(e) => {
-            e.stopPropagation();
-            if (onComment) onComment(task);
-          }}
-          className="p-1 h-auto hover:bg-gray-100 transition-colors duration-200"
-          style={{ borderRadius: '4px' }}
-          title="Add comment"
-        >
-          <MessageCircle className="size-5" style={{ color: 'var(--text-primary)', strokeWidth: 1.5 }} />
-        </Button>
-
-        <Button
-          variant="ghost"
-          size="sm"
-          onClick={(e) => {
-            e.stopPropagation();
-            if (onOptions) onOptions(task);
-          }}
-          className="p-1 h-auto hover:bg-gray-100 transition-colors duration-200"
-          style={{ borderRadius: '4px' }}
-          title="More options"
-        >
-          <MoreHorizontal className="size-5" style={{ color: 'var(--text-primary)', strokeWidth: 1.5 }} />
-        </Button>
+        {/* Removed comment and options buttons - unused functionality */}
       </div>
     </div>
   );

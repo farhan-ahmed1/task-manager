@@ -108,8 +108,6 @@ const TodayPage: React.FC = () => {
                   onEdit={() => {}}
                   onDateUpdate={handleDateUpdate}
                   onToggleComplete={handleToggleComplete}
-                  onComment={() => {}}
-                  onOptions={() => {}}
                   showDescription={true}
                   showDueDate={true}
                 />

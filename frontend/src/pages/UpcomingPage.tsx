@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button';
 import InboxTaskItem from '@/components/tasks/InboxTaskItem';
 import AddTaskModal from '@/components/tasks/AddTaskModal';
 import { useTasks, useCreateTask, useUpdateTask } from '@/hooks/useTasks';
+import { formatUpcomingDate } from '@/lib/taskUtils';
 import type { Task, CreateTaskRequest } from '@/types/api';
 
 const UpcomingPage: React.FC = () => {
@@ -67,23 +68,6 @@ const UpcomingPage: React.FC = () => {
     });
   };
 
-  const formatDate = (dateStr: string) => {
-    const date = new Date(dateStr);
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
-    const tomorrow = new Date(today);
-    tomorrow.setDate(tomorrow.getDate() + 1);
-    
-    const dueDate = new Date(date);
-    dueDate.setHours(0, 0, 0, 0);
-    
-    const diffDays = Math.floor((dueDate.getTime() - today.getTime()) / (1000 * 60 * 60 * 24));
-    
-    if (diffDays === 1) return 'Tomorrow';
-    if (diffDays <= 7) return date.toLocaleDateString('en-US', { weekday: 'long' });
-    return date.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' });
-  };
-
   if (isLoading) {
     return (
       <div className="max-w-4xl mx-auto px-6">
@@ -134,7 +118,7 @@ const UpcomingPage: React.FC = () => {
             {upcomingTasksByDate.map(({ date, tasks }) => (
               <div key={date}>
                 <h2 className="text-sm font-semibold mb-3" style={{ color: 'var(--text-secondary)' }}>
-                  {formatDate(date)}
+                  {formatUpcomingDate(date)}
                 </h2>
                 <div className="bg-card rounded-lg border border-[var(--border)]">
                   {tasks.map((task, index) => (
@@ -144,8 +128,6 @@ const UpcomingPage: React.FC = () => {
                         onEdit={() => {}}
                         onDateUpdate={handleDateUpdate}
                         onToggleComplete={handleToggleComplete}
-                        onComment={() => {}}
-                        onOptions={() => {}}
                         showDescription={true}
                         showDueDate={true}
                       />
