@@ -7,6 +7,7 @@ import { User, Mail, Lock, Save, AlertCircle, CheckCircle, Shield } from 'lucide
 import { useAuth } from '@/context/AuthContext';
 import { authService } from '@/services/auth';
 import { ProfileUpdateSchema, PasswordChangeSchema, type ProfileUpdateFormData, type PasswordChangeFormData } from '@/validation/auth';
+import { Spinner } from '@/components/ui/spinner';
 
 const ProfilePage: React.FC = () => {
   const { user, token, logout, updateUser } = useAuth();
@@ -271,7 +272,7 @@ const ProfilePage: React.FC = () => {
               >
                 {isProfileLoading ? (
                   <>
-                    <div className="w-4 h-4 mr-2 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                    <Spinner size="sm" className="mr-2 text-white" />
                     Updating...
                   </>
                 ) : (
@@ -388,7 +389,7 @@ const ProfilePage: React.FC = () => {
               >
                 {isPasswordLoading ? (
                   <>
-                    <div className="w-4 h-4 mr-2 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                    <Spinner size="sm" className="mr-2 text-white" />
                     Changing...
                   </>
                 ) : (

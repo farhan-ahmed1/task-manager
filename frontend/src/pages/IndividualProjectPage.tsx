@@ -6,6 +6,7 @@ import ProjectTasksLayout from '@/components/projects/ProjectTasksLayout';
 import { useProject } from '@/hooks/useProjects';
 import { useProjectLayoutConfig } from '@/hooks/useLayoutConfig';
 import type { Project } from '@/types/api';
+import { Spinner } from '@/components/ui/spinner';
 
 const IndividualProjectPage: React.FC = () => {
   const { projectId } = useParams<{ projectId: string }>();
@@ -31,10 +32,7 @@ const IndividualProjectPage: React.FC = () => {
   if (isLoading) {
     return (
       <div className="max-w-5xl mx-auto p-6">
-        <div className="flex items-center justify-center py-12">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2" 
-               style={{ borderColor: 'var(--primary)' }} />
-        </div>
+        <Spinner size="lg" centered />
       </div>
     );
   }

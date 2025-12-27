@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
 import { ScrollArea } from '@/components/ui/scroll-area';
+import { Spinner } from '@/components/ui/spinner';
 import { 
   Plus, 
   TrendingUp, 
@@ -66,10 +67,7 @@ const DashboardPage: React.FC = () => {
   if (isLoading) {
     return (
       <div className="container mx-auto px-4 py-8">
-        <div className="text-center py-12">
-          <div className="animate-spin h-8 w-8 border-2 border-primary border-t-transparent rounded-full mx-auto mb-4"></div>
-          <p className="text-muted-foreground">Loading dashboard...</p>
-        </div>
+        <Spinner size="lg" text="Loading dashboard..." centered />
       </div>
     );
   }
