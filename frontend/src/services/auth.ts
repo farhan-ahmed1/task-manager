@@ -1,6 +1,6 @@
 import type { User } from '@/types/api';
 
-const API_BASE_URL = 'http://localhost:3000';
+const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
 
 export interface LoginRequest {
   email: string;
@@ -73,15 +73,6 @@ class AuthService {
     return this.makeRequest<AuthResponse>('/auth/register', {
       method: 'POST',
       body: JSON.stringify(userData),
-    });
-  }
-
-  async refreshToken(token: string): Promise<AuthResponse> {
-    return this.makeRequest<AuthResponse>('/auth/refresh', {
-      method: 'POST',
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
     });
   }
 

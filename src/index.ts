@@ -93,13 +93,30 @@ if (!rateLimitingDisabled) {
 app.get('/health', async (_req, res) => {
   try {
     const rateLimitStatus = await rateLimitHealthCheck();
+    
+    // Check database connection
+    let dbStatus = 'ok';
+    let dbMessage = 'Connected';
+    try {
+      const { default: pool } = await import('./db/pool');
+      await pool.query('SELECT 1');
+    } catch (dbError) {
+      dbStatus = 'error';
+      dbMessage = dbError instanceof Error ? dbError.message : 'Database connection failed';
+    }
 
-    res.json({
-      status: 'ok',
+    const isHealthy = dbStatus === 'ok' && rateLimitStatus.status === 'ok';
+
+    res.status(isHealthy ? 200 : 503).json({
+      status: isHealthy ? 'ok' : 'degraded',
       timestamp: new Date().toISOString(),
       version: process.env.npm_package_version || '1.0.0',
       environment: process.env.NODE_ENV || 'development',
       services: {
+        database: {
+          status: dbStatus,
+          message: dbMessage,
+        },
         rateLimit: rateLimitStatus,
       },
     });
@@ -151,14 +168,20 @@ app.use(errorLogger);
 type AppError = Error & { status?: number; code?: string };
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 app.use((err: AppError, req: Request, res: Response, next: NextFunction) => {
+  // Handle specific error types
   const status =
-    err.name === 'TaskNotFoundError'
+    err.name === 'TaskNotFoundError' || err.name === 'ProjectNotFoundError'
       ? 404
-      : err.name === 'ProjectNotFoundError'
-        ? 404
-        : err.name === 'ZodError'
+      : err.name === 'UnauthorizedError'
+        ? 401
+        : err.name === 'ValidationError'
           ? 400
-          : err.status || 500;
+          : err.name === 'ZodError'
+            ? 400
+            : err.name === 'DatabaseError'
+              ? 500
+              : err.status || 500;
+  
   const code = err.code || err.name || 'INTERNAL_ERROR';
   const message = err.message || 'An unexpected error occurred';
 
