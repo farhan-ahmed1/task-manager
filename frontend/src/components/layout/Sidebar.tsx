@@ -1,10 +1,11 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { useAuth } from '@/context/AuthContext';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import AddTaskModal from '@/components/tasks/AddTaskModal';
-import { taskService } from '@/services/tasks';
+import { useProjects } from '@/hooks/useProjects';
+import { useCreateTask } from '@/hooks/useTasks';
 import type { CreateTaskRequest } from '@/types/api';
 import { 
   Plus, 
@@ -19,8 +20,6 @@ import {
   ChevronRight,
   PanelLeftClose
 } from 'lucide-react';
-import { projectService } from '@/services/projects';
-import type { Project } from '@/types/api';
 import { useCommandPalette } from '@/hooks/useCommandPalette';
 
 const mainNavigation = [
@@ -70,31 +69,23 @@ const Sidebar: React.FC<SidebarProps> = ({ onClose, onToggle, onOpenSearch, clas
   const { user } = useAuth();
   const location = useLocation();
   const { open: openCommandPalette } = useCommandPalette();
-  const [projects, setProjects] = useState<Project[]>([]);
-  const [favoriteProjects, setFavoriteProjects] = useState<Project[]>([]);
+  
+  // React Query hooks - single source of truth
+  const { data: projects = [], isLoading } = useProjects();
+  const createTaskMutation = useCreateTask();
+  
+  // UI state only
+  const [favoriteProjects, setFavoriteProjects] = useState(projects.slice(0, 2));
   const [isProjectsExpanded, setIsProjectsExpanded] = useState(true);
   const [isFavoritesExpanded, setIsFavoritesExpanded] = useState(true);
-  const [isLoading, setIsLoading] = useState(true);
   const [isAddTaskModalOpen, setIsAddTaskModalOpen] = useState(false);
 
-  useEffect(() => {
-    const fetchProjects = async () => {
-      try {
-        const response = await projectService.getProjects();
-        if (response.success) {
-          setProjects(response.data || []);
-          // For now, we'll simulate favorites - you might want to add a favorites field to your project model
-          setFavoriteProjects(response.data?.slice(0, 2) || []);
-        }
-      } catch (error) {
-        console.error('Failed to fetch projects:', error);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    fetchProjects();
-  }, []);
+  // Update favorites when projects change
+  React.useEffect(() => {
+    if (projects.length > 0) {
+      setFavoriteProjects(projects.slice(0, 2));
+    }
+  }, [projects]);
 
   const isCurrentPath = (href: string) => {
     if (href === '/today' && location.pathname === '/tasks') return true;
@@ -133,16 +124,7 @@ const Sidebar: React.FC<SidebarProps> = ({ onClose, onToggle, onOpenSearch, clas
   };
 
   const handleCreateTask = async (taskData: CreateTaskRequest) => {
-    try {
-      const response = await taskService.createTask(taskData);
-      if (response.success) {
-        // Task created successfully
-        // You might want to show a success notification here
-      }
-    } catch (error) {
-      console.error('Failed to create task:', error);
-      // You might want to show an error notification here
-    }
+    await createTaskMutation.mutateAsync(taskData);
   };
 
   return (

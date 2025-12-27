@@ -1,49 +1,32 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { FolderOpen } from 'lucide-react';
 import ProjectHeader from '@/components/layout/ProjectHeader';
 import ProjectTasksLayout from '@/components/projects/ProjectTasksLayout';
-
-import { projectService } from '@/services/projects';
-import { useAuth } from '@/context/AuthContext';
+import { useProject } from '@/hooks/useProjects';
 import type { Project } from '@/types/api';
 
 const IndividualProjectPage: React.FC = () => {
   const { projectId } = useParams<{ projectId: string }>();
   const navigate = useNavigate();
-  const { isAuthenticated } = useAuth();
-  const [project, setProject] = useState<Project | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const [localProject, setLocalProject] = useState<Project | null>(null);
 
-  useEffect(() => {
-    if (!projectId || !isAuthenticated) {
-      navigate('/projects');
-      return;
+  // React Query hook - single source of truth
+  const { data: project, isLoading, error } = useProject(projectId || '');
+
+  // Update local project state when React Query data changes
+  React.useEffect(() => {
+    if (project) {
+      setLocalProject(project);
     }
+  }, [project]);
 
-    const loadProject = async () => {
-      setLoading(true);
-      setError(null);
-      
-      try {
-        const result = await projectService.getProject(projectId);
-        if (result.success) {
-          setProject(result.data);
-        } else {
-          setError(result.error.message);
-        }
-      } catch {
-        setError('Failed to load project');
-      } finally {
-        setLoading(false);
-      }
-    };
+  if (!projectId) {
+    navigate('/projects');
+    return null;
+  }
 
-    loadProject();
-  }, [projectId, isAuthenticated, navigate]);
-
-  if (loading) {
+  if (isLoading) {
     return (
       <div className="max-w-5xl mx-auto p-6">
         <div className="flex items-center justify-center py-12">
@@ -66,7 +49,7 @@ const IndividualProjectPage: React.FC = () => {
             Project Not Found
           </h3>
           <p className="text-body mb-4" style={{ color: 'var(--text-muted)' }}>
-            {error || 'The project you are looking for does not exist or you do not have access to it.'}
+            {typeof error === 'string' ? error : 'The project you are looking for does not exist or you do not have access to it.'}
           </p>
           <button 
             onClick={() => navigate('/projects')}
@@ -81,36 +64,24 @@ const IndividualProjectPage: React.FC = () => {
 
 
 
-  const handleEdit = () => {
-    // TODO: Implement project editing
-  };
-
-  const handleDelete = () => {
-    // TODO: Implement project deletion
-  };
-
-  const handleShare = () => {
-    // TODO: Implement project sharing
-  };
-
   return (
     <div className="min-h-screen" style={{ backgroundColor: 'var(--background)' }}>
       {/* Project Header */}
       <ProjectHeader 
-        project={project}
-        onEdit={handleEdit}
-        onDelete={handleDelete}
-        onShare={handleShare}
+        project={localProject || project}
+        onEdit={() => {/* TODO */}}
+        onDelete={() => {/* TODO */}}
+        onShare={() => {/* TODO */}}
       />
       
       {/* Project content with simplified individual project title */}
       <ProjectTasksLayout
-        project={project}
-        title={project.name}
+        project={localProject || project}
+        title={(localProject || project).name}
         emptyStateTitle="This project is empty"
         emptyStateDescription="Add your first task to start organizing work in this project."
         emptyButtonText="Add your first task"
-        onProjectUpdate={(updatedProject) => setProject(updatedProject)}
+        onProjectUpdate={(updatedProject) => setLocalProject(updatedProject)}
       />
     </div>
   );

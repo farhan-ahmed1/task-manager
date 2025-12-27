@@ -11,10 +11,9 @@ import SectionHeader from '@/components/tasks/SectionHeader';
 
 import AddSectionButton from '@/components/tasks/AddSectionButton';
 import { type ViewOptions } from '@/components/tasks/ViewOptionsMenu';
-import { taskService } from '@/services/tasks';
+import { useTasks, useCreateTask, useUpdateTask, useDeleteTask } from '@/hooks/useTasks';
+import { useUpdateProject } from '@/hooks/useProjects';
 import { sectionService } from '@/services/sections';
-import { projectService } from '@/services/projects';
-import { useAuth } from '@/context/AuthContext';
 import {
   DndContext,
   DragOverlay as DndDragOverlay,
@@ -28,7 +27,6 @@ import {
   type DragOverEvent,
 } from '@dnd-kit/core';
 import {
-  arrayMove,
   SortableContext,
   sortableKeyboardCoordinates,
   verticalListSortingStrategy,
@@ -57,8 +55,18 @@ const ProjectTasksLayout: React.FC<ProjectTasksLayoutProps> = ({
   emptyButtonText,
   onProjectUpdate,
 }) => {
-  const { isAuthenticated, token } = useAuth();
-  const [tasks, setTasks] = useState<Task[]>([]);
+  // React Query hooks - single source of truth
+  const filters = project ? { project_id: project.id } : {};
+  const { data: allTasks = [], isLoading: tasksLoading } = useTasks(filters);
+  const createTaskMutation = useCreateTask();
+  const updateTaskMutation = useUpdateTask();
+  const deleteTaskMutation = useDeleteTask();
+  const updateProjectMutation = useUpdateProject();
+
+  // Filter inbox tasks on client side (tasks without project_id)
+  const tasks = project ? allTasks : allTasks.filter(task => !task.project_id);
+  
+  // UI state only
   const [sections, setSections] = useState<Section[]>([]);
   const [loading, setLoading] = useState(true);
   const [showAddTaskModal, setShowAddTaskModal] = useState(false);
@@ -106,51 +114,13 @@ const ProjectTasksLayout: React.FC<ProjectTasksLayoutProps> = ({
     setOverId(null);
 
     if (active.id !== over?.id) {
-      setTasks((tasks) => {
-        const oldIndex = tasks.findIndex((task) => task.id === active.id);
-        const newIndex = tasks.findIndex((task) => task.id === over?.id);
-
-        return arrayMove(tasks, oldIndex, newIndex);
-      });
+      // TODO: Implement task reordering with backend sync
+      // For now, just visual feedback - React Query will sync on refresh
     }
   };
 
-  const loadTasks = React.useCallback(async () => {
-    setLoading(true);
-    
-    if (!isAuthenticated || !token) {
-      setLoading(false);
-      return;
-    }
-    
-    try {
-      // Use task service filtering instead of client-side filtering
-      const filters = project 
-        ? { project_id: project.id } 
-        : {}; // For inbox, get all tasks and filter client-side
-      
-      const result = await taskService.getTasks(filters);
-      if (result.success) {
-        // For inbox, filter out tasks that have a project_id
-        // For projects, the filtering is already done server-side
-        const filteredTasks = project 
-          ? result.data 
-          : result.data.filter((task: Task) => !task.project_id);
-        setTasks(filteredTasks);
-      }
-    } catch (error) {
-      console.error('Error loading tasks:', error);
-    } finally {
-      setLoading(false);
-    }
-  }, [isAuthenticated, token, project]);
-
   // Load sections from backend
   const loadSections = React.useCallback(async () => {
-    if (!isAuthenticated || !token) {
-      return;
-    }
-    
     try {
       const result = project 
         ? await sectionService.getSections(project.id) // Project-specific sections
@@ -161,49 +131,33 @@ const ProjectTasksLayout: React.FC<ProjectTasksLayoutProps> = ({
       }
     } catch (error) {
       console.error('Error loading sections:', error);
+    } finally {
+      setLoading(false);
     }
-  }, [isAuthenticated, token, project]);
+  }, [project]);
 
   useEffect(() => {
-    loadTasks();
     loadSections();
-  }, [loadTasks, loadSections]);
+  }, [loadSections]);
 
   const handleCreateTask = async (taskData: CreateTaskRequest) => {
-    try {
-      const enhancedTaskData: CreateTaskRequest = {
-        ...taskData,
-        project_id: project?.id || taskData.project_id, // Set project_id for project view, keep undefined for inbox
-        section_id: selectedSectionId && selectedSectionId !== 'no-section' ? selectedSectionId : taskData.section_id
-      };
-      
-      const result = await taskService.createTask(enhancedTaskData);
-      if (result.success) {
-        setTasks(prev => [result.data, ...prev]);
-        setShowAddTaskModal(false);
-        setSelectedSectionId(null);
-      }
-    } catch (error) {
-      console.error('Error creating task:', error);
-    }
+    const enhancedTaskData: CreateTaskRequest = {
+      ...taskData,
+      project_id: project?.id || taskData.project_id,
+      section_id: selectedSectionId && selectedSectionId !== 'no-section' ? selectedSectionId : taskData.section_id
+    };
+    
+    await createTaskMutation.mutateAsync(enhancedTaskData);
+    setShowAddTaskModal(false);
+    setSelectedSectionId(null);
   };
 
   const handleUpdateTask = async (taskId: string, updates: UpdateTaskRequest) => {
-    try {
-      const result = await taskService.updateTask(taskId, updates);
-      if (result.success) {
-        setTasks(prev => prev.map(task => 
-          task.id === taskId ? { ...task, ...updates } : task
-        ));
-        
-        if (selectedTask?.id === taskId) {
-          setSelectedTask({ ...selectedTask, ...updates });
-        }
-      } else {
-        console.error('Failed to update task:', result.error);
-      }
-    } catch (error) {
-      console.error('Error updating task:', error);
+    await updateTaskMutation.mutateAsync({ id: taskId, updates });
+    
+    // Update selected task if it's the one being updated
+    if (selectedTask?.id === taskId) {
+      setSelectedTask({ ...selectedTask, ...updates });
     }
   };
 
@@ -270,18 +224,9 @@ const ProjectTasksLayout: React.FC<ProjectTasksLayoutProps> = ({
   };
 
   const handleTaskDelete = async (taskId: string) => {
-    try {
-      const result = await taskService.deleteTask(taskId);
-      if (result.success) {
-        setTasks(prev => prev.filter(task => task.id !== taskId));
-        setShowTaskDetail(false);
-        setSelectedTask(null);
-      } else {
-        console.error('Failed to delete task:', result.error);
-      }
-    } catch (error) {
-      console.error('Error deleting task:', error);
-    }
+    await deleteTaskMutation.mutateAsync(taskId);
+    setShowTaskDetail(false);
+    setSelectedTask(null);
   };
 
   const handleComment = () => {
@@ -296,20 +241,14 @@ const ProjectTasksLayout: React.FC<ProjectTasksLayoutProps> = ({
   const handleSaveTitle = async () => {
     if (!project || !editingTitle.trim()) return;
     
-    try {
-      const result = await projectService.updateProject(project.id, { name: editingTitle.trim() });
-      if (result.success) {
-        setIsEditingTitle(false);
-        // Call the callback to update the parent component
-        if (onProjectUpdate) {
-          onProjectUpdate(result.data);
-        }
-      } else {
-        alert('Failed to update project name: ' + result.error.message);
-      }
-    } catch (error) {
-      console.error('Error updating project name:', error);
-      alert('Failed to update project name. Please try again.');
+    const updatedProject = await updateProjectMutation.mutateAsync({
+      id: project.id,
+      updates: { name: editingTitle.trim() }
+    });
+    
+    setIsEditingTitle(false);
+    if (onProjectUpdate) {
+      onProjectUpdate(updatedProject);
     }
   };
 
@@ -379,13 +318,7 @@ const ProjectTasksLayout: React.FC<ProjectTasksLayoutProps> = ({
       const result = await sectionService.deleteSection(sectionId);
       
       if (result.success) {
-        // Move tasks from deleted section to default (no section_id)
-        setTasks(prev => prev.map(task =>
-          task.section_id === sectionId
-            ? { ...task, section_id: undefined }
-            : task
-        ));
-        
+        // Sections will be reloaded, React Query will handle task updates
         setSections(prev => prev.filter(section => section.id !== sectionId));
       } else {
         alert('Failed to delete section: ' + result.error.message);
@@ -487,7 +420,7 @@ const ProjectTasksLayout: React.FC<ProjectTasksLayoutProps> = ({
     return defaultTasks;
   };
 
-  if (loading) {
+  if (loading || tasksLoading) {
     return (
       <div className="max-w-5xl mx-auto p-6">
         <div className="flex items-center justify-center py-12">

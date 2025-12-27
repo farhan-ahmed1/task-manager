@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState } from 'react';
 import { Plus, AlertCircle, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Alert, AlertDescription } from '@/components/ui/alert';
@@ -7,18 +7,20 @@ import TaskForm from './TaskForm';
 import TaskFilters from './TaskFilters';
 import TaskDetailsModal from './TaskDetailsModal';
 import ConfirmDialog from '../ui/ConfirmDialog';
-import { taskService, TaskServiceError } from '@/services/tasks';
+import { useTasks, useCreateTask, useUpdateTask, useDeleteTask } from '@/hooks/useTasks';
 import { filterTasks, sortTasks, getTaskStats } from '@/lib/taskUtils';
 import type { Task, TaskStatus, TaskPriority } from '@/types/api';
 import type { CreateTaskFormData, UpdateTaskFormData } from '@/validation/task';
 
 const TaskList: React.FC = () => {
-  // State management
-  const [tasks, setTasks] = useState<Task[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  // React Query hooks - single source of truth
+  const { data: allTasks = [], isLoading } = useTasks();
+  const createTaskMutation = useCreateTask();
+  const updateTaskMutation = useUpdateTask();
+  const deleteTaskMutation = useDeleteTask();
   
-  // Form states
+  // UI state only
+  const [error, setError] = useState<string | null>(null);
   const [showTaskForm, setShowTaskForm] = useState(false);
   const [editingTask, setEditingTask] = useState<Task | null>(null);
   const [formLoading, setFormLoading] = useState(false);
@@ -39,50 +41,18 @@ const TaskList: React.FC = () => {
   const [sortBy, setSortBy] = useState<'created_at' | 'updated_at' | 'due_date' | 'title' | 'priority'>('created_at');
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc');
 
-  // Load tasks
-  const loadTasks = useCallback(async () => {
-    try {
-      setLoading(true);
-      setError(null);
-      
-      const result = await taskService.getTasks();
-      if (result.success) {
-        setTasks(result.data);
-      } else {
-        setError(result.error.message);
-      }
-    } catch {
-      setError('Failed to load tasks');
-    } finally {
-      setLoading(false);
-    }
-  }, []);
-
-  // Initial load
-  useEffect(() => {
-    loadTasks();
-  }, [loadTasks]);
-
   // Handle task creation
   const handleCreateTask = async (data: CreateTaskFormData) => {
+    setFormLoading(true);
     try {
-      setFormLoading(true);
-      
-      const result = await taskService.createTask({
+      await createTaskMutation.mutateAsync({
         ...data,
         due_date: data.due_date || undefined
       });
-      
-      if (result.success) {
-        setTasks(prev => [result.data, ...prev]);
-        setShowTaskForm(false);
-      } else {
-        throw new Error(result.error.message);
-      }
-    } catch (err) {
-      const message = err instanceof TaskServiceError ? err.message : 'Failed to create task';
-      setError(message);
-      throw err; // Re-throw to prevent form from closing
+      setShowTaskForm(false);
+    } catch {
+      setError('Failed to create task');
+      throw new Error('Failed to create task');
     } finally {
       setFormLoading(false);
     }
@@ -92,27 +62,20 @@ const TaskList: React.FC = () => {
   const handleUpdateTask = async (data: UpdateTaskFormData) => {
     if (!editingTask) return;
     
+    setFormLoading(true);
     try {
-      setFormLoading(true);
-      
-      const result = await taskService.updateTask(editingTask.id, {
-        ...data,
-        due_date: data.due_date || undefined
+      await updateTaskMutation.mutateAsync({
+        id: editingTask.id,
+        updates: {
+          ...data,
+          due_date: data.due_date || undefined
+        }
       });
-      
-      if (result.success) {
-        setTasks(prev => prev.map(task => 
-          task.id === editingTask.id ? result.data : task
-        ));
-        setEditingTask(null);
-        setShowTaskForm(false);
-      } else {
-        throw new Error(result.error.message);
-      }
-    } catch (err) {
-      const message = err instanceof TaskServiceError ? err.message : 'Failed to update task';
-      setError(message);
-      throw err;
+      setEditingTask(null);
+      setShowTaskForm(false);
+    } catch {
+      setError('Failed to update task');
+      throw new Error('Failed to update task');
     } finally {
       setFormLoading(false);
     }
@@ -121,95 +84,44 @@ const TaskList: React.FC = () => {
   // Handle task status change
   const handleStatusChange = async (task: Task, newStatus: TaskStatus) => {
     try {
-      const result = await taskService.updateTask(task.id, { status: newStatus });
-      
-      if (result.success) {
-        setTasks(prev => prev.map(t => 
-          t.id === task.id ? result.data : t
-        ));
-      } else {
-        setError(result.error.message);
-      }
-    } catch (err) {
-      const message = err instanceof TaskServiceError ? err.message : 'Failed to update task';
-      setError(message);
+      await updateTaskMutation.mutateAsync({
+        id: task.id,
+        updates: { status: newStatus }
+      });
+    } catch {
+      setError('Failed to update task');
     }
   };
 
   // Handle task deletion
   const handleDeleteTask = async () => {
-    if (!taskToDelete || deleteLoading) return;
+    if (!taskToDelete) return;
     
-    const taskId = taskToDelete.id;
-    
+    setDeleteLoading(true);
     try {
-      setDeleteLoading(true);
-      
-      // Optimistic update - remove task from UI immediately
-      setTasks(prev => prev.filter(task => task.id !== taskId));
-      
-      const result = await taskService.deleteTask(taskId);
-      
-      if (result.success) {
-        // Task already removed optimistically, just clean up
-        setTaskToDelete(null);
-        setShowDeleteDialog(false);
-      } else {
-        // Handle different error types
-        if (result.error.code === 'TASK_NOT_FOUND') {
-          // Task was already deleted (404), don't restore it
-          setTaskToDelete(null);
-          setShowDeleteDialog(false);
-          // Optionally show a brief success message since the task is gone
-        } else {
-          // For other errors, restore the task
-          setTasks(prev => {
-            // Only restore if the task isn't already in the list
-            const exists = prev.some(task => task.id === taskId);
-            if (!exists && taskToDelete) {
-              return [...prev, taskToDelete].sort((a, b) => 
-                new Date(b.updated_at).getTime() - new Date(a.updated_at).getTime()
-              );
-            }
-            return prev;
-          });
-          setError(result.error.message);
-        }
-      }
-    } catch (err) {
-      // Restore task if request failed (network error, etc.)
-      setTasks(prev => {
-        const exists = prev.some(task => task.id === taskId);
-        if (!exists && taskToDelete) {
-          return [...prev, taskToDelete].sort((a, b) => 
-            new Date(b.updated_at).getTime() - new Date(a.updated_at).getTime()
-          );
-        }
-        return prev;
-      });
-      const message = err instanceof TaskServiceError ? err.message : 'Failed to delete task';
-      setError(message);
-    } finally {
-      setDeleteLoading(false);
-      // Always clean up the dialog state
+      await deleteTaskMutation.mutateAsync(taskToDelete.id);
       setTaskToDelete(null);
       setShowDeleteDialog(false);
+    } catch {
+      setError('Failed to delete task');
+    } finally {
+      setDeleteLoading(false);
     }
   };
 
   // Filter and sort tasks
   const filteredAndSortedTasks = React.useMemo(() => {
-    const filtered = filterTasks(tasks, {
+    const filtered = filterTasks(allTasks, {
       search,
       status: statusFilter,
       priority: priorityFilter
     });
     
     return sortTasks(filtered, sortBy, sortOrder);
-  }, [tasks, search, statusFilter, priorityFilter, sortBy, sortOrder]);
+  }, [allTasks, search, statusFilter, priorityFilter, sortBy, sortOrder]);
 
   // Task statistics
-  const stats = getTaskStats(tasks);
+  const stats = getTaskStats(allTasks);
 
   // Handle opening task form for editing
   const handleEditTask = (task: Task) => {
@@ -271,7 +183,7 @@ const TaskList: React.FC = () => {
     setSortOrder(newSortOrder);
   };
 
-  if (loading) {
+  if (isLoading) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50/30 to-slate-50">
         <div className="flex flex-col items-center justify-center py-20">
@@ -401,15 +313,15 @@ const TaskList: React.FC = () => {
               </svg>
             </div>
             <h3 className="text-xl font-semibold text-slate-900 mb-3">
-              {tasks.length === 0 ? 'No tasks yet' : 'No tasks match your filters'}
+              {allTasks.length === 0 ? 'No tasks yet' : 'No tasks match your filters'}
             </h3>
             <p className="text-slate-600 mb-6 leading-relaxed">
-              {tasks.length === 0 
+              {allTasks.length === 0 
                 ? 'Ready to get productive? Create your first task and start organizing your work.'
                 : 'Try adjusting your search terms or filter criteria to find what you\'re looking for.'
               }
             </p>
-            {tasks.length === 0 && (
+            {allTasks.length === 0 && (
               <Button 
                 onClick={() => setShowTaskForm(true)}
                 size="lg"

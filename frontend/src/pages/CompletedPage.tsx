@@ -1,7 +1,7 @@
-import React, { useState, useEffect } from 'react';
+import React, { useMemo } from 'react';
 import { Button } from '@/components/ui/button';
-import { taskService } from '@/services/tasks';
-import { projectService } from '@/services/projects';
+import { useTasks } from '@/hooks/useTasks';
+import { useProjects } from '@/hooks/useProjects';
 import { useAuth } from '@/context/AuthContext';
 import ActivitySection from '@/components/activity/ActivitySection';
 import '@/components/activity/activity.css';
@@ -9,52 +9,26 @@ import type { Task, Project } from '@/types/api';
 
 const CompletedPage: React.FC = () => {
   const { user } = useAuth();
-  const [completedTasks, setCompletedTasks] = useState<Task[]>([]);
-  const [projects, setProjects] = useState<{ [key: string]: Project }>({});
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  
+  // React Query hooks - single source of truth
+  const { data: completedTasks = [], isLoading: tasksLoading, error: tasksError } = useTasks({ status: 'COMPLETED' });
+  const { data: allProjects = [], isLoading: projectsLoading } = useProjects();
 
+  const isLoading = tasksLoading || projectsLoading;
 
-  useEffect(() => {
-    const loadCompletedTasks = async () => {
-      setIsLoading(true);
-      setError(null);
-
-      try {
-        // Fetch completed tasks
-        const tasksResult = await taskService.getTasks({ status: 'COMPLETED' });
-        if (!tasksResult.success) {
-          setError(tasksResult.error.message);
-          return;
-        }
-
-        const tasks = tasksResult.data;
-        setCompletedTasks(tasks);
-
-        // Fetch projects for tasks that have project_id
-        const projectIds = [...new Set(tasks.map(task => task.project_id).filter(Boolean))];
-        if (projectIds.length > 0) {
-          const projectsResult = await projectService.getProjects();
-          if (projectsResult.success) {
-            const projectsMap: { [key: string]: Project } = {};
-            projectsResult.data.forEach(project => {
-              if (projectIds.includes(project.id)) {
-                projectsMap[project.id] = project;
-              }
-            });
-            setProjects(projectsMap);
-          }
-        }
-      } catch (err) {
-        setError('Failed to load completed tasks');
-        console.error('Error loading completed tasks:', err);
-      } finally {
-        setIsLoading(false);
+  // Create projects map
+  const projects = useMemo(() => {
+    const projectsMap: { [key: string]: Project } = {};
+    const projectIds = [...new Set(completedTasks.map(task => task.project_id).filter(Boolean))];
+    
+    allProjects.forEach(project => {
+      if (projectIds.includes(project.id)) {
+        projectsMap[project.id] = project;
       }
-    };
-
-    loadCompletedTasks();
-  }, []);
+    });
+    
+    return projectsMap;
+  }, [completedTasks, allProjects]);
 
   // Group tasks by completion date (using updated_at as proxy for completion time)
   const groupTasksByDate = (tasks: Task[]) => {
@@ -98,12 +72,12 @@ const CompletedPage: React.FC = () => {
     );
   }
 
-  if (error) {
+  if (tasksError) {
     return (
       <div className="W8rBu9M main-view-layout i_TMTDC main-view-layout--narrow _19abae45 a7c6de33 _1e47f652 d607c41c bfa58fdf d19e99ad">
         <div className="flex items-center justify-center py-12">
           <div className="text-center">
-            <p className="text-error mb-4">{error}</p>
+            <p className="text-error mb-4">Failed to load completed tasks</p>
             <Button onClick={() => window.location.reload()}>
               Try Again
             </Button>
