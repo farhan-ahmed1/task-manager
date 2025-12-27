@@ -1,8 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { FolderOpen } from 'lucide-react';
-import { ButtonSpinner } from '@/components/ui/spinner';
+import { FolderOpen, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -120,7 +119,7 @@ const TaskForm: React.FC<TaskFormProps> = ({
       await onSubmit(submitData);
       reset();
       onOpenChange(false);
-    } catch (error) {
+    } catch {
       // Error handling is done in the parent component
     }
   };
@@ -273,7 +272,7 @@ const TaskForm: React.FC<TaskFormProps> = ({
             >
               Cancel
             </Button>
-            <Button type="submit" disabled={loading}>
+            <Button type="submit" variant="primary" disabled={loading}>
               {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
               {isEditMode ? 'Update Task' : 'Create Task'}
             </Button>

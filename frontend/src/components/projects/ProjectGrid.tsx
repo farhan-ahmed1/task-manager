@@ -62,7 +62,8 @@ const ProjectGrid: React.FC<ProjectGridProps> = ({
           <Button 
             onClick={onCreateProject}
             size="lg"
-            className="bg-[var(--primary)] hover:bg-[var(--primary-dark)] text-white px-6 py-3 rounded-xl shadow-lg hover:shadow-xl transition-all duration-200 transform hover:scale-105"
+            variant="primary"
+            className="px-6 py-3 rounded-xl transform hover:scale-105"
           >
             <Plus className="h-5 w-5 mr-2" />
             Create New Project

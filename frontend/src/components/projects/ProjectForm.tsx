@@ -169,8 +169,9 @@ const ProjectForm: React.FC<ProjectFormProps> = ({
             </Button>
             <Button
               type="submit"
+              variant="primary"
               disabled={isSubmitting || (!isDirty && isEditMode)}
-              className="bg-primary text-white hover:bg-primary-dark rounded-lg px-6 py-2 shadow-sm hover:shadow-md transition-all duration-200"
+              className="rounded-lg px-6 py-2"
             >
               {isSubmitting && (
                 <Loader2 className="h-4 w-4 mr-2 animate-spin" />

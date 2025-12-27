@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Plus, AlertCircle } from 'lucide-react';
+import { Plus, AlertCircle, ListTodo } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Spinner } from '@/components/ui/spinner';
@@ -274,7 +274,8 @@ const TaskList: React.FC = () => {
           <Button 
             onClick={() => setShowTaskForm(true)}
             size="lg"
-            className="bg-primary hover:bg-primary-dark text-white px-6 py-3 rounded-xl shadow-lg hover:shadow-xl transition-all duration-200 transform hover:scale-105 button-with-icon"
+            variant="primary"
+            className="px-6 py-3 rounded-xl transform hover:scale-105 button-with-icon"
           >
             <Plus className="w-5 h-5 mr-2 icon-enhanced icon-hover" strokeWidth={2.5} />
             Create New Task

@@ -166,7 +166,8 @@ const LoginPage: React.FC = () => {
               
               <div className="space-y-4">
                 <Button 
-                  type="submit" 
+                  type="submit"
+                  variant="primary"
                   className="w-full h-12 text-base font-medium"
                   disabled={isLoading}
                 >

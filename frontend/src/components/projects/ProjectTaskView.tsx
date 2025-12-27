@@ -157,7 +157,7 @@ const ProjectTaskView: React.FC<ProjectTaskViewProps> = ({
             <Button 
               onClick={onCreateTask} 
               size="sm"
-              className="bg-primary hover:bg-primary-dark text-white"
+              variant="primary"
             >
               <Plus className="h-4 w-4 mr-2" />
               Add Task
