@@ -140,7 +140,7 @@ const Sidebar: React.FC<SidebarProps> = ({ onClose, onToggle, onOpenSearch, clas
       <div className="px-6 py-6">
         <div className="flex items-center justify-between">
           <div>
-            <h2 className="text-body font-medium" style={{ color: 'var(--text-primary)' }}>
+            <h2 className="text-body font-medium text-text-primary">
               {user?.name?.split(' ')[0]}'s workspace
             </h2>
           </div>
@@ -283,7 +283,7 @@ const Sidebar: React.FC<SidebarProps> = ({ onClose, onToggle, onOpenSearch, clas
             }}
           >
             <div className="flex items-center">
-              <MoreHorizontal className="w-6 h-6 mr-3 flex-shrink-0" style={{ color: 'var(--text-muted)' }} />
+              <MoreHorizontal className="w-6 h-6 mr-3 flex-shrink-0 text-text-muted" />
               <span className="group-hover:text-[var(--text-primary)] transition-colors duration-150">More</span>
             </div>
           </button>
@@ -311,9 +311,9 @@ const Sidebar: React.FC<SidebarProps> = ({ onClose, onToggle, onOpenSearch, clas
             >
               <span>Favorites</span>
               {isFavoritesExpanded ? (
-                <ChevronDown className="w-3 h-3 transition-transform" style={{ color: 'var(--text-muted)' }} />
+                <ChevronDown className="w-3 h-3 transition-transform text-text-muted" />
               ) : (
-                <ChevronRight className="w-3 h-3 transition-transform" style={{ color: 'var(--text-muted)' }} />
+                <ChevronRight className="w-3 h-3 transition-transform text-text-muted" />
               )}
             </button>
             {isFavoritesExpanded && (
@@ -391,17 +391,17 @@ const Sidebar: React.FC<SidebarProps> = ({ onClose, onToggle, onOpenSearch, clas
           >
             <span>My Projects</span>
             {isProjectsExpanded ? (
-              <ChevronDown className="w-3 h-3 transition-transform" style={{ color: 'var(--text-muted)' }} />
+              <ChevronDown className="w-3 h-3 transition-transform text-text-muted" />
             ) : (
-              <ChevronRight className="w-3 h-3 transition-transform" style={{ color: 'var(--text-muted)' }} />
+              <ChevronRight className="w-3 h-3 transition-transform text-text-muted" />
             )}
           </button>
           {isProjectsExpanded && (
             <div className="mt-2 space-y-1">
               {isLoading ? (
-                <div className="px-4 py-2 text-sm ml-2" style={{ color: 'var(--text-muted)' }}>Loading...</div>
+                <div className="px-4 py-2 text-sm ml-2 text-text-muted">Loading...</div>
               ) : projects.length === 0 ? (
-                <div className="px-4 py-2 text-sm ml-2" style={{ color: 'var(--text-muted)' }}>No projects yet</div>
+                <div className="px-4 py-2 text-sm ml-2 text-text-muted">No projects yet</div>
               ) : (
                 projects.map((project) => {
                   const isActive = location.pathname === getProjectPath(project.id);
@@ -473,10 +473,10 @@ const Sidebar: React.FC<SidebarProps> = ({ onClose, onToggle, onOpenSearch, clas
             {getUserInitials()}
           </div>
           <div className="flex-1 min-w-0">
-            <p className="text-sm font-medium truncate" style={{ color: 'var(--text-primary)' }}>
+            <p className="text-sm font-medium truncate text-text-primary">
               {user?.name || 'Admin User'}
             </p>
-            <p className="text-xs truncate" style={{ color: 'var(--text-secondary)' }}>
+            <p className="text-xs truncate text-text-secondary">
               {user?.email || 'admin@taskmanager.com'}
             </p>
           </div>

@@ -113,7 +113,9 @@
   }
 }
 
-/* Minimalist Typography Scale - Hierarchy through Size and Spacing */
+/* ==========================================
+   Typography Scale
+   ========================================== */
 .text-h1 {
   font-size: 28px;
   font-weight: 500;
@@ -163,19 +165,18 @@
   color: var(--text-muted);
 }
 
-/* Subtle focus states - minimal but clear */
+/* ==========================================
+   Focus States
+   ========================================== */
 input:focus-visible,
 button:focus-visible {
   outline: 2px solid var(--accent);
   outline-offset: 2px;
 }
 
-/* Minimal transitions */
-* {
-  transition: opacity 0.2s ease;
-}
-
-/* Clean card styles - rely on space and subtle borders */
+/* ==========================================
+   Card Styles - Used in SearchPage, Auth Pages
+   ========================================== */
 .tm-card {
   background: var(--surface);
   border: 1px solid var(--border-subtle);
@@ -187,7 +188,9 @@ button:focus-visible {
   border-color: var(--border);
 }
 
-/* Minimal button styles */
+/* ==========================================
+   Button Styles - Keep Only Used Classes
+   ========================================== */
 .tm-btn-primary {
   background: var(--primary);
   color: white;
@@ -202,169 +205,9 @@ button:focus-visible {
 .tm-btn-primary:hover {
   opacity: 0.9;
 }
-
-.tm-btn-secondary {
-  background: var(--surface);
-  color: var(--text-primary);
-  border: 1px solid var(--border);
-  padding: var(--spacing-sm) var(--spacing-md);
-  border-radius: var(--radius-md);
-  font-weight: 400;
-  cursor: pointer;
-  font-size: 15px;
-}
-
-.tm-btn-secondary:hover {
-  background: var(--surface-hover);
-}
-
-/* Minimalist utility classes */
-.minimal-border {
-  border: 1px solid var(--border-subtle);
-}
-
-.minimal-focus:focus-visible {
-  outline: 2px solid var(--accent);
-  outline-offset: 2px;
-}
-
-.breathing-room {
-  padding: var(--spacing-lg);
-}
-
-.generous-spacing > * + * {
-  margin-top: var(--spacing-md);
-}
-
-.subtle-separator {
-  border-top: 1px solid var(--border-subtle);
-  padding-top: var(--spacing-md);
-  margin-top: var(--spacing-md);
-}
-
-/* Clean list styles */
-.minimal-list {
-  list-style: none;
-  padding: 0;
-  margin: 0;
-}
-
-.minimal-list li {
-  padding: var(--spacing-sm) 0;
-  border-bottom: 1px solid var(--border-subtle);
-}
-
-.minimal-list li:last-child {
-  border-bottom: none;
-}
-
-/* Subtle hover states */
-.subtle-hover:hover {
-  opacity: 0.7;
-  transition: opacity 0.2s ease;
-}
-
-/* Clean form layouts */
-.form-group {
-  margin-bottom: var(--spacing-lg);
-}
-
-.form-group label {
-  display: block;
-  margin-bottom: var(--spacing-xs);
-  font-size: 14px;
-  color: var(--text-secondary);
-}
-
-/* Minimal shadows for depth */
-.subtle-elevation {
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.02);
-}
-
-.subtle-elevation:hover {
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04);
-}
-
-/* Rounded corner utilities */
-.rounded-minimal {
-  border-radius: 4px;
-}
-
-.rounded-subtle {
-  border-radius: 8px;
-}
-
-.rounded-soft {
-  border-radius: 12px;
-}
-
-/* Modal and popup styling */
-.modal-overlay {
-  background: rgba(0, 0, 0, 0.4);
-  backdrop-filter: blur(4px);
-}
-
-.modal-content {
-  background: white;
-  border-radius: 12px;
-  border: 1px solid var(--border-subtle);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-}
-
-.tm-btn-ghost {
-  background: transparent;
-  color: var(--text-secondary);
-  padding: 12px 16px;
-  border-radius: 6px;
-  font-weight: 500;
-  border: none;
-  cursor: pointer;
-  transition: all 0.15s ease-in-out;
-}
-
-.tm-btn-ghost:hover {
-  background: var(--surface-hover);
-  color: var(--text-primary);
-}
-
-/* Priority Indicators */
-.priority-high {
-  color: var(--error);
-  border-left: 3px solid var(--error);
-}
-
-.priority-medium {
-  color: var(--warning);
-  border-left: 3px solid var(--warning);
-}
-
-.priority-low {
-  color: var(--success);
-  border-left: 3px solid var(--success);
-}
-
-.priority-none {
-  color: var(--text-muted);
-  border-left: 3px solid var(--text-muted);
-}
-
-/* Task States */
-.task-completed {
-  text-decoration: line-through;
-  color: var(--text-secondary);
-}
-
-.task-overdue {
-  background-color: rgba(234, 67, 53, 0.05);
-  border-left: 3px solid var(--error);
-}
-
-.task-due-today {
-  background-color: rgba(255, 152, 0, 0.05);
-  border-left: 3px solid var(--warning);
-}
-
-/* Form Inputs */
+/* ==========================================
+   Form Inputs - Used in SearchPage
+   ========================================== */
 .tm-input {
   background: var(--surface);
   border: 1px solid var(--border);
@@ -386,38 +229,9 @@ button:focus-visible {
   color: var(--text-muted);
 }
 
-/* Progress Bar */
-.tm-progress {
-  background: var(--border-light);
-  height: 8px;
-  border-radius: 4px;
-  overflow: hidden;
-}
-
-.tm-progress-fill {
-  background: linear-gradient(90deg, var(--primary), var(--success));
-  height: 100%;
-  border-radius: 4px;
-  transition: width 0.3s ease-in-out;
-}
-
-/* Loading states */
-.loading {
-  opacity: 0.7;
-  pointer-events: none;
-}
-
-/* Beautiful background pattern */
-.bg-gradient-pattern {
-  background: 
-    linear-gradient(135deg, hsl(var(--background)) 0%, hsl(var(--muted)/0.3) 100%),
-    radial-gradient(circle at 25px 25px, rgba(255,255,255,0.1) 2%, transparent 2%), 
-    radial-gradient(circle at 75px 75px, rgba(255,255,255,0.05) 2%, transparent 2%);
-  background-size: 100% 100%, 60px 60px, 60px 60px;
-  background-position: 0 0, 0 0, 30px 30px;
-}
-
-/* Improved card styling */
+/* ==========================================
+   Card Hover Effects - Used in Auth & Profile Pages
+   ========================================== */
 .card-hover {
   transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
   border: 1px solid hsl(var(--border)/0.5);
@@ -432,7 +246,6 @@ button:focus-visible {
   border-color: hsl(var(--primary)/0.2);
 }
 
-/* Enhanced form styling */
 .auth-form-container {
   backdrop-filter: blur(12px);
   background: linear-gradient(145deg, 
@@ -445,20 +258,9 @@ button:focus-visible {
     0 0 0 1px rgba(255, 255, 255, 0.5) inset;
 }
 
-/* Modern backdrop and glass effects */
-.backdrop-blur-modern {
-  backdrop-filter: blur(12px) saturate(180%);
-  background: rgba(255, 255, 255, 0.85);
-  border: 1px solid rgba(148, 163, 184, 0.2);
-}
-
-/* Subtle background patterns */
-.bg-pattern-dots {
-  background-image: radial-gradient(rgba(148, 163, 184, 0.1) 1px, transparent 1px);
-  background-size: 20px 20px;
-}
-
-/* Line clamp utilities */
+/* ==========================================
+   Line Clamp Utilities - Used Throughout
+   ========================================== */
 .line-clamp-1 {
   overflow: hidden;
   display: -webkit-box;
@@ -483,100 +285,11 @@ button:focus-visible {
   line-clamp: 3;
 }
 
-/* Enhanced hover transitions */
-.hover-lift {
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-.hover-lift:hover {
-  transform: translateY(-2px) scale(1.01);
-  box-shadow: 
-    0 20px 25px -5px rgba(0, 0, 0, 0.1),
-    0 10px 10px -5px rgba(0, 0, 0, 0.04),
-    0 0 0 1px rgba(59, 130, 246, 0.1);
-}
-
-/* Progress bar enhancements */
-.progress-modern {
-  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
-  animation: shimmer 2s infinite;
-}
-
-@keyframes shimmer {
-  0% { transform: translateX(-100%); }
-  100% { transform: translateX(100%); }
-}
-
-/* Status indicator animations */
-.status-pulse {
-  animation: status-pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
-}
-
-@keyframes status-pulse {
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0.5; }
-}
-
-/* Inbox Task Item Enhancements */
-.inbox-task-item {
-  position: relative;
-  overflow: hidden;
-}
-
-.inbox-task-item::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: -100%;
-  width: 100%;
-  height: 100%;
-  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
-  transition: left 0.5s;
-}
-
-.inbox-task-item:hover::before {
-  left: 100%;
-}
-
-.task-actions {
-  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-.task-actions.show {
-  transform: translateX(0);
-  opacity: 1;
-}
-
-.task-actions.hide {
-  transform: translateX(8px);
-  opacity: 0;
-}
-
-/* Priority checkmark animations */
-.priority-check {
-  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-.priority-check:hover {
-  transform: scale(1.1);
-  filter: brightness(1.1);
-}
-
-.priority-check.completed {
-  animation: check-bounce 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
-}
-
-@keyframes check-bounce {
-  0% { transform: scale(0.8); }
-  50% { transform: scale(1.2); }
-  100% { transform: scale(1); }
-}
-
 /* ==========================================
-   🎨 ICON ENHANCEMENT SYSTEM
+   Icon Enhancement System - Used in Task Components
    ========================================== */
 
-/* Base icon improvements - crisp, clean, and professional */
+/* Base icon improvements */
 .icon-enhanced {
   stroke-width: 2;
   transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
@@ -585,50 +298,10 @@ button:focus-visible {
   -moz-osx-font-smoothing: grayscale;
 }
 
-/* Icon size classes - larger and more prominent */
-.icon-xs {
-  width: 14px;
-  height: 14px;
-  stroke-width: 2.5;
-}
-
-.icon-sm {
-  width: 18px;
-  height: 18px;
-  stroke-width: 2;
-}
-
-.icon-md {
-  width: 20px;
-  height: 20px;
-  stroke-width: 2;
-}
-
-.icon-lg {
-  width: 24px;
-  height: 24px;
-  stroke-width: 1.75;
-}
-
-.icon-xl {
-  width: 28px;
-  height: 28px;
-  stroke-width: 1.5;
-}
-
-/* Icon hover effects - smooth and polished */
+/* Icon hover effects */
 .icon-hover:hover {
   transform: scale(1.1);
   filter: brightness(1.15);
-}
-
-.icon-hover-lift:hover {
-  transform: translateY(-1px) scale(1.08);
-  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.1));
-}
-
-.icon-hover-spin:hover {
-  transform: rotate(90deg);
 }
 
 .icon-hover-pulse:hover {
@@ -646,196 +319,10 @@ button:focus-visible {
   }
 }
 
-/* Icon button containers - clean and professional */
-.icon-button {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: 0.5rem;
-  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
-  cursor: pointer;
-  position: relative;
-  overflow: hidden;
-}
-
-.icon-button::before {
-  content: '';
-  position: absolute;
-  inset: 0;
-  background: currentColor;
-  opacity: 0;
-  transition: opacity 0.25s ease;
-  border-radius: inherit;
-}
-
-.icon-button:hover::before {
-  opacity: 0.08;
-}
-
-.icon-button:active::before {
-  opacity: 0.12;
-}
-
-/* Icon with background container */
-.icon-container {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: 0.5rem;
-  padding: 0.5rem;
-  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-.icon-container:hover {
-  transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-}
-
-/* Status icon styles with crisp rendering */
-.icon-status {
-  stroke-width: 2.25;
-  filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.05));
-}
-
-.icon-status-success {
-  color: #22c55e;
-  stroke-width: 2.5;
-}
-
-.icon-status-warning {
-  color: #f59e0b;
-  stroke-width: 2.5;
-}
-
+/* Status icon styles */
 .icon-status-error {
   color: #ef4444;
   stroke-width: 2.5;
-}
-
-.icon-status-info {
-  color: #3b82f6;
-  stroke-width: 2.5;
-}
-
-/* Action icon styles */
-.icon-action {
-  stroke-width: 2;
-  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-.icon-action:hover {
-  stroke-width: 2.5;
-  transform: scale(1.15);
-}
-
-/* Icon badge container */
-.icon-badge {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.5rem;
-  padding: 0.375rem 0.75rem;
-  border-radius: 0.5rem;
-  font-size: 0.875rem;
-  font-weight: 500;
-  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-.icon-badge:hover {
-  transform: translateY(-1px);
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-}
-
-.icon-badge svg {
-  width: 16px;
-  height: 16px;
-  stroke-width: 2.5;
-}
-
-/* Animated icon transitions */
-.icon-fade-in {
-  animation: icon-fade-in 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-@keyframes icon-fade-in {
-  from {
-    opacity: 0;
-    transform: scale(0.8);
-  }
-  to {
-    opacity: 1;
-    transform: scale(1);
-  }
-}
-
-.icon-slide-in {
-  animation: icon-slide-in 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-@keyframes icon-slide-in {
-  from {
-    opacity: 0;
-    transform: translateX(-8px);
-  }
-  to {
-    opacity: 1;
-    transform: translateX(0);
-  }
-}
-
-/* Icon glow effects for special states */
-.icon-glow-success {
-  filter: drop-shadow(0 0 6px rgba(34, 197, 94, 0.4));
-}
-
-.icon-glow-warning {
-  filter: drop-shadow(0 0 6px rgba(245, 158, 11, 0.4));
-}
-
-.icon-glow-error {
-  filter: drop-shadow(0 0 6px rgba(239, 68, 68, 0.4));
-}
-
-.icon-glow-info {
-  filter: drop-shadow(0 0 6px rgba(59, 130, 246, 0.4));
-}
-
-/* Icon rotation animations */
-.icon-rotate-45 {
-  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-.icon-rotate-45:hover {
-  transform: rotate(45deg);
-}
-
-.icon-rotate-90 {
-  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-.icon-rotate-90:hover {
-  transform: rotate(90deg);
-}
-
-.icon-rotate-180 {
-  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-.icon-rotate-180:hover {
-  transform: rotate(180deg);
-}
-
-/* Enhanced button hover with icon */
-.button-with-icon {
-  position: relative;
-  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-.button-with-icon:hover svg {
-  transform: translateX(2px);
-}
-
-.button-with-icon:active svg {
-  transform: scale(0.95);
 }
 
 /* Lucide icon specific optimizations */
@@ -847,64 +334,4 @@ svg[class*="lucide"] {
   shape-rendering: geometricPrecision;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-}
-
-/* Icon color utilities with smooth transitions */
-.icon-color-transition {
-  transition: color 0.2s cubic-bezier(0.4, 0, 0.2, 1),
-              stroke 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-/* Dropdown menu icon improvements */
-.dropdown-icon {
-  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-  stroke-width: 2;
-}
-
-.dropdown-icon:hover {
-  stroke-width: 2.5;
-  opacity: 1;
-}
-
-/* Icon loading state */
-.icon-loading {
-  animation: icon-spin 1s linear infinite;
-}
-
-@keyframes icon-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
-}
-
-/* Icon with notification dot */
-.icon-with-dot {
-  position: relative;
-}
-
-.icon-with-dot::after {
-  content: '';
-  position: absolute;
-  top: -2px;
-  right: -2px;
-  width: 6px;
-  height: 6px;
-  background: #ef4444;
-  border-radius: 50%;
-  border: 2px solid white;
-  animation: dot-pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
-}
-
-@keyframes dot-pulse {
-  0%, 100% {
-    opacity: 1;
-    transform: scale(1);
-  }
-  50% {
-    opacity: 0.5;
-    transform: scale(0.8);
-  }
 }

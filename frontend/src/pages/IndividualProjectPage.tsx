@@ -43,14 +43,13 @@ const IndividualProjectPage: React.FC = () => {
     return (
       <div className="max-w-5xl mx-auto p-6">
         <div className="text-center py-16">
-          <div className="w-16 h-16 mx-auto mb-4 rounded-full flex items-center justify-center" 
-               style={{ backgroundColor: 'var(--border-light)' }}>
-            <FolderOpen className="w-8 h-8" style={{ color: 'var(--text-muted)' }} />
+            <div className="flex items-center justify-center w-16 h-16 rounded-xl mb-4 bg-border-light mx-auto">
+            <FolderOpen className="w-8 h-8 text-text-muted" />
           </div>
-          <h3 className="text-h3 mb-2" style={{ color: 'var(--text-primary)' }}>
+          <h3 className="text-h3 mb-2 text-text-primary">
             Project Not Found
           </h3>
-          <p className="text-body mb-4" style={{ color: 'var(--text-muted)' }}>
+          <p className="text-body mb-4 text-text-muted">
             {typeof error === 'string' ? error : 'The project you are looking for does not exist or you do not have access to it.'}
           </p>
           <button 
@@ -67,7 +66,7 @@ const IndividualProjectPage: React.FC = () => {
 
 
   return (
-    <div className="min-h-screen" style={{ backgroundColor: 'var(--background)' }}>
+    <div className="min-h-screen bg-background">
       {/* Project Header */}
       <ProjectHeader 
         project={localProject || project}

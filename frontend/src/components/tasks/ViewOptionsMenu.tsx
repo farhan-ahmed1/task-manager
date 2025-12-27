@@ -70,7 +70,7 @@ const ViewOptionsMenu: React.FC<ViewOptionsMenuProps> = ({
           aria-haspopup="dialog"
           aria-expanded="false"
         >
-          <Settings className="w-4 h-4" style={{ color: 'var(--text-muted)' }} />
+          <Settings className="w-4 h-4 text-text-muted" />
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end" className="w-64">

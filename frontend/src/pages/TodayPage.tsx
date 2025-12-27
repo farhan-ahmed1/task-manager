@@ -69,7 +69,7 @@ const TodayPage: React.FC = () => {
     <div className="max-w-4xl mx-auto px-6">
       {/* Page Title */}
       <div className="pt-12 pb-6">
-        <h1 className="text-2xl font-bold flex items-center" style={{ color: 'var(--text-primary)' }}>
+        <h1 className="text-2xl font-bold flex items-center text-text-primary">
           <Calendar className="w-6 h-6 mr-2" />
           Today
         </h1>
@@ -81,14 +81,13 @@ const TodayPage: React.FC = () => {
       <div className="mb-6">
         {todayTasks.length === 0 ? (
           <div className="text-center py-12">
-            <div className="w-16 h-16 mx-auto mb-4 rounded-full flex items-center justify-center" 
-                 style={{ backgroundColor: 'var(--border-light)' }}>
-              <Calendar className="w-8 h-8" style={{ color: 'var(--text-muted)' }} />
+            <div className="flex items-center justify-center w-16 h-16 rounded-xl mb-4 bg-border-light mx-auto">
+              <Calendar className="w-8 h-8 text-text-muted" />
             </div>
-            <h3 className="text-h3 mb-2" style={{ color: 'var(--text-primary)' }}>
+            <h3 className="text-h3 mb-2 text-text-primary">
               No tasks due today
             </h3>
-            <p className="text-body mb-4" style={{ color: 'var(--text-muted)' }}>
+            <p className="text-body mb-4 text-text-muted">
               Add tasks with today's date to see them here.
             </p>
             <Button 
@@ -112,8 +111,7 @@ const TodayPage: React.FC = () => {
                   showDueDate={true}
                 />
                 {index < todayTasks.length - 1 && (
-                  <hr className="border-0 h-px my-0 opacity-70" 
-                      style={{ backgroundColor: 'var(--border-light)' }} />
+                  <hr className="h-px my-4 bg-border-light border-0 opacity-70\" />
                 )}
               </div>
             ))}

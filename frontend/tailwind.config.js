@@ -86,6 +86,19 @@ export default {
         md: 'calc(var(--radius) - 2px)',
         sm: 'calc(var(--radius) - 4px)',
       },
+      // Background color utilities for hover states
+      backgroundColor: {
+        'surface': 'var(--surface)',
+        'surface-hover': 'var(--surface-hover)',
+        'surface-active': 'var(--surface-active)',
+      },
+      // Height utilities
+      height: {
+        '56px': '56px',
+      },
+      minHeight: {
+        '56px': '56px',
+      },
     },
   },
   plugins: [],

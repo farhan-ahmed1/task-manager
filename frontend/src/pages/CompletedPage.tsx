@@ -96,7 +96,7 @@ const CompletedPage: React.FC = () => {
       <div className="px-6">
         {/* Page Title */}
         <div className="pt-12 pb-6">
-          <h1 className="text-2xl font-bold" style={{ color: 'var(--text-primary)' }}>
+          <h1 className="text-2xl font-bold text-text-primary">
             Completed
           </h1>
         </div>

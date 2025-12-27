@@ -5,7 +5,7 @@ import { useLayoutConfig } from '@/hooks/useLayoutConfig';
 
 const InboxPage: React.FC = () => {
   const config = useLayoutConfig('Inbox', {
-    icon: <Inbox className="w-5 h-5 mr-2" style={{ color: 'var(--primary)' }} />,
+    icon: <Inbox className="w-5 h-5 mr-2 text-primary" />,
     emptyState: 'inbox',
   });
 

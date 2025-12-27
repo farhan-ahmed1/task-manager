@@ -83,7 +83,7 @@ const UpcomingPage: React.FC = () => {
     <div className="max-w-4xl mx-auto px-6">
       {/* Page Title */}
       <div className="pt-12 pb-6">
-        <h1 className="text-2xl font-bold flex items-center" style={{ color: 'var(--text-primary)' }}>
+        <h1 className="text-2xl font-bold flex items-center text-text-primary">
           <CalendarDays className="w-6 h-6 mr-2" />
           Upcoming
         </h1>
@@ -95,14 +95,13 @@ const UpcomingPage: React.FC = () => {
       <div className="mb-6 space-y-6">
         {upcomingTasksByDate.length === 0 ? (
           <div className="text-center py-12">
-            <div className="w-16 h-16 mx-auto mb-4 rounded-full flex items-center justify-center" 
-                 style={{ backgroundColor: 'var(--border-light)' }}>
-              <CalendarDays className="w-8 h-8" style={{ color: 'var(--text-muted)' }} />
+            <div className="flex items-center justify-center w-16 h-16 rounded-xl mb-4 bg-border-light mx-auto">
+              <CalendarDays className="w-8 h-8 text-text-muted" />
             </div>
-            <h3 className="text-h3 mb-2" style={{ color: 'var(--text-primary)' }}>
+            <h3 className="text-h3 mb-2 text-text-primary">
               No upcoming tasks
             </h3>
-            <p className="text-body mb-4" style={{ color: 'var(--text-muted)' }}>
+            <p className="text-body mb-4 text-text-muted">
               Add tasks with future dates to see them here.
             </p>
             <Button 
@@ -117,7 +116,7 @@ const UpcomingPage: React.FC = () => {
           <>
             {upcomingTasksByDate.map(({ date, tasks }) => (
               <div key={date}>
-                <h2 className="text-sm font-semibold mb-3" style={{ color: 'var(--text-secondary)' }}>
+                <h2 className="text-sm font-semibold mb-3 text-text-secondary">
                   {formatUpcomingDate(date)}
                 </h2>
                 <div className="bg-card rounded-lg border border-[var(--border)]">
@@ -132,8 +131,7 @@ const UpcomingPage: React.FC = () => {
                         showDueDate={true}
                       />
                       {index < tasks.length - 1 && (
-                        <hr className="border-0 h-px my-0 opacity-70" 
-                            style={{ backgroundColor: 'var(--border-light)' }} />
+                        <hr className="h-px my-4 bg-border-light border-0 opacity-70" />
                       )}
                     </div>
                   ))}

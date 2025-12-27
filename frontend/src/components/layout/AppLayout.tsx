@@ -10,9 +10,7 @@ const AppLayout: React.FC = () => {
   const { isOpen, close, open } = useCommandPalette();
 
   return (
-    <div className="h-screen flex overflow-hidden" style={{ 
-      backgroundColor: 'var(--background)' 
-    }}>
+    <div className="h-screen flex overflow-hidden bg-background">
       {/* Mobile sidebar overlay */}
       {sidebarOpen && (
         <div className="fixed inset-0 flex z-40 md:hidden">
@@ -59,10 +57,7 @@ const AppLayout: React.FC = () => {
             onClick={() => {
               setSidebarOpen(true);
             }}
-            className="p-2 rounded-lg transition-all duration-200 hover:bg-gray-100 hover:bg-opacity-50 hover:scale-110 active:scale-95"
-            style={{ 
-              color: '#6B7280'
-            }}
+            className="p-2 rounded-lg transition-all duration-200 text-gray-500 hover:bg-gray-100 hover:bg-opacity-50 hover:scale-110 active:scale-95"
             title="Open sidebar"
           >
             <PanelLeftClose className="w-5 h-5" />
@@ -76,31 +71,12 @@ const AppLayout: React.FC = () => {
       }`}>
         {/* Compact Header - 56px height, similar to Todoist */}
         <header 
-          className="flex items-center justify-end px-4 gap-2"
-          style={{ 
-            height: '56px',
-            minHeight: '56px',
-            borderBottom: '1px solid var(--border)',
-            backgroundColor: 'var(--background)'
-          }}
+          className="flex items-center justify-end px-4 gap-2 h-56px min-h-56px border-b border-border bg-background"
         >
           {/* Mobile menu button - only on mobile */}
           <button
             type="button"
-            className="md:hidden flex items-center justify-center h-8 w-8 transition-all duration-150 mr-auto"
-            style={{
-              borderRadius: 'var(--radius-sm)',
-              color: 'var(--text-muted)',
-              backgroundColor: 'transparent'
-            }}
-            onMouseEnter={(e) => {
-              e.currentTarget.style.backgroundColor = 'var(--surface-hover)';
-              e.currentTarget.style.color = 'var(--text-primary)';
-            }}
-            onMouseLeave={(e) => {
-              e.currentTarget.style.backgroundColor = 'transparent';
-              e.currentTarget.style.color = 'var(--text-muted)';
-            }}
+            className="md:hidden flex items-center justify-center h-8 w-8 transition-all duration-150 mr-auto rounded-sm text-text-muted hover:bg-surface-hover hover:text-text-primary"
             onClick={() => setSidebarOpen(true)}
           >
             <span className="sr-only">Open sidebar</span>
@@ -109,17 +85,7 @@ const AppLayout: React.FC = () => {
 
           {/* Filter buttons - placeholder for now, can be customized per page */}
           <button 
-            className="flex items-center justify-center h-8 w-8 rounded transition-all duration-150"
-            style={{
-              color: 'var(--text-muted)',
-              backgroundColor: 'transparent'
-            }}
-            onMouseEnter={(e) => {
-              e.currentTarget.style.backgroundColor = 'var(--surface-hover)';
-            }}
-            onMouseLeave={(e) => {
-              e.currentTarget.style.backgroundColor = 'transparent';
-            }}
+            className="flex items-center justify-center h-8 w-8 rounded transition-all duration-150 text-text-muted hover:bg-surface-hover"
             title="Filter by collaborator"
           >
             <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none">
@@ -128,17 +94,7 @@ const AppLayout: React.FC = () => {
           </button>
 
           <button 
-            className="flex items-center justify-center h-8 w-8 rounded transition-all duration-150"
-            style={{
-              color: 'var(--text-muted)',
-              backgroundColor: 'transparent'
-            }}
-            onMouseEnter={(e) => {
-              e.currentTarget.style.backgroundColor = 'var(--surface-hover)';
-            }}
-            onMouseLeave={(e) => {
-              e.currentTarget.style.backgroundColor = 'transparent';
-            }}
+            className="flex items-center justify-center h-8 w-8 rounded transition-all duration-150 text-text-muted hover:bg-surface-hover"
             title="Completed tasks"
           >
             <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" viewBox="0 0 24 24">
@@ -148,9 +104,7 @@ const AppLayout: React.FC = () => {
         </header>
 
         {/* Page content */}
-        <main className="flex-1 relative overflow-y-auto focus:outline-none" style={{ 
-          backgroundColor: 'var(--background)' 
-        }}>
+        <main className="flex-1 relative overflow-y-auto focus:outline-none bg-background">
           <div className="h-full">
             <Outlet />
           </div>
