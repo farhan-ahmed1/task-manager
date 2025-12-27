@@ -62,7 +62,7 @@ const ProjectGrid: React.FC<ProjectGridProps> = ({
           <Button 
             onClick={onCreateProject}
             size="lg"
-            className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-xl shadow-lg hover:shadow-xl transition-all duration-200 transform hover:scale-105"
+            className="bg-[var(--primary)] hover:bg-[var(--primary-dark)] text-white px-6 py-3 rounded-xl shadow-lg hover:shadow-xl transition-all duration-200 transform hover:scale-105"
           >
             <Plus className="h-5 w-5 mr-2" />
             Create New Project
@@ -75,10 +75,10 @@ const ProjectGrid: React.FC<ProjectGridProps> = ({
       {/* Stats Cards */}
       {projects.length > 0 && (
         <div className="flex flex-wrap gap-3 mb-6">
-          <div className="bg-white/80 backdrop-blur-sm rounded-lg px-3 py-2 border border-slate-200/60">
+          <div className="bg-white/80 backdrop-blur-sm rounded-lg px-3 py-2 border border-[var(--border)]">
             <div className="flex items-center gap-2">
-              <div className="h-2 w-2 rounded-full bg-slate-400"></div>
-              <span className="text-sm font-medium text-slate-700">
+              <div className="h-2 w-2 rounded-full bg-[var(--text-muted)]"></div>
+              <span className="text-sm font-medium text-[var(--text-secondary)]">
                 {projects.length} Projects
               </span>
             </div>

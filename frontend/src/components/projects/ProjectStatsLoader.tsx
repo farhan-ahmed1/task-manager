@@ -15,7 +15,7 @@ export function ProjectStatsLoader({ projectId, children }: ProjectStatsLoaderPr
   if (isLoading) {
     return (
       <div className="flex items-center justify-center py-4">
-        <Spinner size="sm" className="text-slate-400" />
+        <Spinner size="sm" className="text-[var(--text-muted)]" />
       </div>
     );
   }

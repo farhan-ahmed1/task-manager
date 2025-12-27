@@ -155,7 +155,7 @@ export const createSearchGroups = (navigate: NavigateFunction): SearchGroup[] =>
         id: 'misc-sidebar',
         label: 'Open/close sidebar',
         icon: Menu,
-        action: () => console.log('Toggle sidebar'),
+        action: () => {}, // Placeholder action
         shortcut: { keys: ['M'] },
         keywords: ['sidebar', 'menu', 'toggle'],
       },

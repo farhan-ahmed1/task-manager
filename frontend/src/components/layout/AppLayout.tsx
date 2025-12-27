@@ -15,7 +15,7 @@ const AppLayout: React.FC = () => {
       {sidebarOpen && (
         <div className="fixed inset-0 flex z-40 md:hidden">
           <div 
-            className="fixed inset-0 bg-gray-600 bg-opacity-75" 
+            className="fixed inset-0 bg-[var(--text-tertiary)] bg-opacity-75" 
             onClick={() => setSidebarOpen(false)} 
           />
           <div className="relative flex-1 flex flex-col max-w-[304px] w-full">
@@ -57,7 +57,7 @@ const AppLayout: React.FC = () => {
             onClick={() => {
               setSidebarOpen(true);
             }}
-            className="p-2 rounded-lg transition-all duration-200 text-gray-500 hover:bg-gray-100 hover:bg-opacity-50 hover:scale-110 active:scale-95"
+            className="p-2 rounded-lg transition-all duration-200 text-[var(--text-tertiary)] hover:bg-[var(--bg-tertiary)] hover:bg-opacity-50 hover:scale-110 active:scale-95"
             title="Open sidebar"
           >
             <PanelLeftClose className="w-5 h-5" />

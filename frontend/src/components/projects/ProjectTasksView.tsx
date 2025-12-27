@@ -51,12 +51,12 @@ const ProjectTasksView: React.FC<ProjectTasksViewProps> = ({
               variant="ghost"
               size="sm"
               onClick={onBack}
-              className="text-slate-600 hover:text-slate-900"
+              className="text-[var(--text-secondary)] hover:text-[var(--text-primary)]"
             >
               <ArrowLeft className="h-4 w-4 mr-2" />
               Back to Projects
             </Button>
-            <div className="h-4 w-px bg-slate-300" />
+            <div className="h-4 w-px bg-[var(--border)]" />
             <div>
               <div className="text-xl font-semibold" style={{ color: 'var(--text-primary)' }}>
                 {project.name}

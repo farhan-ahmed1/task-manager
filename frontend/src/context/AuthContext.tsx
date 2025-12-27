@@ -96,13 +96,13 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
             // Update stored user data if it's different
             localStorage.setItem('authUser', JSON.stringify(currentUserResponse.data));
           } catch (tokenValidationError) {
-            console.warn('Token validation failed, clearing session:', tokenValidationError);
+            // Token validation failed, clear session
             localStorage.removeItem('authToken');
             localStorage.removeItem('authUser');
             dispatch({ type: 'SET_LOADING', payload: false });
           }
         } catch (error) {
-          console.error('Failed to restore session:', error);
+          // Failed to restore session, clear storage
           localStorage.removeItem('authToken');
           localStorage.removeItem('authUser');
           dispatch({ type: 'SET_LOADING', payload: false });

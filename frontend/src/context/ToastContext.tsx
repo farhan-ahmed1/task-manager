@@ -37,10 +37,10 @@ export function ToastProvider({ children }: ToastProviderProps) {
             boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)',
           },
           classNames: {
-            error: 'border-red-500',
-            success: 'border-green-500',
-            warning: 'border-yellow-500',
-            info: 'border-blue-500',
+            error: 'border-[var(--error)]',
+            success: 'border-[var(--success)]',
+            warning: 'border-[var(--warning)]',
+            info: 'border-[var(--info)]',
           },
         }}
       />

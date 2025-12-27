@@ -4,6 +4,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
+import { Spinner } from '@/components/ui/spinner';
 import { User, Mail, Lock, UserPlus, AlertCircle } from 'lucide-react';
 import { authService } from '@/services/auth';
 import { useAuth } from '@/context/AuthContext';
@@ -224,7 +225,7 @@ const RegisterPage: React.FC = () => {
                 >
                   {isLoading ? (
                     <>
-                      <div className="w-5 h-5 mr-2 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                      <Spinner size="sm" className="mr-2" />
                       Creating Account...
                     </>
                   ) : (

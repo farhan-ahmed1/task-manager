@@ -122,7 +122,6 @@ const TaskForm: React.FC<TaskFormProps> = ({
       onOpenChange(false);
     } catch (error) {
       // Error handling is done in the parent component
-      console.error('Form submission error:', error);
     }
   };
 
@@ -135,10 +134,10 @@ const TaskForm: React.FC<TaskFormProps> = ({
     <Dialog open={open} onOpenChange={handleClose}>
       <DialogContent className="sm:max-w-[600px] bg-white">
         <DialogHeader>
-          <DialogTitle className="text-gray-900">
+          <DialogTitle className="text-[var(--text-primary)]">
             {isEditMode ? 'Edit Task' : 'Create New Task'}
           </DialogTitle>
-          <DialogDescription className="text-gray-600">
+          <DialogDescription className="text-[var(--text-secondary)]">
             {isEditMode 
               ? 'Update the task details below.' 
               : 'Fill in the details to create a new task.'
@@ -156,7 +155,7 @@ const TaskForm: React.FC<TaskFormProps> = ({
               id="title"
               placeholder="Enter task title..."
               {...register('title')}
-              className={`bg-white border-gray-300 text-gray-900 placeholder-gray-500 ${errors.title ? 'border-red-500' : ''}`}
+              className={`bg-white border-[var(--border)] text-[var(--text-primary)] placeholder-[var(--text-muted)] ${errors.title ? 'border-red-500' : ''}`}
             />
             {errors.title && (
               <p className="text-sm text-red-500">{errors.title.message}</p>
@@ -171,7 +170,7 @@ const TaskForm: React.FC<TaskFormProps> = ({
               placeholder="Enter task description..."
               rows={3}
               {...register('description')}
-              className={`bg-white border-gray-300 text-gray-900 placeholder-gray-500 ${errors.description ? 'border-red-500' : ''}`}
+              className={`bg-white border-[var(--border)] text-[var(--text-primary)] placeholder-[var(--text-muted)] ${errors.description ? 'border-red-500' : ''}`}
             />
             {errors.description && (
               <p className="text-sm text-red-500">{errors.description.message}</p>
@@ -190,17 +189,17 @@ const TaskForm: React.FC<TaskFormProps> = ({
                 onValueChange={(value: string) => setValue('project_id', value === 'none' ? '' : value)}
                 disabled={projectsLoading}
               >
-                <SelectTrigger className="bg-white border-gray-300 text-gray-900">
+                <SelectTrigger className="bg-white border-[var(--border)] text-[var(--text-primary)]">
                   <SelectValue 
                     placeholder={projectsLoading ? "Loading projects..." : "Select a project (optional)"} 
                   />
                 </SelectTrigger>
-                <SelectContent className="bg-white border-gray-300">
-                  <SelectItem value="none" className="text-gray-900">
-                    <span className="text-gray-500">No project</span>
+                <SelectContent className="bg-white border-[var(--border)]">
+                  <SelectItem value="none" className="text-[var(--text-primary)]">
+                    <span className="text-[var(--text-secondary)]">No project</span>
                   </SelectItem>
                   {projects.map((project) => (
-                    <SelectItem key={project.id} value={project.id} className="text-gray-900">
+                    <SelectItem key={project.id} value={project.id} className="text-[var(--text-primary)]">
                       {project.name}
                     </SelectItem>
                   ))}
@@ -221,13 +220,13 @@ const TaskForm: React.FC<TaskFormProps> = ({
                 value={status || 'PENDING'}
                 onValueChange={(value: 'PENDING' | 'IN_PROGRESS' | 'COMPLETED') => setValue('status', value)}
               >
-                <SelectTrigger className="bg-white border-gray-300 text-gray-900">
+                <SelectTrigger className="bg-white border-[var(--border)] text-[var(--text-primary)]">
                   <SelectValue placeholder="Select status" />
                 </SelectTrigger>
-                <SelectContent className="bg-white border-gray-300">
-                  <SelectItem value="PENDING" className="text-gray-900">Pending</SelectItem>
-                  <SelectItem value="IN_PROGRESS" className="text-gray-900">In Progress</SelectItem>
-                  <SelectItem value="COMPLETED" className="text-gray-900">Completed</SelectItem>
+                <SelectContent className="bg-white border-[var(--border)]">
+                  <SelectItem value="PENDING" className="text-[var(--text-primary)]">Pending</SelectItem>
+                  <SelectItem value="IN_PROGRESS" className="text-[var(--text-primary)]">In Progress</SelectItem>
+                  <SelectItem value="COMPLETED" className="text-[var(--text-primary)]">Completed</SelectItem>
                 </SelectContent>
               </Select>
             </div>
@@ -239,13 +238,13 @@ const TaskForm: React.FC<TaskFormProps> = ({
                 value={priority || 'MEDIUM'}
                 onValueChange={(value: 'LOW' | 'MEDIUM' | 'HIGH') => setValue('priority', value)}
               >
-                <SelectTrigger className="bg-white border-gray-300 text-gray-900">
+                <SelectTrigger className="bg-white border-[var(--border)] text-[var(--text-primary)]">
                   <SelectValue placeholder="Select priority" />
                 </SelectTrigger>
-                <SelectContent className="bg-white border-gray-300">
-                  <SelectItem value="LOW" className="text-gray-900">Low</SelectItem>
-                  <SelectItem value="MEDIUM" className="text-gray-900">Medium</SelectItem>
-                  <SelectItem value="HIGH" className="text-gray-900">High</SelectItem>
+                <SelectContent className="bg-white border-[var(--border)]">
+                  <SelectItem value="LOW" className="text-[var(--text-primary)]">Low</SelectItem>
+                  <SelectItem value="MEDIUM" className="text-[var(--text-primary)]">Medium</SelectItem>
+                  <SelectItem value="HIGH" className="text-[var(--text-primary)]">High</SelectItem>
                 </SelectContent>
               </Select>
             </div>
@@ -258,7 +257,7 @@ const TaskForm: React.FC<TaskFormProps> = ({
               id="due_date"
               type="date"
               {...register('due_date')}
-              className={`bg-white border-gray-300 text-gray-900 ${errors.due_date ? 'border-red-500' : ''}`}
+              className={`bg-white border-[var(--border)] text-[var(--text-primary)] ${errors.due_date ? 'border-red-500' : ''}`}
             />
             {errors.due_date && (
               <p className="text-sm text-red-500">{errors.due_date.message}</p>

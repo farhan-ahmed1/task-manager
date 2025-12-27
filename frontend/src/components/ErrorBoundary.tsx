@@ -35,9 +35,6 @@ class ErrorBoundary extends Component<Props, State> {
   }
 
   componentDidCatch(error: Error, errorInfo: ErrorInfo): void {
-    // Log error to console in development
-    console.error('ErrorBoundary caught an error:', error, errorInfo);
-    
     // Store error info in state
     this.setState({
       error,
@@ -118,7 +115,7 @@ class ErrorBoundary extends Component<Props, State> {
                 <p className="text-sm text-[var(--text-primary)]">
                   <strong>What you can do:</strong>
                 </p>
-                <ul className="text-sm text-slate-600 mt-2 space-y-1 list-disc list-inside">
+                <ul className="text-sm text-[var(--text-secondary)] mt-2 space-y-1 list-disc list-inside">
                   <li>Try refreshing the page</li>
                   <li>Go back and try again</li>
                   <li>Clear your browser cache</li>

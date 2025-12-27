@@ -143,7 +143,7 @@ const Sidebar: React.FC<SidebarProps> = ({ onClose, onToggle, onOpenSearch, clas
           </div>
           <button
             onClick={onToggle}
-            className="p-2 hover:bg-gray-100 rounded-md transition-colors"
+            className="p-2 hover:bg-[var(--bg-tertiary)] rounded-md transition-colors"
           >
             <span className="sr-only">Close sidebar</span>
             <PanelLeftClose className="w-6 h-6" />
@@ -340,7 +340,7 @@ const Sidebar: React.FC<SidebarProps> = ({ onClose, onToggle, onOpenSearch, clas
             </p>
           </div>
           <Button variant="ghost" size="sm" className="w-6 h-6 p-0 opacity-60 hover:opacity-100">
-            <ChevronDown className="w-4 h-4 text-gray-500" />
+            <ChevronDown className="w-4 h-4 text-[var(--text-tertiary)]" />
           </Button>
         </button>
       </div>

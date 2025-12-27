@@ -40,7 +40,7 @@ const TaskDetailDialog: React.FC<TaskDetailDialogProps> = ({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-[600px] bg-white">
         <DialogHeader>
-          <DialogTitle className="text-xl font-semibold text-gray-900">
+          <DialogTitle className="text-xl font-semibold text-[var(--text-primary)]">
             {task.title}
           </DialogTitle>
         </DialogHeader>
@@ -74,7 +74,7 @@ const TaskDetailDialog: React.FC<TaskDetailDialogProps> = ({
           {task.description && (
             <div>
               <h3 className="text-sm font-medium text-gray-700 mb-2">Description</h3>
-              <p className="text-gray-600 whitespace-pre-wrap">{task.description}</p>
+              <p className="text-[var(--text-secondary)] whitespace-pre-wrap">{task.description}</p>
             </div>
           )}
 
@@ -86,7 +86,7 @@ const TaskDetailDialog: React.FC<TaskDetailDialogProps> = ({
                 <Calendar className={`h-5 w-5 mt-0.5 ${isOverdue ? 'text-red-500' : 'text-gray-400'}`} aria-hidden="true" />
                 <div>
                   <p className="text-sm font-medium text-gray-700">Due Date</p>
-                  <p className={`text-sm ${isOverdue ? 'text-red-600 font-medium' : 'text-gray-600'}`}>
+                  <p className={`text-sm ${isOverdue ? 'text-[var(--error)] font-medium' : 'text-[var(--text-secondary)]'}`}>
                     {formatDate(task.due_date)}
                   </p>
                 </div>
@@ -98,7 +98,7 @@ const TaskDetailDialog: React.FC<TaskDetailDialogProps> = ({
               <Clock className="h-5 w-5 mt-0.5 text-gray-400" aria-hidden="true" />
               <div>
                 <p className="text-sm font-medium text-gray-700">Created</p>
-                <p className="text-sm text-gray-600">
+                <p className="text-sm text-[var(--text-secondary)]">
                   {formatDate(task.created_at)}
                 </p>
               </div>
@@ -109,7 +109,7 @@ const TaskDetailDialog: React.FC<TaskDetailDialogProps> = ({
               <Clock className="h-5 w-5 mt-0.5 text-gray-400" aria-hidden="true" />
               <div>
                 <p className="text-sm font-medium text-gray-700">Last Updated</p>
-                <p className="text-sm text-gray-600">
+                <p className="text-sm text-[var(--text-secondary)]">
                   {getRelativeTime(task.updated_at)}
                 </p>
               </div>
@@ -121,7 +121,7 @@ const TaskDetailDialog: React.FC<TaskDetailDialogProps> = ({
                 <User className="h-5 w-5 mt-0.5 text-gray-400" aria-hidden="true" />
                 <div>
                   <p className="text-sm font-medium text-gray-700">Project</p>
-                  <p className="text-sm text-gray-600 font-mono">
+                  <p className="text-sm text-[var(--text-secondary)] font-mono">
                     {task.project_id}
                   </p>
                 </div>

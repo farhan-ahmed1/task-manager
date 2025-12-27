@@ -139,7 +139,6 @@ const ProjectSharingDialog: React.FC<ProjectSharingDialogProps> = ({
         await loadMembers(); // Reload members after successful invite
       } catch (err) {
         // Error is handled by parent component
-        console.error('Failed to invite user:', err);
       }
     }
   };
@@ -150,7 +149,7 @@ const ProjectSharingDialog: React.FC<ProjectSharingDialogProps> = ({
         await onRemoveMember(member.user_id);
         await loadMembers(); // Reload members after removal
       } catch (err) {
-        console.error('Failed to remove member:', err);
+        // Error is handled by parent component
       }
     }
   };
@@ -162,7 +161,7 @@ const ProjectSharingDialog: React.FC<ProjectSharingDialogProps> = ({
       setCopySuccess(true);
       setTimeout(() => setCopySuccess(false), 2000);
     } catch (err) {
-      console.error('Failed to copy link:', err);
+      // Silently fail if clipboard access is denied
     }
   };
 
@@ -198,13 +197,13 @@ const ProjectSharingDialog: React.FC<ProjectSharingDialogProps> = ({
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-lg bg-white text-gray-900">
+      <DialogContent className="sm:max-w-lg bg-white text-[var(--text-primary)]">
         <DialogHeader>
-          <DialogTitle className="text-gray-900 flex items-center gap-2">
+          <DialogTitle className="text-[var(--text-primary)] flex items-center gap-2">
             <UserPlus className="h-5 w-5" />
             Share Project
           </DialogTitle>
-          <DialogDescription className="text-gray-600">
+          <DialogDescription className="text-[var(--text-secondary)]">
             Invite team members to collaborate on "{project.name}"
           </DialogDescription>
         </DialogHeader>
@@ -235,7 +234,7 @@ const ProjectSharingDialog: React.FC<ProjectSharingDialogProps> = ({
                     id="email"
                     type="email"
                     placeholder="Enter email address..."
-                    className={`pl-10 bg-white border-gray-300 text-gray-900 placeholder-gray-500 ${
+                    className={`pl-10 bg-white border-[var(--border)] text-[var(--text-primary)] placeholder-[var(--text-muted)] ${
                       errors.email ? 'border-red-500' : ''
                     }`}
                     {...register('email')}
@@ -257,16 +256,16 @@ const ProjectSharingDialog: React.FC<ProjectSharingDialogProps> = ({
                   onValueChange={(value: 'ADMIN' | 'MEMBER' | 'VIEWER') => setValue('role', value)}
                   disabled={isInviting}
                 >
-                  <SelectTrigger className="bg-white border-gray-300 text-gray-900">
+                  <SelectTrigger className="bg-white border-[var(--border)] text-[var(--text-primary)]">
                     <SelectValue placeholder="Select role" />
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="VIEWER">
                       <div className="flex items-center gap-2">
-                        <Eye className="h-4 w-4 text-gray-600" />
+                        <Eye className="h-4 w-4 text-[var(--text-secondary)]" />
                         <div>
                           <div className="font-medium">Viewer</div>
-                          <div className="text-xs text-gray-500">Can view project and tasks</div>
+                          <div className="text-xs text-[var(--text-secondary)]">Can view project and tasks</div>
                         </div>
                       </div>
                     </SelectItem>
@@ -275,7 +274,7 @@ const ProjectSharingDialog: React.FC<ProjectSharingDialogProps> = ({
                         <User className="h-4 w-4 text-success" />
                         <div>
                           <div className="font-medium">Member</div>
-                          <div className="text-xs text-gray-500">Can create and edit tasks</div>
+                          <div className="text-xs text-[var(--text-secondary)]">Can create and edit tasks</div>
                         </div>
                       </div>
                     </SelectItem>
@@ -284,7 +283,7 @@ const ProjectSharingDialog: React.FC<ProjectSharingDialogProps> = ({
                         <Shield className="h-4 w-4 text-info" />
                         <div>
                           <div className="font-medium">Admin</div>
-                          <div className="text-xs text-gray-500">Can manage project and members</div>
+                          <div className="text-xs text-[var(--text-secondary)]">Can manage project and members</div>
                         </div>
                       </div>
                     </SelectItem>
@@ -296,7 +295,7 @@ const ProjectSharingDialog: React.FC<ProjectSharingDialogProps> = ({
             {/* Invite Button */}
             <Button
               type="submit"
-              className="w-full bg-gray-900 text-white hover:bg-gray-800"
+              className="w-full bg-[var(--text-primary)] text-white hover:bg-[var(--text-primary)]/90"
               disabled={isInviting}
             >
               {isInviting && <ButtonSpinner />}
@@ -304,7 +303,7 @@ const ProjectSharingDialog: React.FC<ProjectSharingDialogProps> = ({
             </Button>
           </form>
 
-          <hr className="border-gray-200" />
+          <hr className="border-[var(--border)]" />
 
           {/* Quick Share Link */}
           <div className="space-y-2">
@@ -313,13 +312,13 @@ const ProjectSharingDialog: React.FC<ProjectSharingDialogProps> = ({
               <Input
                 value={`${window.location.origin}/projects/join/${project.id}`}
                 readOnly
-                className="bg-gray-50 border-gray-300 text-gray-700 text-xs"
+                className="bg-[var(--bg-secondary)] border-[var(--border)] text-gray-700 text-xs"
               />
               <Button
                 variant="outline"
                 size="sm"
                 onClick={copyInviteLink}
-                className="border-gray-300 text-gray-700 hover:bg-gray-50"
+                className="border-[var(--border)] text-gray-700 hover:bg-[var(--bg-secondary)]"
               >
                 {copySuccess ? (
                   <Check className="h-4 w-4 text-success" />
@@ -328,12 +327,12 @@ const ProjectSharingDialog: React.FC<ProjectSharingDialogProps> = ({
                 )}
               </Button>
             </div>
-            <p className="text-xs text-gray-500">
+            <p className="text-xs text-[var(--text-secondary)]">
               Share this link to invite members with default MEMBER role
             </p>
           </div>
 
-          <hr className="border-gray-200" />
+          <hr className="border-[var(--border)]" />
 
           {/* Current Members */}
           <div className="space-y-3">
@@ -354,17 +353,17 @@ const ProjectSharingDialog: React.FC<ProjectSharingDialogProps> = ({
                   {members.map((member) => (
                     <div
                       key={member.id}
-                      className="flex items-center justify-between p-2 bg-gray-50 rounded-lg"
+                      className="flex items-center justify-between p-2 bg-[var(--bg-secondary)] rounded-lg"
                     >
                       <div className="flex items-center gap-3">
                         <div className="flex items-center gap-2">
                           {getRoleIcon(member.role)}
                           <div>
-                            <div className="text-sm font-medium text-gray-900">
+                            <div className="text-sm font-medium text-[var(--text-primary)]">
                               {member.user_name || member.user_email}
                             </div>
                             {member.user_name && (
-                              <div className="text-xs text-gray-500">
+                              <div className="text-xs text-[var(--text-secondary)]">
                                 {member.user_email}
                               </div>
                             )}
@@ -389,7 +388,7 @@ const ProjectSharingDialog: React.FC<ProjectSharingDialogProps> = ({
                     </div>
                   ))}
                   {members.length === 0 && (
-                    <p className="text-sm text-gray-500 text-center py-4">
+                    <p className="text-sm text-[var(--text-secondary)] text-center py-4">
                       No members found
                     </p>
                   )}

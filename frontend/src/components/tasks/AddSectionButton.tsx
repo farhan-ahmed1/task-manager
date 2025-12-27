@@ -55,7 +55,7 @@ const AddSectionButton: React.FC<AddSectionButtonProps> = ({
             onChange={(e) => setSectionName(e.target.value)}
             onKeyDown={handleKeyDown}
             placeholder="Section name"
-            className="w-full px-3 py-2 text-sm focus:outline-none mb-3 bg-transparent border-b border-gray-300 focus:border-blue-500"
+            className="w-full px-3 py-2 text-sm focus:outline-none mb-3 bg-transparent border-b border-[var(--border)] focus:border-blue-500"
             style={{ fontSize: '14px' }}
           />
           <div className="flex items-center space-x-2">
@@ -68,7 +68,7 @@ const AddSectionButton: React.FC<AddSectionButtonProps> = ({
             </button>
             <button
               onClick={handleCancel}
-              className="px-4 py-2 text-sm font-medium text-gray-600 hover:text-gray-800 hover:bg-gray-100 rounded-md transition-colors"
+              className="px-4 py-2 text-sm font-medium text-[var(--text-secondary)] hover:text-gray-800 hover:bg-[var(--bg-tertiary)] rounded-md transition-colors"
             >
               Cancel
             </button>
@@ -85,11 +85,11 @@ const AddSectionButton: React.FC<AddSectionButtonProps> = ({
         disabled={disabled}
         className="w-full relative flex items-center hover:opacity-80 transition-opacity duration-200 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
       >
-        <div className="flex-grow border-t border-blue-300"></div>
-        <span className="flex-shrink-0 px-4 text-sm text-blue-600 bg-white font-semibold">
+        <div className="flex-grow border-t border-[var(--border-focus)]"></div>
+        <span className="flex-shrink-0 px-4 text-sm text-[var(--primary)] bg-white font-semibold">
           Add section
         </span>
-        <div className="flex-grow border-t border-blue-300"></div>
+        <div className="flex-grow border-t border-[var(--border-focus)]"></div>
       </button>
     </div>
   );

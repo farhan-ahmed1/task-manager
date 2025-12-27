@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Plus, Edit2, Check, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { Spinner } from '@/components/ui/spinner';
 import { EmptyState } from '@/components/ui/empty-state';
 import InboxTaskItem from '@/components/tasks/InboxTaskItem';
 import InlineAddTask from '@/components/tasks/InlineAddTask';
@@ -433,8 +434,7 @@ const ProjectTasksLayout: React.FC<ProjectTasksLayoutProps> = ({
     return (
       <div className="max-w-5xl mx-auto p-6">
         <div className="flex items-center justify-center py-12">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2" 
-               style={{ borderColor: 'var(--primary)' }} />
+          <Spinner size="lg" text="Loading..." />
         </div>
       </div>
     );
@@ -456,7 +456,7 @@ const ProjectTasksLayout: React.FC<ProjectTasksLayoutProps> = ({
                 type="text"
                 value={editingTitle}
                 onChange={(e) => setEditingTitle(e.target.value)}
-                className="text-lg sm:text-xl md:text-2xl font-bold bg-transparent border-none outline-none focus:bg-white focus:border focus:border-blue-300 focus:rounded px-2 py-1"
+                className="text-lg sm:text-xl md:text-2xl font-bold bg-transparent border-none outline-none focus:bg-white focus:border focus:border-[var(--border-focus)] focus:rounded px-2 py-1"
                 style={{ color: 'var(--text-primary)' }}
                 onKeyDown={(e) => {
                   if (e.key === 'Enter') {
@@ -493,7 +493,7 @@ const ProjectTasksLayout: React.FC<ProjectTasksLayoutProps> = ({
                 <Button
                   variant="ghost"
                   size="sm"
-                  className="p-1 h-auto hover:bg-blue-50 opacity-0 group-hover:opacity-100 transition-opacity ml-2"
+                  className="p-1 h-auto hover:bg-[var(--primary-light)] opacity-0 group-hover:opacity-100 transition-opacity ml-2"
                   onClick={() => setIsEditingTitle(true)}
                 >
                   <Edit2 className="w-4 h-4" style={{ color: 'var(--text-muted)' }} />

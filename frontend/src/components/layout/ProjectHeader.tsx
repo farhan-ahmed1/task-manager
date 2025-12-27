@@ -80,7 +80,7 @@ const ProjectHeader: React.FC<ProjectHeaderProps> = ({
         variant="ghost"
         size="sm"
         onClick={onShare}
-        className="gap-2 text-gray-600 hover:text-gray-900"
+        className="gap-2 text-[var(--text-secondary)] hover:text-[var(--text-primary)]"
       >
         <User className="w-4 h-4" />
         <span className="hidden sm:inline">Share</span>
@@ -104,8 +104,8 @@ const ProjectHeader: React.FC<ProjectHeaderProps> = ({
                 onClick={() => handleLayoutChange('list')}
                 className={`flex flex-col items-center gap-2 p-3 rounded-lg border-2 transition-colors ${
                   viewOptions.layout === 'list' 
-                    ? 'border-blue-500 bg-blue-50' 
-                    : 'border-gray-200 hover:border-gray-300'
+                    ? 'border-blue-500 bg-[var(--primary-light)]' 
+                    : 'border-[var(--border)] hover:border-[var(--border)]'
                 }`}
               >
                 <List className="w-6 h-6" />
@@ -115,8 +115,8 @@ const ProjectHeader: React.FC<ProjectHeaderProps> = ({
                 onClick={() => handleLayoutChange('board')}
                 className={`flex flex-col items-center gap-2 p-3 rounded-lg border-2 transition-colors ${
                   viewOptions.layout === 'board' 
-                    ? 'border-blue-500 bg-blue-50' 
-                    : 'border-gray-200 hover:border-gray-300'
+                    ? 'border-blue-500 bg-[var(--primary-light)]' 
+                    : 'border-[var(--border)] hover:border-[var(--border)]'
                 }`}
               >
                 <Columns className="w-6 h-6" />
@@ -126,8 +126,8 @@ const ProjectHeader: React.FC<ProjectHeaderProps> = ({
                 onClick={() => handleLayoutChange('calendar')}
                 className={`flex flex-col items-center gap-2 p-3 rounded-lg border-2 transition-colors relative ${
                   viewOptions.layout === 'calendar' 
-                    ? 'border-blue-500 bg-blue-50' 
-                    : 'border-gray-200 hover:border-gray-300'
+                    ? 'border-blue-500 bg-[var(--primary-light)]' 
+                    : 'border-[var(--border)] hover:border-[var(--border)]'
                 }`}
               >
                 <div className="relative">
@@ -171,11 +171,11 @@ const ProjectHeader: React.FC<ProjectHeaderProps> = ({
             
             <div className="space-y-3">
               <div>
-                <label className="text-xs font-medium text-gray-600 mb-2 block">Grouping</label>
+                <label className="text-xs font-medium text-[var(--text-secondary)] mb-2 block">Grouping</label>
                 <select 
                   value={viewOptions.groupBy}
                   onChange={(e) => handleViewOptionsChange('groupBy', e.target.value)}
-                  className="w-full p-2 text-sm border border-gray-200 rounded-md bg-white"
+                  className="w-full p-2 text-sm border border-[var(--border)] rounded-md bg-white"
                 >
                   <option value="default">None (default)</option>
                   <option value="date">Date</option>
@@ -185,11 +185,11 @@ const ProjectHeader: React.FC<ProjectHeaderProps> = ({
               </div>
               
               <div>
-                <label className="text-xs font-medium text-gray-600 mb-2 block">Sorting</label>
+                <label className="text-xs font-medium text-[var(--text-secondary)] mb-2 block">Sorting</label>
                 <select 
                   value={viewOptions.sortBy}
                   onChange={(e) => handleViewOptionsChange('sortBy', e.target.value)}
-                  className="w-full p-2 text-sm border border-gray-200 rounded-md bg-white"
+                  className="w-full p-2 text-sm border border-[var(--border)] rounded-md bg-white"
                 >
                   <option value="manual">Manual (default)</option>
                   <option value="date">Date</option>
@@ -213,11 +213,11 @@ const ProjectHeader: React.FC<ProjectHeaderProps> = ({
             
             <div className="space-y-3">
               <div>
-                <label className="text-xs font-medium text-gray-600 mb-2 block">Date</label>
+                <label className="text-xs font-medium text-[var(--text-secondary)] mb-2 block">Date</label>
                 <select 
                   value={viewOptions.dateFilter}
                   onChange={(e) => handleViewOptionsChange('dateFilter', e.target.value)}
-                  className="w-full p-2 text-sm border border-gray-200 rounded-md bg-white"
+                  className="w-full p-2 text-sm border border-[var(--border)] rounded-md bg-white"
                 >
                   <option value="all">All (default)</option>
                   <option value="today">Today</option>
@@ -227,11 +227,11 @@ const ProjectHeader: React.FC<ProjectHeaderProps> = ({
               </div>
               
               <div>
-                <label className="text-xs font-medium text-gray-600 mb-2 block">Priority</label>
+                <label className="text-xs font-medium text-[var(--text-secondary)] mb-2 block">Priority</label>
                 <select 
                   value={viewOptions.priorityFilter}
                   onChange={(e) => handleViewOptionsChange('priorityFilter', e.target.value)}
-                  className="w-full p-2 text-sm border border-gray-200 rounded-md bg-white"
+                  className="w-full p-2 text-sm border border-[var(--border)] rounded-md bg-white"
                 >
                   <option value="all">All (default)</option>
                   <option value="high">High</option>

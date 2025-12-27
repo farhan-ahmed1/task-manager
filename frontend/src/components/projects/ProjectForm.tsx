@@ -8,8 +8,7 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import { Alert } from '@/components/ui/alert';
-import { AlertCircle } from 'lucide-react';
-import { ButtonSpinner } from '@/components/ui/spinner';
+import { AlertCircle, Loader2 } from 'lucide-react';
 import type { Project, CreateProjectRequest, UpdateProjectRequest } from '@/types/api';
 
 // Form validation schema
@@ -63,9 +62,9 @@ const ProjectForm: React.FC<ProjectFormProps> = ({
       await onSubmit(data);
       reset();
       onClose();
-    } catch (err) {
+      
+    } catch {
       // Error is handled by parent component
-      console.error('Form submission error:', err);
     }
   };
 
@@ -86,12 +85,12 @@ const ProjectForm: React.FC<ProjectFormProps> = ({
 
   return (
     <Dialog open={isOpen} onOpenChange={handleClose}>
-      <DialogContent className="sm:max-w-md bg-white/95 backdrop-blur-sm border-slate-200/60 text-slate-900 rounded-xl">
+      <DialogContent className="sm:max-w-md bg-white/95 backdrop-blur-sm border-[var(--border)] text-[var(--text-primary)] rounded-xl">
         <DialogHeader className="space-y-3">
-          <DialogTitle className="text-xl font-semibold text-slate-900">
+          <DialogTitle className="text-xl font-semibold text-[var(--text-primary)]">
             {isEditMode ? 'Edit Project' : 'Create New Project'}
           </DialogTitle>
-          <DialogDescription className="text-slate-600 leading-relaxed">
+          <DialogDescription className="text-[var(--text-secondary)] leading-relaxed">
             {isEditMode 
               ? 'Update your project details below to keep everything organized.'
               : 'Create a new project to organize your tasks and boost productivity.'
@@ -113,7 +112,7 @@ const ProjectForm: React.FC<ProjectFormProps> = ({
 
           {/* Project Name */}
           <div className="space-y-3">
-            <Label htmlFor="name" className="text-slate-700 font-medium text-sm">
+            <Label htmlFor="name" className="text-[var(--text-secondary)] font-medium text-sm">
               Project Name
             </Label>
             <Input
@@ -122,7 +121,7 @@ const ProjectForm: React.FC<ProjectFormProps> = ({
               placeholder="Enter a descriptive project name..."
               {...register('name')}
               disabled={isSubmitting}
-              className={`bg-white/90 border-slate-300 text-slate-900 placeholder-slate-400 rounded-lg transition-all duration-200 focus:bg-white focus:border-primary focus:ring-2 focus:ring-primary/20 ${
+              className={`bg-white/90 border-[var(--border)] text-[var(--text-primary)] placeholder-slate-400 rounded-lg transition-all duration-200 focus:bg-white focus:border-primary focus:ring-2 focus:ring-primary/20 ${
                 errors.name ? 'border-error focus:border-error focus:ring-error/20' : ''
               }`}
             />
@@ -136,16 +135,16 @@ const ProjectForm: React.FC<ProjectFormProps> = ({
 
           {/* Project Description */}
           <div className="space-y-3">
-            <Label htmlFor="description" className="text-slate-700 font-medium text-sm">
-              Description <span className="text-slate-500 font-normal">(Optional)</span>
+            <Label htmlFor="description" className="text-[var(--text-secondary)] font-medium text-sm">
+              Description <span className="text-[var(--text-tertiary)] font-normal">(Optional)</span>
             </Label>
             <Textarea
               id="description"
-              placeholder="Describe what this project is about..."
-              rows={3}
+              placeholder="Add project details, goals, or notes..."
+              rows={4}
               {...register('description')}
               disabled={isSubmitting}
-              className={`bg-white/90 border-slate-300 text-slate-900 placeholder-slate-400 rounded-lg transition-all duration-200 focus:bg-white focus:border-primary focus:ring-2 focus:ring-primary/20 resize-none ${
+              className={`bg-white/90 border-[var(--border)] text-[var(--text-primary)] placeholder-[var(--text-muted)] rounded-lg transition-all duration-200 focus:bg-white focus:border-primary focus:ring-2 focus:ring-primary/20 resize-none ${
                 errors.description ? 'border-error focus:border-error focus:ring-error/20' : ''
               }`}
             />
@@ -158,13 +157,13 @@ const ProjectForm: React.FC<ProjectFormProps> = ({
           </div>
 
           {/* Form Actions */}
-          <div className="flex justify-end space-x-3 pt-4 border-t border-slate-200">
+          <div className="flex justify-end space-x-3 pt-4 border-t border-[var(--border)]">
             <Button
               type="button"
               variant="outline"
               onClick={handleClose}
               disabled={isSubmitting}
-              className="border-slate-300 text-slate-700 hover:bg-slate-50 hover:border-slate-400 rounded-lg px-4 py-2"
+              className="border-[var(--border)] text-[var(--text-secondary)] hover:bg-[var(--bg-secondary)] hover:border-[var(--border)] rounded-lg px-4 py-2"
             >
               Cancel
             </Button>

@@ -55,7 +55,7 @@ const TaskFilters: React.FC<TaskFiltersProps> = ({
   const currentSortLabel = sortOptions.find(opt => opt.value === sortBy)?.label || 'Created Date';
 
   return (
-    <div className="bg-white/80 backdrop-blur-sm rounded-2xl p-6 border border-slate-200/60 shadow-sm">
+    <div className="bg-white/80 backdrop-blur-sm rounded-2xl p-6 border border-[var(--border)]/60 shadow-sm">
       <div className="flex flex-col lg:flex-row gap-4">
         {/* Search */}
         <div className="flex-1 relative">
@@ -64,7 +64,7 @@ const TaskFilters: React.FC<TaskFiltersProps> = ({
             placeholder="Search tasks by title or description..."
             value={search}
             onChange={(e) => onSearchChange(e.target.value)}
-            className="pl-12 h-12 bg-slate-50/50 border-slate-200 text-slate-900 placeholder-slate-500 rounded-xl focus:bg-white focus:border-blue-300 focus:ring-2 focus:ring-blue-100 transition-all"
+            className="pl-12 h-12 bg-[var(--bg-secondary)]/50 border-[var(--border)] text-[var(--text-primary)] placeholder-[var(--text-muted)] rounded-xl focus:bg-white focus:border-[var(--border-focus)] focus:ring-2 focus:ring-blue-100 transition-all"
           />
         </div>
 
@@ -75,14 +75,14 @@ const TaskFilters: React.FC<TaskFiltersProps> = ({
               value={status || 'all'}
               onValueChange={(value: string) => onStatusChange(value === 'all' ? undefined : value as TaskStatus)}
             >
-              <SelectTrigger className="h-12 bg-slate-50/50 border-slate-200 text-slate-900 rounded-xl hover:bg-white hover:border-slate-300 transition-all">
+              <SelectTrigger className="h-12 bg-[var(--bg-secondary)]/50 border-[var(--border)] text-[var(--text-primary)] rounded-xl hover:bg-white hover:border-[var(--border)] transition-all">
                 <SelectValue placeholder="All Status" />
               </SelectTrigger>
-              <SelectContent className="bg-white/95 backdrop-blur-sm border-slate-200/60 rounded-xl z-50">
-                <SelectItem value="all" className="text-slate-900 hover:bg-slate-50 rounded-lg">All Status</SelectItem>
-                <SelectItem value="PENDING" className="text-slate-900 hover:bg-slate-50 rounded-lg">📋 Pending</SelectItem>
-                <SelectItem value="IN_PROGRESS" className="text-slate-900 hover:bg-slate-50 rounded-lg">🚀 In Progress</SelectItem>
-                <SelectItem value="COMPLETED" className="text-slate-900 hover:bg-slate-50 rounded-lg">✅ Completed</SelectItem>
+              <SelectContent className="bg-white/95 backdrop-blur-sm border-[var(--border)]/60 rounded-xl z-50">
+                <SelectItem value="all" className="text-[var(--text-primary)] hover:bg-[var(--bg-secondary)] rounded-lg">All Status</SelectItem>
+                <SelectItem value="PENDING" className="text-[var(--text-primary)] hover:bg-[var(--bg-secondary)] rounded-lg">📋 Pending</SelectItem>
+                <SelectItem value="IN_PROGRESS" className="text-[var(--text-primary)] hover:bg-[var(--bg-secondary)] rounded-lg">🚀 In Progress</SelectItem>
+                <SelectItem value="COMPLETED" className="text-[var(--text-primary)] hover:bg-[var(--bg-secondary)] rounded-lg">✅ Completed</SelectItem>
               </SelectContent>
             </Select>
           </div>
@@ -93,14 +93,14 @@ const TaskFilters: React.FC<TaskFiltersProps> = ({
               value={priority || 'all'}
               onValueChange={(value: string) => onPriorityChange(value === 'all' ? undefined : value as TaskPriority)}
             >
-              <SelectTrigger className="h-12 bg-slate-50/50 border-slate-200 text-slate-900 rounded-xl hover:bg-white hover:border-slate-300 transition-all">
+              <SelectTrigger className="h-12 bg-[var(--bg-secondary)]/50 border-[var(--border)] text-[var(--text-primary)] rounded-xl hover:bg-white hover:border-[var(--border)] transition-all">
                 <SelectValue placeholder="All Priority" />
               </SelectTrigger>
-              <SelectContent className="bg-white/95 backdrop-blur-sm border-slate-200/60 rounded-xl z-50">
-                <SelectItem value="all" className="text-slate-900 hover:bg-slate-50 rounded-lg">All Priority</SelectItem>
-                <SelectItem value="HIGH" className="text-slate-900 hover:bg-slate-50 rounded-lg">🔴 High Priority</SelectItem>
-                <SelectItem value="MEDIUM" className="text-slate-900 hover:bg-slate-50 rounded-lg">🟡 Medium Priority</SelectItem>
-                <SelectItem value="LOW" className="text-slate-900 hover:bg-slate-50 rounded-lg">🟢 Low Priority</SelectItem>
+              <SelectContent className="bg-white/95 backdrop-blur-sm border-[var(--border)]/60 rounded-xl z-50">
+                <SelectItem value="all" className="text-[var(--text-primary)] hover:bg-[var(--bg-secondary)] rounded-lg">All Priority</SelectItem>
+                <SelectItem value="HIGH" className="text-[var(--text-primary)] hover:bg-[var(--bg-secondary)] rounded-lg">🔴 High Priority</SelectItem>
+                <SelectItem value="MEDIUM" className="text-[var(--text-primary)] hover:bg-[var(--bg-secondary)] rounded-lg">🟡 Medium Priority</SelectItem>
+                <SelectItem value="LOW" className="text-[var(--text-primary)] hover:bg-[var(--bg-secondary)] rounded-lg">🟢 Low Priority</SelectItem>
               </SelectContent>
             </Select>
           </div>
@@ -111,25 +111,25 @@ const TaskFilters: React.FC<TaskFiltersProps> = ({
               <Button 
                 variant="outline" 
                 size="default" 
-                className="h-12 min-w-[140px] bg-slate-50/50 border-slate-200 text-slate-900 hover:bg-white hover:border-slate-300 rounded-xl transition-all"
+                className="h-12 min-w-[140px] bg-[var(--bg-secondary)]/50 border-[var(--border)] text-[var(--text-primary)] hover:bg-white hover:border-[var(--border)] rounded-xl transition-all"
               >
                 <SortAsc className="mr-2 h-4 w-4" />
                 {currentSortLabel}
                 {sortOrder === 'desc' ? ' ↓' : ' ↑'}
               </Button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="w-52 bg-white/95 backdrop-blur-sm border-slate-200/60 rounded-xl z-50">
+            <DropdownMenuContent align="end" className="w-52 bg-white/95 backdrop-blur-sm border-[var(--border)]/60 rounded-xl z-50">
               {sortOptions.map((option) => (
                 <React.Fragment key={option.value}>
                   <DropdownMenuItem
                     onClick={() => onSortChange(option.value, 'desc')}
-                    className={`text-slate-900 hover:bg-slate-50 rounded-lg ${sortBy === option.value && sortOrder === 'desc' ? 'bg-blue-50 text-blue-900' : ''}`}
+                    className={`text-[var(--text-primary)] hover:bg-[var(--bg-secondary)] rounded-lg ${sortBy === option.value && sortOrder === 'desc' ? 'bg-[var(--primary-light)] text-[var(--primary-dark)]' : ''}`}
                   >
                     {option.label} (Newest First)
                   </DropdownMenuItem>
                   <DropdownMenuItem
                     onClick={() => onSortChange(option.value, 'asc')}
-                    className={`text-slate-900 hover:bg-slate-50 rounded-lg ${sortBy === option.value && sortOrder === 'asc' ? 'bg-blue-50 text-blue-900' : ''}`}
+                    className={`text-[var(--text-primary)] hover:bg-[var(--bg-secondary)] rounded-lg ${sortBy === option.value && sortOrder === 'asc' ? 'bg-[var(--primary-light)] text-[var(--primary-dark)]' : ''}`}
                   >
                     {option.label} (Oldest First)
                   </DropdownMenuItem>
@@ -144,7 +144,7 @@ const TaskFilters: React.FC<TaskFiltersProps> = ({
               variant="ghost" 
               size="default" 
               onClick={onClearFilters}
-              className="h-12 px-4 text-slate-600 hover:text-slate-900 hover:bg-slate-100 rounded-xl transition-all"
+              className="h-12 px-4 text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-tertiary)] rounded-xl transition-all"
             >
               <Filter className="mr-2 h-4 w-4" />
               Clear All
@@ -155,11 +155,11 @@ const TaskFilters: React.FC<TaskFiltersProps> = ({
 
       {/* Active Filters Display */}
       {hasActiveFilters && (
-        <div className="mt-4 pt-4 border-t border-slate-200/60">
+        <div className="mt-4 pt-4 border-t border-[var(--border)]/60">
           <div className="flex flex-wrap gap-2 items-center">
-            <span className="text-sm text-slate-600 font-medium">Active filters:</span>
+            <span className="text-sm text-[var(--text-secondary)] font-medium">Active filters:</span>
             {search && (
-              <span className="inline-flex items-center gap-1 px-3 py-1 bg-blue-100 text-blue-800 text-xs font-medium rounded-full">
+              <span className="inline-flex items-center gap-1 px-3 py-1 bg-[var(--primary-light)] text-blue-800 text-xs font-medium rounded-full">
                 Search: "{search}"
               </span>
             )}

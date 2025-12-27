@@ -28,12 +28,12 @@ const ProjectStatsView: React.FC<ProjectStatsViewProps> = ({
               variant="ghost"
               size="sm"
               onClick={onBack}
-              className="text-slate-600 hover:text-slate-900"
+              className="text-[var(--text-secondary)] hover:text-[var(--text-primary)]"
             >
               <ArrowLeft className="h-4 w-4 mr-2" />
               Back to Projects
             </Button>
-            <div className="h-4 w-px bg-slate-300" />
+            <div className="h-4 w-px bg-[var(--border)]" />
             <div>
               <div className="text-xl font-semibold" style={{ color: 'var(--text-primary)' }}>
                 {project.name}
@@ -44,9 +44,9 @@ const ProjectStatsView: React.FC<ProjectStatsViewProps> = ({
         </div>
 
         {/* Stats Content - Placeholder */}
-        <div className="text-center py-16 bg-gradient-to-br from-slate-50 to-blue-50 rounded-2xl border border-slate-200/60">
+        <div className="text-center py-16 bg-gradient-to-br from-[var(--bg-secondary)] to-[var(--primary-light)] rounded-2xl border border-[var(--border)]">
           <div className="max-w-md mx-auto">
-            <BarChart3 className="h-16 w-16 text-slate-400 mx-auto mb-4" />
+            <BarChart3 className="h-16 w-16 text-[var(--text-muted)] mx-auto mb-4" />
             <SectionTitle className="justify-center mb-2">
               Project Analytics
             </SectionTitle>

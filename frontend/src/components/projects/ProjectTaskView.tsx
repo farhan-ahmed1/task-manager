@@ -4,6 +4,7 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { ScrollArea } from '@/components/ui/scroll-area';
+import { Spinner } from '@/components/ui/spinner';
 import { EmptyState } from '@/components/ui/empty-state';
 import { Plus, Calendar, Clock, CheckCircle2, Circle, AlertCircle } from 'lucide-react';
 import type { Project, Task, TaskStatus } from '@/types/api';
@@ -72,7 +73,7 @@ const ProjectTaskView: React.FC<ProjectTaskViewProps> = ({
 
   const TaskItem: React.FC<{ task: Task }> = ({ task }) => (
     <Card 
-      className="cursor-pointer hover:bg-gray-50 transition-colors"
+      className="cursor-pointer hover:bg-[var(--bg-secondary)] transition-colors"
       onClick={() => onEditTask?.(task)}
     >
       <CardContent className="p-4">
@@ -117,8 +118,7 @@ const ProjectTaskView: React.FC<ProjectTaskViewProps> = ({
       <Card className={className}>
         <CardContent className="p-8">
           <div className="text-center">
-            <div className="animate-spin h-8 w-8 border-2 border-blue-600 border-t-transparent rounded-full mx-auto mb-4"></div>
-            <p className="text-muted-foreground">Loading tasks...</p>
+            <Spinner size="lg" text="Loading tasks..." />
           </div>
         </CardContent>
       </Card>
