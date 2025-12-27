@@ -51,7 +51,7 @@ const ActivitySection: React.FC<ActivitySectionProps> = ({
       <header>
         <div className="section_head__overflow_actions"></div>
         <h2>
-          <div className="_19abae45 a7c6de33 _194d8611 _1e964f8a c68f8bf6">
+          <div className="section-date-header">
             <Link to={`/search?date=${getSectionId(date)}`}>
               {formatSectionDate(date)}
             </Link>
