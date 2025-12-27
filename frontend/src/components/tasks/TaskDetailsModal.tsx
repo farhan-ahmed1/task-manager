@@ -158,9 +158,9 @@ const TaskDetailsModal: React.FC<TaskDetailsModalProps> = ({
         <div className="sticky top-0 bg-white border-b border-gray-200 px-6 py-4 flex items-center justify-between z-10">
           {/* Left: Breadcrumb */}
           <div className="flex items-center gap-2">
-            <FolderOpen className="h-4 w-4 text-gray-500" />
+            <FolderOpen className="h-4 w-4 text-[var(--text-tertiary)]" />
             <button 
-              className="text-sm font-medium text-gray-700 hover:text-gray-900 transition-colors"
+              className="text-sm font-medium text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors"
               onClick={() => onOpenChange(false)}
             >
               {projectName}

@@ -80,7 +80,7 @@ class ErrorBoundary extends Component<Props, State> {
             <CardHeader>
               <div className="flex items-center gap-3 mb-2">
                 <div className="p-2 bg-red-100 rounded-lg">
-                  <AlertCircle className="h-6 w-6 text-red-600" />
+                  <AlertCircle className="h-6 w-6 text-[var(--error)]" />
                 </div>
                 <div>
                   <CardTitle className="text-xl">Something went wrong</CardTitle>
@@ -93,29 +93,29 @@ class ErrorBoundary extends Component<Props, State> {
             
             <CardContent className="space-y-4">
               {this.state.error && (
-                <div className="p-4 bg-slate-50 rounded-lg border border-slate-200">
-                  <p className="text-sm font-medium text-slate-900 mb-2">
+                <div className="p-4 bg-[var(--bg-secondary)] rounded-lg border border-[var(--border)]">
+                  <p className="text-sm font-medium text-[var(--text-primary)] mb-2">
                     Error Details:
                   </p>
-                  <p className="text-sm text-red-600 font-mono">
+                  <p className="text-sm text-[var(--error)] font-mono">
                     {this.state.error.toString()}
                   </p>
                 </div>
               )}
               
               {process.env.NODE_ENV === 'development' && this.state.errorInfo && (
-                <details className="p-4 bg-slate-50 rounded-lg border border-slate-200">
-                  <summary className="text-sm font-medium text-slate-900 cursor-pointer mb-2">
+                <details className="p-4 bg-[var(--bg-secondary)] rounded-lg border border-[var(--border)]">
+                  <summary className="text-sm font-medium text-[var(--text-primary)] cursor-pointer mb-2">
                     Stack Trace (Development Only)
                   </summary>
-                  <pre className="text-xs text-slate-600 overflow-x-auto mt-2">
+                  <pre className="text-xs text-[var(--text-secondary)] overflow-x-auto mt-2">
                     {this.state.errorInfo.componentStack}
                   </pre>
                 </details>
               )}
 
-              <div className="p-4 bg-blue-50 rounded-lg border border-blue-200">
-                <p className="text-sm text-slate-700">
+              <div className="p-4 bg-[var(--info-light)] rounded-lg border border-[var(--border)]">
+                <p className="text-sm text-[var(--text-primary)]">
                   <strong>What you can do:</strong>
                 </p>
                 <ul className="text-sm text-slate-600 mt-2 space-y-1 list-disc list-inside">

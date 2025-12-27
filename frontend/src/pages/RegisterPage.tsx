@@ -118,7 +118,7 @@ const RegisterPage: React.FC = () => {
           <CardContent className="space-y-6 p-8">
             <form onSubmit={handleSubmit} className="space-y-6">
               {generalError && (
-                <div className="flex items-center gap-2 p-3 text-sm text-red-600 bg-red-50 border border-red-200 rounded-md">
+                <div className="flex items-center gap-2 p-3 text-sm text-[var(--error)] bg-[var(--error-light)] border border-red-200 rounded-md">
                   <AlertCircle className="w-4 h-4" />
                   {generalError}
                 </div>
@@ -140,7 +140,7 @@ const RegisterPage: React.FC = () => {
                   required
                 />
                 {errors.name && (
-                  <p className="text-sm text-red-600 flex items-center gap-1">
+                  <p className="text-sm text-[var(--error)] flex items-center gap-1">
                     <AlertCircle className="w-3 h-3" />
                     {errors.name}
                   </p>
@@ -163,7 +163,7 @@ const RegisterPage: React.FC = () => {
                   required
                 />
                 {errors.email && (
-                  <p className="text-sm text-red-600 flex items-center gap-1">
+                  <p className="text-sm text-[var(--error)] flex items-center gap-1">
                     <AlertCircle className="w-3 h-3" />
                     {errors.email}
                   </p>
@@ -186,7 +186,7 @@ const RegisterPage: React.FC = () => {
                   required
                 />
                 {errors.password && (
-                  <p className="text-sm text-red-600 flex items-center gap-1">
+                  <p className="text-sm text-[var(--error)] flex items-center gap-1">
                     <AlertCircle className="w-3 h-3" />
                     {errors.password}
                   </p>
@@ -209,7 +209,7 @@ const RegisterPage: React.FC = () => {
                   required
                 />
                 {errors.confirmPassword && (
-                  <p className="text-sm text-red-600 flex items-center gap-1">
+                  <p className="text-sm text-[var(--error)] flex items-center gap-1">
                     <AlertCircle className="w-3 h-3" />
                     {errors.confirmPassword}
                   </p>

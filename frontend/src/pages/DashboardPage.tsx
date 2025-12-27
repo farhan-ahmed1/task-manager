@@ -102,10 +102,10 @@ const DashboardPage: React.FC = () => {
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Completed</CardTitle>
-            <CheckCircle2 className="h-4 w-4 text-green-600" />
+            <CheckCircle2 className="h-4 w-4 text-[var(--success)]" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-green-600">{stats.completedTasks}</div>
+            <div className="text-2xl font-bold text-[var(--success)]">{stats.completedTasks}</div>
             <p className="text-xs text-muted-foreground">
               Tasks finished
             </p>
@@ -115,10 +115,10 @@ const DashboardPage: React.FC = () => {
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">In Progress</CardTitle>
-            <Clock className="h-4 w-4 text-blue-600" />
+            <Clock className="h-4 w-4 text-[var(--primary)]" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-blue-600">{stats.inProgressTasks}</div>
+            <div className="text-2xl font-bold text-[var(--primary)]">{stats.inProgressTasks}</div>
             <p className="text-xs text-muted-foreground">
               Currently working on
             </p>
@@ -157,15 +157,15 @@ const DashboardPage: React.FC = () => {
               <Progress value={stats.completionRate} className="h-3" />
               <div className="grid grid-cols-3 gap-4 text-center">
                 <div>
-                  <div className="text-lg font-bold text-gray-600">{stats.pendingTasks}</div>
+                  <div className="text-lg font-bold text-[var(--text-secondary)]">{stats.pendingTasks}</div>
                   <div className="text-xs text-muted-foreground">Pending</div>
                 </div>
                 <div>
-                  <div className="text-lg font-bold text-blue-600">{stats.inProgressTasks}</div>
+                  <div className="text-lg font-bold text-[var(--primary)]">{stats.inProgressTasks}</div>
                   <div className="text-xs text-muted-foreground">In Progress</div>
                 </div>
                 <div>
-                  <div className="text-lg font-bold text-green-600">{stats.completedTasks}</div>
+                  <div className="text-lg font-bold text-[var(--success)]">{stats.completedTasks}</div>
                   <div className="text-xs text-muted-foreground">Completed</div>
                 </div>
               </div>
@@ -206,7 +206,7 @@ const DashboardPage: React.FC = () => {
                   {recentTasks.map((task) => (
                     <div
                       key={task.id}
-                      className="flex items-start justify-between p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors cursor-pointer"
+                      className="flex items-start justify-between p-3 bg-[var(--bg-secondary)] rounded-lg hover:bg-[var(--bg-tertiary)] transition-colors cursor-pointer"
                       onClick={() => navigate('/tasks')}
                     >
                       <div className="flex-1 min-w-0">
@@ -231,7 +231,7 @@ const DashboardPage: React.FC = () => {
                           <span>{getRelativeTime(task.created_at)}</span>
                         </div>
                         {task.due_date && (
-                          <div className="text-xs text-orange-600 mt-1">
+                          <div className="text-xs text-[var(--warning)] mt-1">
                             Due: {new Date(task.due_date).toLocaleDateString()}
                           </div>
                         )}
@@ -276,7 +276,7 @@ const DashboardPage: React.FC = () => {
                     return (
                       <div
                         key={project.id}
-                        className="p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors cursor-pointer"
+                        className="p-3 bg-[var(--bg-secondary)] rounded-lg hover:bg-[var(--bg-tertiary)] transition-colors cursor-pointer"
                         onClick={() => navigate('/projects')}
                       >
                         <div className="flex items-start justify-between mb-2">

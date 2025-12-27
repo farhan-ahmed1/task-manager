@@ -65,9 +65,9 @@ const ProjectsPage: React.FC = () => {
   // Loading state
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50/30 to-slate-50">
+      <div className="min-h-screen bg-gradient-to-br from-[var(--bg-secondary)] via-[var(--primary-subtle)] to-[var(--bg-secondary)]">
         <div className="flex flex-col items-center justify-center py-20">
-          <div className="bg-white/80 backdrop-blur-sm rounded-2xl p-8 border border-slate-200/60 shadow-lg">
+          <div className="bg-white/80 backdrop-blur-sm rounded-2xl p-8 border border-[var(--border)] shadow-lg">
             <Spinner size="lg" text="Loading your projects..." />
           </div>
         </div>

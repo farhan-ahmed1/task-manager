@@ -206,14 +206,14 @@ const ProfilePage: React.FC = () => {
           <CardContent className="space-y-6">
             <form onSubmit={handleProfileSubmit} className="space-y-4">
               {profileGeneralError && (
-                <div className="flex items-center gap-2 p-3 text-sm text-red-600 bg-red-50 border border-red-200 rounded-md">
+                <div className="flex items-center gap-2 p-3 text-sm text-[var(--error)] bg-[var(--error-light)] border border-red-200 rounded-md">
                   <AlertCircle className="w-4 h-4" />
                   {profileGeneralError}
                 </div>
               )}
               
               {profileSuccessMessage && (
-                <div className="flex items-center gap-2 p-3 text-sm text-green-600 bg-green-50 border border-green-200 rounded-md">
+                <div className="flex items-center gap-2 p-3 text-sm text-[var(--success)] bg-[var(--success-light)] border border-green-200 rounded-md">
                   <CheckCircle className="w-4 h-4" />
                   {profileSuccessMessage}
                 </div>
@@ -235,7 +235,7 @@ const ProfilePage: React.FC = () => {
                   required
                 />
                 {profileErrors.name && (
-                  <p className="text-sm text-red-600 flex items-center gap-1">
+                  <p className="text-sm text-[var(--error)] flex items-center gap-1">
                     <AlertCircle className="w-3 h-3" />
                     {profileErrors.name}
                   </p>
@@ -258,7 +258,7 @@ const ProfilePage: React.FC = () => {
                   required
                 />
                 {profileErrors.email && (
-                  <p className="text-sm text-red-600 flex items-center gap-1">
+                  <p className="text-sm text-[var(--error)] flex items-center gap-1">
                     <AlertCircle className="w-3 h-3" />
                     {profileErrors.email}
                   </p>
@@ -300,14 +300,14 @@ const ProfilePage: React.FC = () => {
           <CardContent className="space-y-6">
             <form onSubmit={handlePasswordSubmit} className="space-y-4">
               {passwordGeneralError && (
-                <div className="flex items-center gap-2 p-3 text-sm text-red-600 bg-red-50 border border-red-200 rounded-md">
+                <div className="flex items-center gap-2 p-3 text-sm text-[var(--error)] bg-[var(--error-light)] border border-red-200 rounded-md">
                   <AlertCircle className="w-4 h-4" />
                   {passwordGeneralError}
                 </div>
               )}
               
               {passwordSuccessMessage && (
-                <div className="flex items-center gap-2 p-3 text-sm text-green-600 bg-green-50 border border-green-200 rounded-md">
+                <div className="flex items-center gap-2 p-3 text-sm text-[var(--success)] bg-[var(--success-light)] border border-green-200 rounded-md">
                   <CheckCircle className="w-4 h-4" />
                   {passwordSuccessMessage}
                 </div>
@@ -329,7 +329,7 @@ const ProfilePage: React.FC = () => {
                   required
                 />
                 {passwordErrors.currentPassword && (
-                  <p className="text-sm text-red-600 flex items-center gap-1">
+                  <p className="text-sm text-[var(--error)] flex items-center gap-1">
                     <AlertCircle className="w-3 h-3" />
                     {passwordErrors.currentPassword}
                   </p>
@@ -352,7 +352,7 @@ const ProfilePage: React.FC = () => {
                   required
                 />
                 {passwordErrors.newPassword && (
-                  <p className="text-sm text-red-600 flex items-center gap-1">
+                  <p className="text-sm text-[var(--error)] flex items-center gap-1">
                     <AlertCircle className="w-3 h-3" />
                     {passwordErrors.newPassword}
                   </p>
@@ -375,7 +375,7 @@ const ProfilePage: React.FC = () => {
                   required
                 />
                 {passwordErrors.confirmNewPassword && (
-                  <p className="text-sm text-red-600 flex items-center gap-1">
+                  <p className="text-sm text-[var(--error)] flex items-center gap-1">
                     <AlertCircle className="w-3 h-3" />
                     {passwordErrors.confirmNewPassword}
                   </p>
@@ -407,7 +407,7 @@ const ProfilePage: React.FC = () => {
       {/* Account Actions */}
       <Card className="card-hover mt-8">
         <CardHeader>
-          <CardTitle className="text-red-600">Danger Zone</CardTitle>
+          <CardTitle className="text-[var(--error)]">Danger Zone</CardTitle>
           <CardDescription>
             Actions that cannot be undone
           </CardDescription>
@@ -416,7 +416,7 @@ const ProfilePage: React.FC = () => {
           <div className="flex flex-col sm:flex-row gap-4">
             <Button 
               variant="outline" 
-              className="border-red-200 text-red-600 hover:bg-red-50 hover:text-red-700 hover:border-red-300"
+              className="border-red-200 text-[var(--error)] hover:bg-[var(--error-light)] hover:text-[var(--error)] hover:border-red-300"
               onClick={handleLogout}
             >
               Sign Out of Account

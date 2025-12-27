@@ -52,7 +52,7 @@ const IndividualProjectPage: React.FC = () => {
           </p>
           <button 
             onClick={() => navigate('/projects')}
-            className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg transition-colors"
+            className="bg-[var(--primary)] hover:bg-[var(--primary-dark)] text-white px-4 py-2 rounded-lg transition-colors"
           >
             Back to Projects
           </button>
