@@ -1,125 +1,90 @@
 import { create } from 'zustand';
 import { devtools } from 'zustand/middleware';
-import type { Task, Project } from '@/types/api';
 
-interface TaskStore {
-  tasks: Task[];
-  selectedTask: Task | null;
-  isLoading: boolean;
-  error: string | null;
+/**
+ * UI State Store
+ * 
+ * This store ONLY manages UI-specific state, NOT server data.
+ * Server data (tasks, projects) is managed by React Query hooks.
+ * 
+ * Use this store for:
+ * - Selected items (for UI highlighting/navigation)
+ * - Modal/dialog open states
+ * - UI preferences (themes, layout modes, etc.)
+ * - Temporary UI flags
+ */
 
+interface UIStore {
+  // Selected items for UI purposes only
+  selectedTaskId: string | null;
+  selectedProjectId: string | null;
+  
+  // UI view modes
+  sidebarCollapsed: boolean;
+  viewMode: 'list' | 'board' | 'calendar';
+  
   // Actions
-  setTasks: (tasks: Task[]) => void;
-  addTask: (task: Task) => void;
-  updateTask: (taskId: string, updates: Partial<Task>) => void;
-  removeTask: (taskId: string) => void;
-  setSelectedTask: (task: Task | null) => void;
-  setLoading: (loading: boolean) => void;
-  setError: (error: string | null) => void;
-  clearTasks: () => void;
+  setSelectedTaskId: (id: string | null) => void;
+  setSelectedProjectId: (id: string | null) => void;
+  setSidebarCollapsed: (collapsed: boolean) => void;
+  setViewMode: (mode: 'list' | 'board' | 'calendar') => void;
+  clearSelection: () => void;
 }
 
-interface ProjectStore {
-  projects: Project[];
-  selectedProject: Project | null;
-  isLoading: boolean;
-  error: string | null;
-
-  // Actions
-  setProjects: (projects: Project[]) => void;
-  addProject: (project: Project) => void;
-  updateProject: (projectId: string, updates: Partial<Project>) => void;
-  removeProject: (projectId: string) => void;
-  setSelectedProject: (project: Project | null) => void;
-  setLoading: (loading: boolean) => void;
-  setError: (error: string | null) => void;
-  clearProjects: () => void;
-}
-
-export const useTaskStore = create<TaskStore>()(
+export const useUIStore = create<UIStore>()(
   devtools(
     (set) => ({
-      tasks: [],
-      selectedTask: null,
-      isLoading: false,
-      error: null,
+      selectedTaskId: null,
+      selectedProjectId: null,
+      sidebarCollapsed: false,
+      viewMode: 'list',
 
-      setTasks: (tasks) => set({ tasks }, false, 'setTasks'),
-      addTask: (task) => set((state) => ({ tasks: [...state.tasks, task] }), false, 'addTask'),
-      updateTask: (taskId, updates) =>
-        set(
-          (state) => ({
-            tasks: state.tasks.map((task) =>
-              task.id === taskId ? { ...task, ...updates } : task
-            ),
-            selectedTask:
-              state.selectedTask?.id === taskId
-                ? { ...state.selectedTask, ...updates }
-                : state.selectedTask,
-          }),
-          false,
-          'updateTask'
-        ),
-      removeTask: (taskId) =>
-        set(
-          (state) => ({
-            tasks: state.tasks.filter((task) => task.id !== taskId),
-            selectedTask: state.selectedTask?.id === taskId ? null : state.selectedTask,
-          }),
-          false,
-          'removeTask'
-        ),
-      setSelectedTask: (task) => set({ selectedTask: task }, false, 'setSelectedTask'),
-      setLoading: (loading) => set({ isLoading: loading }, false, 'setLoading'),
-      setError: (error) => set({ error }, false, 'setError'),
-      clearTasks: () => set({ tasks: [], selectedTask: null }, false, 'clearTasks'),
+      setSelectedTaskId: (id) => set({ selectedTaskId: id }, false, 'setSelectedTaskId'),
+      setSelectedProjectId: (id) => set({ selectedProjectId: id }, false, 'setSelectedProjectId'),
+      setSidebarCollapsed: (collapsed) => set({ sidebarCollapsed: collapsed }, false, 'setSidebarCollapsed'),
+      setViewMode: (mode) => set({ viewMode: mode }, false, 'setViewMode'),
+      clearSelection: () => set({ selectedTaskId: null, selectedProjectId: null }, false, 'clearSelection'),
     }),
     {
-      name: 'task-store',
+      name: 'ui-store',
     }
   )
 );
 
-export const useProjectStore = create<ProjectStore>()(
-  devtools(
-    (set) => ({
-      projects: [],
-      selectedProject: null,
-      isLoading: false,
-      error: null,
+// Keep the old exports for backward compatibility during migration
+// TODO: Remove these after all components are migrated to React Query
+export const useTaskStore = () => {
+  console.warn('useTaskStore is deprecated. Use React Query hooks from @/hooks/useTasks instead.');
+  return {
+    tasks: [],
+    selectedTask: null,
+    isLoading: false,
+    error: null,
+    setTasks: () => {},
+    addTask: () => {},
+    updateTask: () => {},
+    removeTask: () => {},
+    setSelectedTask: () => {},
+    setLoading: () => {},
+    setError: () => {},
+    clearTasks: () => {},
+  };
+};
 
-      setProjects: (projects) => set({ projects }, false, 'setProjects'),
-      addProject: (project) => set((state) => ({ projects: [...state.projects, project] }), false, 'addProject'),
-      updateProject: (projectId, updates) =>
-        set(
-          (state) => ({
-            projects: state.projects.map((project) =>
-              project.id === projectId ? { ...project, ...updates } : project
-            ),
-            selectedProject:
-              state.selectedProject?.id === projectId
-                ? { ...state.selectedProject, ...updates }
-                : state.selectedProject,
-          }),
-          false,
-          'updateProject'
-        ),
-      removeProject: (projectId) =>
-        set(
-          (state) => ({
-            projects: state.projects.filter((project) => project.id !== projectId),
-            selectedProject: state.selectedProject?.id === projectId ? null : state.selectedProject,
-          }),
-          false,
-          'removeProject'
-        ),
-      setSelectedProject: (project) => set({ selectedProject: project }, false, 'setSelectedProject'),
-      setLoading: (loading) => set({ isLoading: loading }, false, 'setLoading'),
-      setError: (error) => set({ error }, false, 'setError'),
-      clearProjects: () => set({ projects: [], selectedProject: null }, false, 'clearProjects'),
-    }),
-    {
-      name: 'project-store',
-    }
-  )
-);
+export const useProjectStore = () => {
+  console.warn('useProjectStore is deprecated. Use React Query hooks from @/hooks/useProjects instead.');
+  return {
+    projects: [],
+    selectedProject: null,
+    isLoading: false,
+    error: null,
+    setProjects: () => {},
+    addProject: () => {},
+    updateProject: () => {},
+    removeProject: () => {},
+    setSelectedProject: () => {},
+    setLoading: () => {},
+    setError: () => {},
+    clearProjects: () => {},
+  };
+};

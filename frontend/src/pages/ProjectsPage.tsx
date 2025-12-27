@@ -1,48 +1,39 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Alert } from '@/components/ui/alert';
 import ConfirmDialog from '@/components/ui/ConfirmDialog';
-import { ProjectCard, ProjectForm, ProjectStats, ProjectTaskView, ProjectSharingDialog, ProjectFilters } from '@/components/projects';
+import { ProjectCard, ProjectForm, ProjectTaskView, ProjectSharingDialog, ProjectFilters } from '@/components/projects';
 import TaskForm from '@/components/tasks/TaskForm';
 import { Plus, AlertCircle, Loader2, BarChart3, FolderOpen, ArrowLeft } from 'lucide-react';
-import { useProjectStore, useTaskStore } from '@/store/useStore';
+import { useProjects, useCreateProject, useUpdateProject, useDeleteProject } from '@/hooks/useProjects';
+import { useCreateTask, useUpdateTask } from '@/hooks/useTasks';
 import { projectService } from '@/services/projects';
-import { taskService } from '@/services/tasks';
 import type { Project, CreateProjectRequest, UpdateProjectRequest, Task, CreateTaskRequest } from '@/types/api';
-import type { ProjectStats as ProjectStatsType } from '@/services/projects';
 import type { CreateTaskFormData } from '@/validation/task';
 
 type ViewMode = 'dashboard' | 'stats' | 'tasks';
 
 const ProjectsPage: React.FC = () => {
   const navigate = useNavigate();
-  const {
-    projects,
-    selectedProject,
-    isLoading,
-    error,
-    setProjects,
-    addProject,
-    updateProject,
-    removeProject,
-    setSelectedProject,
-    setLoading,
-    setError,
-  } = useProjectStore();
+  
+  // React Query hooks - single source of truth
+  const { data: projects = [], isLoading, error } = useProjects();
+  const createProjectMutation = useCreateProject();
+  const updateProjectMutation = useUpdateProject();
+  const deleteProjectMutation = useDeleteProject();
+  const createTaskMutation = useCreateTask();
+  const updateTaskMutation = useUpdateTask();
 
-  const { addTask: addTaskToStore, updateTask: updateTaskInStore } = useTaskStore();
-
-  const [projectStats, setProjectStats] = useState<Record<string, ProjectStatsType>>({});
+  // UI state only
+  const [selectedProject, setSelectedProject] = useState<Project | null>(null);
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [editingProject, setEditingProject] = useState<Project | null>(null);
-  const [isFormSubmitting, setIsFormSubmitting] = useState(false);
   const [formError, setFormError] = useState<string | null>(null);
   const [deleteDialog, setDeleteDialog] = useState<{ isOpen: boolean; project: Project | null }>({
     isOpen: false,
     project: null,
   });
-  const [isDeleting, setIsDeleting] = useState(false);
   const [viewMode, setViewMode] = useState<ViewMode>('dashboard');
 
   // Project filtering and search state
@@ -60,177 +51,50 @@ const ProjectsPage: React.FC = () => {
   const [isTaskFormOpen, setIsTaskFormOpen] = useState(false);
   const [editingTask, setEditingTask] = useState<Task | null>(null);
   const [taskFormProjectId, setTaskFormProjectId] = useState<string | undefined>();
-  const [isTaskFormSubmitting, setIsTaskFormSubmitting] = useState(false);
   const [taskFormError, setTaskFormError] = useState<string | null>(null);
-  const [taskRefreshTrigger, setTaskRefreshTrigger] = useState(0);
-
-
-
-  // Helper function to load stats for a single project
-  const loadProjectStats = async (projectId: string) => {
-    try {
-      const result = await projectService.getProjectStats(projectId);
-      if (result.success) {
-        setProjectStats(prev => ({
-          ...prev,
-          [projectId]: result.data
-        }));
-      }
-    } catch (error) {
-      console.error('Failed to load project stats:', error);
-    }
-  };
-
-  // Load projects on mount
-  useEffect(() => {
-    const loadInitialData = async () => {
-      setLoading(true);
-      setError(null);
-
-      try {
-        const result = await projectService.getProjects();
-        
-        if (result.success) {
-          setProjects(result.data);
-        } else {
-          setError(result.error.message);
-        }
-      } catch {
-        setError('Failed to load projects');
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    loadInitialData();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []); // Empty dependency array - only run on mount (Zustand setters are stable)
-
-  // Load project stats when projects change (debounced to prevent rapid API calls)
-  useEffect(() => {
-    if (projects.length > 0) {
-      // Debounce the stats loading to prevent rapid successive calls
-      const timeoutId = setTimeout(async () => {
-        try {
-          // Only load stats for projects we don't already have stats for
-          const projectsNeedingStats = projects.filter(project => !projectStats[project.id]);
-          
-          if (projectsNeedingStats.length === 0) {
-            return; // No new projects to load stats for
-          }
-
-          // Limit concurrent requests to prevent rate limiting
-          const BATCH_SIZE = 5;
-          const newStatsMap: Record<string, ProjectStatsType> = { ...projectStats };
-          
-          for (let i = 0; i < projectsNeedingStats.length; i += BATCH_SIZE) {
-            const batch = projectsNeedingStats.slice(i, i + BATCH_SIZE);
-            
-            const statsPromises = batch.map(async (project) => {
-              const result = await projectService.getProjectStats(project.id);
-              return { projectId: project.id, stats: result.success ? result.data : null };
-            });
-
-            const batchResults = await Promise.all(statsPromises);
-            
-            batchResults.forEach(({ projectId, stats }) => {
-              if (stats) {
-                newStatsMap[projectId] = stats;
-              }
-            });
-
-            // Small delay between batches to be respectful to rate limits
-            if (i + BATCH_SIZE < projectsNeedingStats.length) {
-              await new Promise(resolve => setTimeout(resolve, 100));
-            }
-          }
-
-          setProjectStats(newStatsMap);
-        } catch (err) {
-          console.error('Failed to load project stats:', err);
-        }
-      }, 300); // 300ms debounce
-
-      return () => clearTimeout(timeoutId);
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [projects]); // projectStats intentionally excluded to prevent infinite loop
 
 
 
   const handleCreateProject = async (data: CreateProjectRequest) => {
-    setIsFormSubmitting(true);
     setFormError(null);
 
     try {
-      const result = await projectService.createProject(data);
-      
-      if (result.success) {
-        addProject(result.data);
-        setIsFormOpen(false);
-        setEditingProject(null);
-      } else {
-        setFormError(result.error.message);
-      }
-    } catch {
-      setFormError('Failed to create project');
-    } finally {
-      setIsFormSubmitting(false);
+      await createProjectMutation.mutateAsync(data);
+      setIsFormOpen(false);
+      setEditingProject(null);
+    } catch (err: unknown) {
+      setFormError(err instanceof Error ? err.message : 'Failed to create project');
     }
   };
 
   const handleUpdateProject = async (data: UpdateProjectRequest) => {
     if (!editingProject) return;
 
-    setIsFormSubmitting(true);
     setFormError(null);
 
     try {
-      const result = await projectService.updateProject(editingProject.id, data);
-      
-      if (result.success) {
-        updateProject(editingProject.id, result.data);
-        setIsFormOpen(false);
-        setEditingProject(null);
-      } else {
-        setFormError(result.error.message);
-      }
-    } catch {
-      setFormError('Failed to update project');
-    } finally {
-      setIsFormSubmitting(false);
+      await updateProjectMutation.mutateAsync({ id: editingProject.id, updates: data });
+      setIsFormOpen(false);
+      setEditingProject(null);
+    } catch (err: unknown) {
+      setFormError(err instanceof Error ? err.message : 'Failed to update project');
     }
   };
 
   const handleDeleteProject = async (project: Project) => {
-    if (isDeleting) return; // Prevent double-delete
-    
-    setIsDeleting(true);
-    
     try {
-      const result = await projectService.deleteProject(project.id);
+      await deleteProjectMutation.mutateAsync(project.id);
       
-      if (result.success) {
-        // Remove from local state immediately
-        removeProject(project.id);
-        
-        // Clear selected project if it was the deleted one
-        if (selectedProject?.id === project.id) {
-          setSelectedProject(null);
-        }
-        
-        // Close dialog and clear any error
-        setDeleteDialog({ isOpen: false, project: null });
-        setError(null);
-      } else {
-        setError(result.error.message);
-        setDeleteDialog({ isOpen: false, project: null });
+      // Clear selected project if it was the deleted one
+      if (selectedProject?.id === project.id) {
+        setSelectedProject(null);
       }
-    } catch {
-      setError('Failed to delete project');
+      
+      // Close dialog
       setDeleteDialog({ isOpen: false, project: null });
-    } finally {
-      setIsDeleting(false);
+    } catch (err: unknown) {
+      console.error('Failed to delete project:', err);
+      setDeleteDialog({ isOpen: false, project: null });
     }
   };
 
@@ -324,34 +188,24 @@ const ProjectsPage: React.FC = () => {
   };
 
   const handleTaskFormSubmit = async (data: CreateTaskFormData) => {
-    setIsTaskFormSubmitting(true);
     setTaskFormError(null);
 
     try {
       if (editingTask) {
         // Update existing task
-        const result = await taskService.updateTask(editingTask.id, {
-          title: data.title,
-          description: data.description || undefined,
-          status: data.status,
-          priority: data.priority,
-          due_date: data.due_date || undefined,
-          project_id: data.project_id || undefined,
-        });
-
-        if (result.success) {
-          updateTaskInStore(editingTask.id, result.data);
-          setIsTaskFormOpen(false);
-          setEditingTask(null);
-          setTaskRefreshTrigger(prev => prev + 1);
-          
-          // Refresh project stats if task was in a project
-          if (result.data.project_id) {
-            await loadProjectStats(result.data.project_id);
+        await updateTaskMutation.mutateAsync({
+          id: editingTask.id,
+          updates: {
+            title: data.title,
+            description: data.description || undefined,
+            status: data.status,
+            priority: data.priority,
+            due_date: data.due_date || undefined,
+            project_id: data.project_id || undefined,
           }
-        } else {
-          setTaskFormError(result.error.message);
-        }
+        });
+        setIsTaskFormOpen(false);
+        setEditingTask(null);
       } else {
         // Create new task
         const taskData: CreateTaskRequest = {
@@ -363,27 +217,13 @@ const ProjectsPage: React.FC = () => {
           project_id: data.project_id || undefined,
         };
 
-        const result = await taskService.createTask(taskData);
-
-        if (result.success) {
-          addTaskToStore(result.data);
-          setIsTaskFormOpen(false);
-          setTaskFormProjectId(undefined);
-          setTaskRefreshTrigger(prev => prev + 1);
-          
-          // Refresh project stats if task was assigned to a project
-          if (result.data.project_id) {
-            await loadProjectStats(result.data.project_id);
-          }
-        } else {
-          setTaskFormError(result.error.message);
-        }
+        await createTaskMutation.mutateAsync(taskData);
+        setIsTaskFormOpen(false);
+        setTaskFormProjectId(undefined);
       }
     } catch (error) {
       console.error('Task operation failed:', error);
-      setTaskFormError('An unexpected error occurred. Please try again.');
-    } finally {
-      setIsTaskFormSubmitting(false);
+      setTaskFormError(error instanceof Error ? error.message : 'An unexpected error occurred. Please try again.');
     }
   };
 
@@ -421,16 +261,10 @@ const ProjectsPage: React.FC = () => {
         case 'updated_at':
           comparison = new Date(a.updated_at).getTime() - new Date(b.updated_at).getTime();
           break;
-        case 'completion_rate': {
-          const aStats = projectStats[a.id];
-          const bStats = projectStats[b.id];
-          const aTotal = aStats ? aStats.PENDING + aStats.IN_PROGRESS + aStats.COMPLETED : 0;
-          const bTotal = bStats ? bStats.PENDING + bStats.IN_PROGRESS + bStats.COMPLETED : 0;
-          const aRate = aTotal > 0 ? Math.round((aStats.COMPLETED / aTotal) * 100) : 0;
-          const bRate = bTotal > 0 ? Math.round((bStats.COMPLETED / bTotal) * 100) : 0;
-          comparison = aRate - bRate;
+        case 'completion_rate':
+          // TODO: Re-implement with React Query stats
+          comparison = 0;
           break;
-        }
         default:
           comparison = new Date(a.created_at).getTime() - new Date(b.created_at).getTime();
       }
@@ -439,7 +273,7 @@ const ProjectsPage: React.FC = () => {
     });
 
     return sorted;
-  }, [projects, searchQuery, sortBy, sortOrder, projectStats]);
+  }, [projects, searchQuery, sortBy, sortOrder]);
 
   // Handle filter functions
   const handleSortChange = (newSortBy: string, newSortOrder: 'asc' | 'desc') => {
@@ -478,9 +312,8 @@ const ProjectsPage: React.FC = () => {
   }
 
     // Stats view
+  // Stats view with React Query
   if (viewMode === 'stats' && selectedProject) {
-    const stats = projectStats[selectedProject.id];
-    
     return (
       <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50/30 to-slate-50">
         <div className="container mx-auto px-4 py-8 max-w-7xl">
@@ -503,17 +336,13 @@ const ProjectsPage: React.FC = () => {
             </div>
           </div>
 
-          {stats ? (
-            <ProjectStats project={selectedProject} stats={stats} />
-          ) : (
-            <div className="text-center py-16 bg-gradient-to-br from-slate-50 to-blue-50 rounded-2xl border border-slate-200/60">
-              <div className="max-w-md mx-auto">
-                <BarChart3 className="h-16 w-16 text-slate-400 mx-auto mb-4" />
-                <h3 className="text-xl font-semibold text-slate-900 mb-2">Loading Analytics</h3>
-                <p className="text-slate-600">Gathering project statistics...</p>
-              </div>
+          <div className="text-center py-16 bg-gradient-to-br from-slate-50 to-blue-50 rounded-2xl border border-slate-200/60">
+            <div className="max-w-md mx-auto">
+              <BarChart3 className="h-16 w-16 text-slate-400 mx-auto mb-4" />
+              <h3 className="text-xl font-semibold text-slate-900 mb-2">Project Analytics</h3>
+              <p className="text-slate-600">Stats view will be available soon with React Query</p>
             </div>
-          )}
+          </div>
         </div>
       </div>
     );
@@ -550,7 +379,7 @@ const ProjectsPage: React.FC = () => {
             project={selectedProject}
             onCreateTask={() => handleCreateTask(selectedProject.id)}
             onEditTask={handleEditTask}
-            refreshTrigger={taskRefreshTrigger}
+            refreshTrigger={0}
           />
 
           {/* Task Form Dialog for Tasks View */}
@@ -559,7 +388,7 @@ const ProjectsPage: React.FC = () => {
             onOpenChange={handleTaskFormClose}
             task={editingTask || undefined}
             onSubmit={handleTaskFormSubmit}
-            loading={isTaskFormSubmitting}
+            loading={createTaskMutation.isPending || updateTaskMutation.isPending}
             defaultProjectId={taskFormProjectId}
             showProjectSelector={true}
           />
@@ -586,7 +415,7 @@ const ProjectsPage: React.FC = () => {
             <AlertCircle className="h-4 w-4" />
             <div className="ml-2">
               <p className="font-medium">Error</p>
-              <p className="text-sm">{error}</p>
+              <p className="text-sm">{error instanceof Error ? error.message : 'Failed to load projects'}</p>
             </div>
           </Alert>
         )}
@@ -605,22 +434,6 @@ const ProjectsPage: React.FC = () => {
                     <div className="flex items-center gap-2">
                       <div className="h-2 w-2 rounded-full bg-slate-400"></div>
                       <span className="text-sm font-medium text-slate-700">{projects.length} Projects</span>
-                    </div>
-                  </div>
-                  <div className="bg-white/80 backdrop-blur-sm rounded-lg px-3 py-2 border border-slate-200/60">
-                    <div className="flex items-center gap-2">
-                      <div className="h-2 w-2 rounded-full bg-green-500"></div>
-                      <span className="text-sm font-medium text-slate-700">
-                        {Object.values(projectStats).reduce((acc, stats) => acc + (stats?.COMPLETED || 0), 0)} Tasks Done
-                      </span>
-                    </div>
-                  </div>
-                  <div className="bg-white/80 backdrop-blur-sm rounded-lg px-3 py-2 border border-slate-200/60">
-                    <div className="flex items-center gap-2">
-                      <div className="h-2 w-2 rounded-full bg-blue-500"></div>
-                      <span className="text-sm font-medium text-slate-700">
-                        {Object.values(projectStats).reduce((acc, stats) => acc + (stats?.IN_PROGRESS || 0), 0)} In Progress
-                      </span>
                     </div>
                   </div>
                 </div>
@@ -699,11 +512,11 @@ const ProjectsPage: React.FC = () => {
               <ProjectCard
                 key={project.id}
                 project={project}
-                stats={projectStats[project.id]}
+                stats={undefined}
                 onEdit={handleEditProject}
                 onDelete={(project) => {
                   // Don't allow delete if already deleting
-                  if (!isDeleting) {
+                  if (!deleteProjectMutation.isPending) {
                     setDeleteDialog({ isOpen: true, project });
                   }
                 }}
@@ -726,14 +539,14 @@ const ProjectsPage: React.FC = () => {
         }}
         onSubmit={handleFormSubmit}
         project={editingProject || undefined}
-        isSubmitting={isFormSubmitting}
+        isSubmitting={createProjectMutation.isPending || updateProjectMutation.isPending}
         error={formError}
       />
 
       {/* Delete Confirmation Dialog */}
       <ConfirmDialog
         open={deleteDialog.isOpen}
-        onOpenChange={(open) => !open && !isDeleting && setDeleteDialog({ isOpen: false, project: null })}
+        onOpenChange={(open) => !open && !deleteProjectMutation.isPending && setDeleteDialog({ isOpen: false, project: null })}
         onConfirm={() => deleteDialog.project && handleDeleteProject(deleteDialog.project)}
         title="Delete Project"
         description={
@@ -744,7 +557,7 @@ const ProjectsPage: React.FC = () => {
         confirmText="Delete"
         cancelText="Cancel"
         destructive={true}
-        loading={isDeleting}
+        loading={deleteProjectMutation.isPending}
       />
 
       {/* Task Form Dialog */}
@@ -753,7 +566,7 @@ const ProjectsPage: React.FC = () => {
         onOpenChange={handleTaskFormClose}
         task={editingTask || undefined}
         onSubmit={handleTaskFormSubmit}
-        loading={isTaskFormSubmitting}
+        loading={createTaskMutation.isPending || updateTaskMutation.isPending}
         defaultProjectId={taskFormProjectId}
         showProjectSelector={true}
       />

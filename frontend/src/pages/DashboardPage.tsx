@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -17,12 +17,9 @@ import {
   User,
   Target
 } from 'lucide-react';
-import { useProjectStore, useTaskStore } from '@/store/useStore';
-import { projectService } from '@/services/projects';
-import { taskService } from '@/services/tasks';
+import { useProjects } from '@/hooks/useProjects';
+import { useTasks } from '@/hooks/useTasks';
 import { getTaskStatusColor, getTaskPriorityColor } from '@/lib/taskUtils';
-import type { Task } from '@/types/api';
-import type { ProjectStats } from '@/services/projects';
 
 interface DashboardStats {
   totalTasks: number;
@@ -35,81 +32,13 @@ interface DashboardStats {
 
 const DashboardPage: React.FC = () => {
   const navigate = useNavigate();
-  const { projects, setProjects, setLoading: setProjectsLoading } = useProjectStore();
-  const { tasks, setTasks, setLoading: setTasksLoading } = useTaskStore();
+  const { data: projects = [], isLoading: projectsLoading } = useProjects();
+  const { data: tasks = [], isLoading: tasksLoading } = useTasks();
   
-  const [stats, setStats] = useState<DashboardStats>({
-    totalTasks: 0,
-    completedTasks: 0,
-    inProgressTasks: 0,
-    pendingTasks: 0,
-    totalProjects: 0,
-    completionRate: 0,
-  });
-  const [projectStats, setProjectStats] = useState<Record<string, ProjectStats>>({});
-  const [recentTasks, setRecentTasks] = useState<Task[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
-
-  // Load dashboard data
-  useEffect(() => {
-    const loadDashboardData = async () => {
-      setIsLoading(true);
-      setProjectsLoading(true);
-      setTasksLoading(true);
-
-      try {
-        // Load projects and tasks in parallel
-        const [projectsResult, tasksResult] = await Promise.all([
-          projectService.getProjects(),
-          taskService.getTasks(),
-        ]);
-
-        if (projectsResult.success) {
-          setProjects(projectsResult.data);
-        }
-
-        if (tasksResult.success) {
-          setTasks(tasksResult.data);
-          
-          // Set recent tasks (last 5)
-          const sortedTasks = [...tasksResult.data]
-            .sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
-            .slice(0, 5);
-          setRecentTasks(sortedTasks);
-        }
-
-        // Load project stats
-        if (projectsResult.success && projectsResult.data.length > 0) {
-          const statsPromises = projectsResult.data.map(async (project) => {
-            const result = await projectService.getProjectStats(project.id);
-            return { projectId: project.id, stats: result.success ? result.data : null };
-          });
-
-          const statsResults = await Promise.all(statsPromises);
-          const statsMap: Record<string, ProjectStats> = {};
-          
-          statsResults.forEach(({ projectId, stats }) => {
-            if (stats) {
-              statsMap[projectId] = stats;
-            }
-          });
-
-          setProjectStats(statsMap);
-        }
-      } catch (error) {
-        console.error('Failed to load dashboard data:', error);
-      } finally {
-        setIsLoading(false);
-        setProjectsLoading(false);
-        setTasksLoading(false);
-      }
-    };
-
-    loadDashboardData();
-  }, [setProjects, setTasks, setProjectsLoading, setTasksLoading]);
+  const isLoading = projectsLoading || tasksLoading;
 
   // Calculate dashboard stats
-  useEffect(() => {
+  const stats = useMemo<DashboardStats>(() => {
     const totalTasks = tasks.length;
     const completedTasks = tasks.filter(task => task.status === 'COMPLETED').length;
     const inProgressTasks = tasks.filter(task => task.status === 'IN_PROGRESS').length;
@@ -117,15 +46,22 @@ const DashboardPage: React.FC = () => {
     const totalProjects = projects.length;
     const completionRate = totalTasks > 0 ? Math.round((completedTasks / totalTasks) * 100) : 0;
 
-    setStats({
+    return {
       totalTasks,
       completedTasks,
       inProgressTasks,
       pendingTasks,
       totalProjects,
       completionRate,
-    });
+    };
   }, [tasks, projects]);
+
+  // Get recent tasks (last 5)
+  const recentTasks = useMemo(() => {
+    return [...tasks]
+      .sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
+      .slice(0, 5);
+  }, [tasks]);
 
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
@@ -345,11 +281,6 @@ const DashboardPage: React.FC = () => {
               <ScrollArea className="h-[300px]">
                 <div className="space-y-3">
                   {projects.slice(0, 5).map((project) => {
-                    const stats = projectStats[project.id];
-                    const totalTasks = stats ? stats.PENDING + stats.IN_PROGRESS + stats.COMPLETED : 0;
-                    const completedTasks = stats?.COMPLETED || 0;
-                    const completionRate = totalTasks > 0 ? Math.round((completedTasks / totalTasks) * 100) : 0;
-
                     return (
                       <div
                         key={project.id}
@@ -368,18 +299,11 @@ const DashboardPage: React.FC = () => {
                             {project.description}
                           </p>
                         )}
-                        {totalTasks > 0 && (
-                          <div className="space-y-1">
-                            <div className="flex items-center justify-between text-xs">
-                              <span className="text-muted-foreground">Progress</span>
-                              <span className="font-medium">{completionRate}%</span>
-                            </div>
-                            <Progress value={completionRate} className="h-1" />
+                        <div className="space-y-1">
                             <div className="text-xs text-muted-foreground">
-                              {completedTasks} of {totalTasks} tasks completed
+                              View project details
                             </div>
                           </div>
-                        )}
                       </div>
                     );
                   })}
