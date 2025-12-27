@@ -88,7 +88,6 @@ const ProfilePage: React.FC = () => {
       }
 
       const updatedUser = await authService.updateProfile(profileData, token);
-      console.log('Profile updated:', updatedUser);
       
       // Update the user context with new data
       updateUser(updatedUser);
@@ -123,18 +122,15 @@ const ProfilePage: React.FC = () => {
   const validatePasswordForm = (): boolean => {
     try {
       PasswordChangeSchema.parse(passwordData);
-      console.log('✅ Password validation successful');
       setPasswordErrors({});
       return true;
     } catch (error) {
-      console.log('❌ Password validation failed:', error);
       if (error && typeof error === 'object' && 'issues' in error) {
         const zodError = error as { issues: Array<{ path: string[]; message: string }> };
         const fieldErrors: Partial<PasswordChangeFormData> = {};
         zodError.issues.forEach((issue) => {
           const field = issue.path[0] as keyof PasswordChangeFormData;
           fieldErrors[field] = issue.message;
-          console.log(`❌ Field error - ${field}: ${issue.message}`);
         });
         setPasswordErrors(fieldErrors);
       }

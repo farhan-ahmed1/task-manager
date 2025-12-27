@@ -27,7 +27,6 @@ const RegisterPage: React.FC = () => {
   useEffect(() => {
     if (isAuthenticated) {
       const from = location.state?.from?.pathname || '/dashboard';
-      console.log('🟢 RegisterPage: User is authenticated, redirecting to:', from);
       navigate(from, { replace: true });
     }
   }, [isAuthenticated, navigate, location]);

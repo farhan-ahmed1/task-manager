@@ -137,7 +137,6 @@ const Sidebar: React.FC<SidebarProps> = ({ onClose, onToggle, onOpenSearch, clas
       const response = await taskService.createTask(taskData);
       if (response.success) {
         // Task created successfully
-        console.log('Task created:', response.data);
         // You might want to show a success notification here
       }
     } catch (error) {

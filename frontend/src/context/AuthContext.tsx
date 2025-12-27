@@ -116,11 +116,9 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   }, []);
 
   const login = (user: User, token: string) => {
-    console.log('🟢 AuthContext: Login function called with:', { user, hasToken: !!token });
     localStorage.setItem('authToken', token);
     localStorage.setItem('authUser', JSON.stringify(user));
     dispatch({ type: 'LOGIN', payload: { user, token } });
-    console.log('🟢 AuthContext: Login dispatch completed');
   };
 
   const logout = () => {

@@ -83,17 +83,14 @@ const IndividualProjectPage: React.FC = () => {
 
   const handleEdit = () => {
     // TODO: Implement project editing
-    console.log('Edit project:', project?.name);
   };
 
   const handleDelete = () => {
     // TODO: Implement project deletion
-    console.log('Delete project:', project?.name);
   };
 
   const handleShare = () => {
     // TODO: Implement project sharing
-    console.log('Share project:', project?.name);
   };
 
   return (

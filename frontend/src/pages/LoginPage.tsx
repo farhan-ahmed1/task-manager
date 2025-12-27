@@ -25,7 +25,6 @@ const LoginPage: React.FC = () => {
   useEffect(() => {
     if (isAuthenticated) {
       const from = location.state?.from?.pathname || '/dashboard';
-      console.log('🟢 LoginPage: User is authenticated, redirecting to:', from);
       navigate(from, { replace: true });
     }
   }, [isAuthenticated, navigate, location]);
@@ -78,12 +77,9 @@ const LoginPage: React.FC = () => {
     setGeneralError('');
 
     try {
-      console.log('🔵 LoginPage: Starting login process');
       const response = await authService.login(formData);
-      console.log('🟢 LoginPage: Got response from auth service:', response);
       
       login(response.user, response.token);
-      console.log('🟢 LoginPage: Called AuthContext login function');
       
       // Redirect will be handled by the AuthContext/ProtectedRoute
     } catch (err) {
