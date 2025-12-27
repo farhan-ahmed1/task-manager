@@ -102,7 +102,7 @@ const ProjectStats: React.FC<ProjectStatsProps> = ({
                 >
                   {progressStatus.status}
                 </Badge>
-                <span className="text-2xl font-bold text-slate-900">{completionRate}%</span>
+                <span className="text-xl sm:text-2xl font-bold text-slate-900">{completionRate}%</span>
               </div>
             </div>
             <div className="w-full bg-slate-100 rounded-full h-4 overflow-hidden">
@@ -138,7 +138,7 @@ const ProjectStats: React.FC<ProjectStatsProps> = ({
               </div>
               <div>
                 <p className="text-sm text-slate-600 font-medium">{stat.title}</p>
-                <p className="text-2xl font-bold text-slate-900">{stat.value}</p>
+                <p className="text-xl sm:text-2xl font-bold text-slate-900">{stat.value}</p>
               </div>
             </div>
           </div>

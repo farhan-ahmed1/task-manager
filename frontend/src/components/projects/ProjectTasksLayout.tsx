@@ -456,7 +456,7 @@ const ProjectTasksLayout: React.FC<ProjectTasksLayoutProps> = ({
                 type="text"
                 value={editingTitle}
                 onChange={(e) => setEditingTitle(e.target.value)}
-                className="text-2xl font-bold bg-transparent border-none outline-none focus:bg-white focus:border focus:border-blue-300 focus:rounded px-2 py-1"
+                className="text-lg sm:text-xl md:text-2xl font-bold bg-transparent border-none outline-none focus:bg-white focus:border focus:border-blue-300 focus:rounded px-2 py-1"
                 style={{ color: 'var(--text-primary)' }}
                 onKeyDown={(e) => {
                   if (e.key === 'Enter') {
@@ -486,7 +486,7 @@ const ProjectTasksLayout: React.FC<ProjectTasksLayoutProps> = ({
             </div>
           ) : (
             <div className="flex items-center group">
-              <h1 className="text-2xl font-bold" style={{ color: 'var(--text-primary)' }}>
+              <h1 className="text-lg sm:text-xl md:text-2xl font-bold" style={{ color: 'var(--text-primary)' }}>
                 {title}
               </h1>
               {project && (

@@ -93,7 +93,7 @@ const LoginPage: React.FC = () => {
     <div className="min-h-screen flex items-center justify-center bg-background bg-gradient-pattern py-8 px-4 sm:px-6 lg:px-8">
       <div className="max-w-lg w-full space-y-8">
         <div className="text-center">
-          <h2 className="text-4xl font-bold tracking-tight text-foreground mb-2">
+          <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold tracking-tight text-foreground mb-2">
             Welcome Back
           </h2>
           <p className="text-lg text-muted-foreground">

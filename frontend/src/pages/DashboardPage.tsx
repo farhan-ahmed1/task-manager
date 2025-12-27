@@ -93,7 +93,7 @@ const DashboardPage: React.FC = () => {
             <Target className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{stats.totalTasks}</div>
+            <div className="text-xl sm:text-2xl font-bold">{stats.totalTasks}</div>
             <p className="text-xs text-muted-foreground">
               {stats.completionRate}% completion rate
             </p>
@@ -106,7 +106,7 @@ const DashboardPage: React.FC = () => {
             <CheckCircle2 className="h-4 w-4 text-[var(--success)]" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-[var(--success)]">{stats.completedTasks}</div>
+            <div className="text-xl sm:text-2xl font-bold text-[var(--success)]">{stats.completedTasks}</div>
             <p className="text-xs text-muted-foreground">
               Tasks finished
             </p>
@@ -119,7 +119,7 @@ const DashboardPage: React.FC = () => {
             <Clock className="h-4 w-4 text-[var(--primary)]" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-[var(--primary)]">{stats.inProgressTasks}</div>
+            <div className="text-xl sm:text-2xl font-bold text-[var(--primary)]">{stats.inProgressTasks}</div>
             <p className="text-xs text-muted-foreground">
               Currently working on
             </p>
@@ -132,7 +132,7 @@ const DashboardPage: React.FC = () => {
             <FolderOpen className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{stats.totalProjects}</div>
+            <div className="text-xl sm:text-2xl font-bold">{stats.totalProjects}</div>
             <p className="text-xs text-muted-foreground">
               Active projects
             </p>

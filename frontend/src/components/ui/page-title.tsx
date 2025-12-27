@@ -70,7 +70,7 @@ export const PageTitle: React.FC<PageTitleProps> = ({
         <div className="flex-1 min-w-0">
           <h1 
             className={cn(
-              'text-2xl font-bold text-[var(--text-primary)] flex items-center gap-2',
+              'text-xl sm:text-2xl md:text-3xl font-bold text-[var(--text-primary)] flex items-center gap-2',
               titleClassName
             )}
           >
@@ -80,7 +80,7 @@ export const PageTitle: React.FC<PageTitleProps> = ({
           {subtitle && (
             <p 
               className={cn(
-                'text-[var(--text-secondary)] mt-2',
+                'text-sm sm:text-base text-[var(--text-secondary)] mt-2',
                 subtitleClassName
               )}
             >
@@ -111,7 +111,7 @@ export const SectionTitle: React.FC<{
   return (
     <h2 
       className={cn(
-        'text-lg font-semibold text-[var(--text-primary)] mb-4',
+        'text-base sm:text-lg font-semibold text-[var(--text-primary)] mb-4',
         className
       )}
     >

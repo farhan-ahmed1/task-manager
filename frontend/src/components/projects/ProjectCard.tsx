@@ -78,8 +78,8 @@ const ProjectCard: React.FC<ProjectCardProps> = ({
                   />
                 </div>
                 
-                {/* Task Status Badges - Horizontal Layout */}
-                <div className="flex items-center gap-3 text-xs">
+                {/* Task Status Badges - Responsive Layout */}
+                <div className="flex flex-wrap items-center gap-2 sm:gap-3 text-xs">
                   {stats.COMPLETED > 0 && (
                     <div className="flex items-center gap-1.5 px-2.5 py-1.5 bg-success-light text-success rounded-lg border border-success">
                       <div className="w-2 h-2 bg-success rounded-full" />
@@ -131,8 +131,8 @@ const ProjectCard: React.FC<ProjectCardProps> = ({
 
           {/* Right Section - Actions */}
           <div className="flex flex-col items-end gap-3 flex-shrink-0">
-            {/* Quick Action Buttons - Always visible on desktop, show on hover on mobile */}
-            <div className="flex gap-2">
+            {/* Quick Action Buttons - Always visible on mobile, show on hover on desktop */}
+            <div className="flex gap-2 sm:hidden md:flex">
               {onViewTasks && (
                 <Button
                   onClick={(e) => {
@@ -141,7 +141,7 @@ const ProjectCard: React.FC<ProjectCardProps> = ({
                   }}
                   size="sm"
                   variant="outline"
-                  className="h-9 px-3 bg-info-light hover:bg-info/10 border-info text-info rounded-lg text-xs font-medium opacity-80 group-hover:opacity-100 transition-all duration-200 hover:shadow-md hover:-translate-y-0.5 button-with-icon"
+                  className="h-9 px-3 bg-info-light hover:bg-info/10 border-info text-info rounded-lg text-xs font-medium transition-all duration-200 hover:shadow-md hover:-translate-y-0.5 button-with-icon"
                 >
                   <FolderOpen className="w-4 h-4 mr-1.5 icon-enhanced icon-hover" strokeWidth={2} />
                   Tasks
@@ -155,7 +155,7 @@ const ProjectCard: React.FC<ProjectCardProps> = ({
                   }}
                   size="sm"
                   variant="outline"
-                  className="h-9 px-3 bg-muted hover:bg-muted/80 border-border text-muted-foreground hover:text-foreground rounded-lg text-xs font-medium opacity-80 group-hover:opacity-100 transition-all duration-200 hover:shadow-md hover:-translate-y-0.5 button-with-icon"
+                  className="h-9 px-3 bg-muted hover:bg-muted/80 border-border text-muted-foreground hover:text-foreground rounded-lg text-xs font-medium transition-all duration-200 hover:shadow-md hover:-translate-y-0.5 button-with-icon"
                 >
                   <BarChart3 className="w-4 h-4 mr-1.5 icon-enhanced icon-hover" strokeWidth={2} />
                   Stats
@@ -169,7 +169,7 @@ const ProjectCard: React.FC<ProjectCardProps> = ({
                 <Button 
                   variant="ghost" 
                   size="icon" 
-                  className="h-9 w-9 opacity-60 group-hover:opacity-100 transition-all duration-200 hover:bg-muted rounded-lg flex-shrink-0 icon-button"
+                  className="h-9 w-9 opacity-60 sm:opacity-60 md:group-hover:opacity-100 transition-all duration-200 hover:bg-muted rounded-lg flex-shrink-0 icon-button"
                 >
                   <MoreHorizontal className="w-5 h-5 text-muted-foreground icon-enhanced dropdown-icon" strokeWidth={2} />
                 </Button>
