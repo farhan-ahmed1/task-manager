@@ -83,7 +83,6 @@ const LoginPage: React.FC = () => {
       
       // Redirect will be handled by the AuthContext/ProtectedRoute
     } catch (err) {
-      console.error('🔴 LoginPage: Login error:', err);
       setGeneralError(err instanceof Error ? err.message : 'Login failed');
     } finally {
       setIsLoading(false);
