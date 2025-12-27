@@ -4,6 +4,7 @@ import { FolderOpen } from 'lucide-react';
 import ProjectHeader from '@/components/layout/ProjectHeader';
 import ProjectTasksLayout from '@/components/projects/ProjectTasksLayout';
 import { useProject } from '@/hooks/useProjects';
+import { useProjectLayoutConfig } from '@/hooks/useLayoutConfig';
 import type { Project } from '@/types/api';
 
 const IndividualProjectPage: React.FC = () => {
@@ -13,6 +14,7 @@ const IndividualProjectPage: React.FC = () => {
 
   // React Query hook - single source of truth
   const { data: project, isLoading, error } = useProject(projectId || '');
+  const config = useProjectLayoutConfig(localProject || project);
 
   // Update local project state when React Query data changes
   React.useEffect(() => {
@@ -77,10 +79,7 @@ const IndividualProjectPage: React.FC = () => {
       {/* Project content with simplified individual project title */}
       <ProjectTasksLayout
         project={localProject || project}
-        title={(localProject || project).name}
-        emptyStateTitle="This project is empty"
-        emptyStateDescription="Add your first task to start organizing work in this project."
-        emptyButtonText="Add your first task"
+        config={config}
         onProjectUpdate={(updatedProject) => setLocalProject(updatedProject)}
       />
     </div>

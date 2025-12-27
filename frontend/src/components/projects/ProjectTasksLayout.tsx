@@ -8,6 +8,7 @@ import TaskDetailsModal from '@/components/tasks/TaskDetailsModal';
 import DragOverlay from '@/components/tasks/DragOverlay';
 import DropIndicator from '@/components/tasks/DropIndicator';
 import SectionHeader from '@/components/tasks/SectionHeader';
+import type { ProjectLayoutConfig } from '@/types/layout';
 
 import AddSectionButton from '@/components/tasks/AddSectionButton';
 import { type ViewOptions } from '@/components/tasks/ViewOptionsMenu';
@@ -38,23 +39,16 @@ import type { Task, Section, CreateTaskRequest, UpdateTaskRequest, Project } fro
 
 interface ProjectTasksLayoutProps {
   project?: Project; // undefined for inbox, defined for specific projects
-  icon?: React.ReactNode;
-  title: string;
-  emptyStateTitle: string;
-  emptyStateDescription: string;
-  emptyButtonText: string;
+  config: ProjectLayoutConfig;
   onProjectUpdate?: (updatedProject: Project) => void;
 }
 
 const ProjectTasksLayout: React.FC<ProjectTasksLayoutProps> = ({
   project,
-  icon,
-  title,
-  emptyStateTitle,
-  emptyStateDescription, 
-  emptyButtonText,
+  config,
   onProjectUpdate,
 }) => {
+  const { title, icon, emptyState } = config;
   // React Query hooks - single source of truth
   const filters = project ? { project_id: project.id } : {};
   const { data: allTasks = [], isLoading: tasksLoading } = useTasks(filters);
@@ -498,17 +492,17 @@ const ProjectTasksLayout: React.FC<ProjectTasksLayoutProps> = ({
                 {icon}
               </div>
               <h3 className="text-h3 mb-2" style={{ color: 'var(--text-primary)' }}>
-                {emptyStateTitle}
+                {emptyState.title}
               </h3>
               <p className="text-body mb-4" style={{ color: 'var(--text-muted)' }}>
-                {emptyStateDescription}
+                {emptyState.description}
               </p>
               <Button 
                 onClick={() => setShowAddTaskModal(true)}
                 className="tm-btn-primary"
               >
                 <Plus className="w-4 h-4 mr-2" />
-                {emptyButtonText}
+                {emptyState.buttonText}
               </Button>
             </div>
           ) : (
