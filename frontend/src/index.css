@@ -2,52 +2,54 @@
 
 @layer base {
   :root {
-    /* Enhanced Slate Blue Design System - Professional & Sophisticated */
+    /* World Class Design System - "Nebula" Theme */
     
-    /* Primary Colors - Refined Blue */
-    --primary: #2563EB;           /* Vibrant Blue (slightly warmer) */
-    --primary-dark: #1E40AF;      /* Deep Blue */
-    --primary-light: #DBEAFE;     /* Sky Blue */
-    --primary-subtle: #EFF6FF;    /* Very light blue */
+    /* Primary Colors - Electric Violet & Indigo */
+    --primary: #6366f1;           /* Indigo 500 */
+    --primary-dark: #4338ca;      /* Indigo 700 */
+    --primary-light: #818cf8;     /* Indigo 400 */
+    --primary-subtle: rgba(99, 102, 241, 0.1);
     
-    /* Secondary & Accent */
-    --accent: #3B82F6;            /* Bright Blue */
-    --accent-hover: #2563EB;      /* Darker on hover */
+    /* Secondary & Accent - Vibrant Pink/Purple gradients */
+    --accent: #ec4899;            /* Pink 500 */
+    --accent-hover: #db2777;      /* Pink 600 */
+    --accent-gradient: linear-gradient(135deg, #6366f1 0%, #ec4899 100%);
     
-    /* Status Colors - More Vibrant */
-    --success: #10B981;           /* Emerald (modern green) */
-    --success-light: #D1FAE5;     /* Light emerald */
-    --warning: #F59E0B;           /* Amber (warmer) */
-    --warning-light: #FEF3C7;     /* Light amber */
-    --error: #EF4444;             /* Red (brighter) */
-    --error-light: #FEE2E2;       /* Light red */
-    --info: #3B82F6;              /* Blue */
-    --info-light: #DBEAFE;        /* Light blue */
+    /* Status Colors - Neon-ish */
+    --success: #10b981;           /* Emerald 500 */
+    --success-light: rgba(16, 185, 129, 0.1);
+    --warning: #f59e0b;           /* Amber 500 */
+    --warning-light: rgba(245, 158, 11, 0.1);
+    --error: #ef4444;             /* Red 500 */
+    --error-light: rgba(239, 68, 68, 0.1);
+    --info: #3b82f6;              /* Blue 500 */
+    --info-light: rgba(59, 130, 246, 0.1);
     
-    /* Backgrounds - Softer Gradients */
-    --background: #FFFFFF;        /* Pure white */
-    --bg-primary: #FFFFFF;
-    --bg-secondary: #F8FAFC;      /* Soft slate */
-    --bg-tertiary: #F1F5F9;       /* Light slate */
-    --background-subtle: #F8FAFC;
-    --bg-gradient-start: #F8FAFC;
-    --bg-gradient-end: #EFF6FF;   /* Hint of blue */
+    /* Backgrounds - Deep Space */
+    --background: #0f172a;        /* Slate 900 */
+    --bg-primary: #0f172a;
+    --bg-secondary: #1e293b;      /* Slate 800 */
+    --bg-tertiary: #334155;       /* Slate 700 */
+    --background-subtle: #1e293b;
+    --bg-gradient-start: #0f172a;
+    --bg-gradient-end: #1e1b4b;   /* Deep Indigo */
     
-    /* Surfaces */
-    --surface: #FFFFFF;
-    --surface-hover: rgba(59, 130, 246, 0.04);  /* Subtle blue tint */
-    --surface-active: rgba(59, 130, 246, 0.08);
+    /* Surfaces - Glassmorphism */
+    --surface: rgba(30, 41, 59, 0.7);
+    --surface-hover: rgba(51, 65, 85, 0.5);
+    --surface-active: rgba(71, 85, 105, 0.5);
+    --glass-border: rgba(255, 255, 255, 0.08);
     
-    /* Text - More Contrast */
-    --text-primary: #0F172A;      /* Near black */
-    --text-secondary: #475569;    /* Medium slate */
-    --text-tertiary: #94A3B8;     /* Light slate */
-    --text-muted: #CBD5E1;        /* Very light slate */
+    /* Text - High Contrast */
+    --text-primary: #f8fafc;      /* Slate 50 */
+    --text-secondary: #94a3b8;    /* Slate 400 */
+    --text-tertiary: #64748b;     /* Slate 500 */
+    --text-muted: #475569;        /* Slate 600 */
     
-    /* Borders - Subtle */
-    --border: #E2E8F0;            /* Soft slate border */
-    --border-light: #F1F5F9;      /* Very light border */
-    --border-subtle: #F1F5F9;
+    /* Borders - Subtle & Glowing */
+    --border: rgba(255, 255, 255, 0.08);
+    --border-light: rgba(255, 255, 255, 0.04);
+    --border-subtle: rgba(255, 255, 255, 0.02);
     --border-focus: #3B82F6;      /* Blue focus ring */
     
     /* Radius */
@@ -72,13 +74,13 @@
     --shadow-card-hover: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 
                          0 10px 10px -5px rgba(0, 0, 0, 0.04);
     
-    /* Gradients & Overlays */
-    --overlay-light: rgba(255, 255, 255, 0.95);
-    --overlay-subtle: rgba(248, 250, 252, 0.95);
-    --overlay-border: rgba(148, 163, 184, 0.2);
-    --overlay-shadow-inner: rgba(255, 255, 255, 0.5);
-    --overlay-shadow-main: rgba(0, 0, 0, 0.1);
-    --bg-hover-subtle: rgba(0, 0, 0, 0.03);
+    /* Gradients & Overlays - Updated for dark glassmorphism */
+    --overlay-light: rgba(30, 41, 59, 0.8);      /* --bg-secondary with alpha */
+    --overlay-subtle: rgba(51, 65, 85, 0.6);     /* --bg-tertiary with alpha */
+    --overlay-border: rgba(255, 255, 255, 0.1);  /* glass border */
+    --overlay-shadow-inner: rgba(255, 255, 255, 0.05);
+    --overlay-shadow-main: rgba(0, 0, 0, 0.3);
+    --bg-hover-subtle: rgba(255, 255, 255, 0.05);
     
     /* Note: Tailwind and components use hex values directly from the root variables above */
   }
@@ -274,15 +276,17 @@ a:focus-visible {
 }
 
 .auth-form-container {
-  backdrop-filter: blur(12px);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
   background: linear-gradient(145deg, 
     var(--overlay-light), 
     var(--overlay-subtle)
   );
   border: 1px solid var(--overlay-border);
   box-shadow: 
-    0 10px 25px -5px var(--overlay-shadow-main),
-    0 0 0 1px var(--overlay-shadow-inner) inset;
+    0 20px 40px -10px rgba(0, 0, 0, 0.5),
+    0 0 0 1px var(--overlay-shadow-inner) inset,
+    0 0 100px -20px rgba(99, 102, 241, 0.1);
 }
 
 /* ==========================================

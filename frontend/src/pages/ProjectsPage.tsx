@@ -65,9 +65,9 @@ const ProjectsPage: React.FC = () => {
   // Loading state
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-[var(--bg-secondary)] via-[var(--primary-subtle)] to-[var(--bg-secondary)]">
+      <div className="min-h-screen bg-[var(--background)]">
         <div className="flex flex-col items-center justify-center py-20">
-          <div className="bg-white/80 backdrop-blur-sm rounded-2xl p-8 border border-[var(--border)] shadow-lg">
+          <div className="bg-[var(--bg-secondary)]/80 backdrop-blur-sm rounded-2xl p-8 border border-[var(--glass-border)] shadow-lg">
             <Spinner size="lg" text="Loading your projects..." />
           </div>
         </div>
@@ -172,10 +172,6 @@ const ProjectsPage: React.FC = () => {
             isOpen={operations.isSharingDialogOpen}
             onClose={operations.closeSharingDialog}
             project={operations.sharingProject}
-            onInviteUser={operations.handleInviteUser}
-            onRemoveMember={operations.handleRemoveMember}
-            isInviting={operations.isInvitingUser}
-            error={operations.sharingError}
           />
         )}
       </div>

@@ -128,7 +128,7 @@ const ProjectStats: React.FC<ProjectStatsProps> = ({
         {statsCards.map((stat, index) => (
           <div 
             key={index}
-            className="bg-white/80 backdrop-blur-sm rounded-xl p-4 border border-[var(--border)]/60 hover:bg-white hover:shadow-md transition-all duration-200"
+            className="bg-[var(--bg-secondary)]/80 backdrop-blur-sm rounded-xl p-4 border border-[var(--glass-border)] hover:bg-[var(--surface-hover)] hover:shadow-md transition-all duration-200"
           >
             <div className="flex items-center space-x-3">
               <div className={`p-3 rounded-xl ${stat.bgColor} border border-[var(--border)]/60`}>
@@ -146,7 +146,7 @@ const ProjectStats: React.FC<ProjectStatsProps> = ({
       </div>
 
       {/* Task Breakdown */}
-      <div className="bg-white/80 backdrop-blur-sm rounded-2xl p-6 border border-[var(--border)]/60 hover:bg-white hover:shadow-md transition-all duration-200">
+      <div className="bg-[var(--bg-secondary)]/80 backdrop-blur-sm rounded-2xl p-6 border border-[var(--glass-border)] hover:bg-[var(--surface-hover)] hover:shadow-md transition-all duration-200">
         <h3 className="text-lg font-semibold text-[var(--text-primary)] mb-4">Task Breakdown</h3>
         <div className="space-y-4">
           {/* Completed Tasks */}

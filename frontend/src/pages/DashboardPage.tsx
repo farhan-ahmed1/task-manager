@@ -1,29 +1,24 @@
 import React, { useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import { Progress } from '@/components/ui/progress';
+import { cn } from '@/lib/utils';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Spinner } from '@/components/ui/spinner';
-import { PageTitle } from '@/components/ui/page-title';
-import { EmptyState } from '@/components/ui/empty-state';
 import PageContainer from '@/components/ui/page-container';
 import { 
-  Plus, 
   TrendingUp, 
   CheckCircle2, 
   Clock, 
-  FolderOpen, 
   Calendar,
   BarChart3,
-  AlertCircle,
-  User,
-  Target
+  Target,
+  ArrowUpRight,
+  Zap,
+  Layout,
+  ListTodo
 } from 'lucide-react';
 import { useProjects } from '@/hooks/useProjects';
 import { useTasks } from '@/hooks/useTasks';
-import { getTaskStatusColor, getTaskPriorityColor, getRelativeTime } from '@/lib/taskUtils';
+import { getRelativeTime } from '@/lib/taskUtils';
 
 interface DashboardStats {
   totalTasks: number;
@@ -34,6 +29,47 @@ interface DashboardStats {
   completionRate: number;
 }
 
+interface StatCardProps {
+  title: string;
+  value: number;
+  icon: React.ComponentType<{ className?: string }>;
+  trend?: string;
+  color?: string;
+}
+
+const GlassCard = ({ className, children, ...props }: React.HTMLAttributes<HTMLDivElement>) => (
+  <div 
+    className={cn(
+      "relative overflow-hidden rounded-2xl border border-white/10 bg-white/5 p-6 backdrop-blur-xl transition-all duration-300 hover:bg-white/10 hover:shadow-2xl hover:shadow-primary/20 group",
+      className
+    )} 
+    {...props}
+  >
+    <div className="absolute inset-0 bg-gradient-to-br from-primary/10 via-transparent to-transparent opacity-0 transition-opacity duration-500 group-hover:opacity-100" />
+    <div className="relative z-10">{children}</div>
+  </div>
+);
+
+const StatCard = ({ title, value, icon: Icon, trend, color }: StatCardProps) => (
+  <GlassCard className="flex flex-col justify-between h-full">
+    <div className="flex justify-between items-start mb-4">
+      <div className={cn("p-3 rounded-xl bg-white/5 ring-1 ring-white/10", color)}>
+        <Icon className="w-6 h-6" />
+      </div>
+      {trend && (
+        <div className="flex items-center gap-1 text-xs font-medium text-emerald-400 bg-emerald-400/10 px-2 py-1 rounded-full">
+          <TrendingUp className="w-3 h-3" />
+          {trend}
+        </div>
+      )}
+    </div>
+    <div>
+      <h3 className="text-sm font-medium text-slate-400 mb-1">{title}</h3>
+      <div className="text-3xl font-bold text-white tracking-tight">{value}</div>
+    </div>
+  </GlassCard>
+);
+
 const DashboardPage: React.FC = () => {
   const navigate = useNavigate();
   const { data: projects = [], isLoading: projectsLoading } = useProjects();
@@ -41,7 +77,6 @@ const DashboardPage: React.FC = () => {
   
   const isLoading = projectsLoading || tasksLoading;
 
-  // Calculate dashboard stats
   const stats = useMemo<DashboardStats>(() => {
     const totalTasks = tasks.length;
     const completedTasks = tasks.filter(task => task.status === 'COMPLETED').length;
@@ -60,253 +95,224 @@ const DashboardPage: React.FC = () => {
     };
   }, [tasks, projects]);
 
-  // Get recent tasks (last 5)
   const recentTasks = useMemo(() => {
     return [...tasks]
       .sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
       .slice(0, 5);
   }, [tasks]);
 
+  const upcomingTasks = useMemo(() => {
+    return tasks
+      .filter(t => t.status !== 'COMPLETED' && t.due_date)
+      .sort((a, b) => new Date(a.due_date!).getTime() - new Date(b.due_date!).getTime())
+      .slice(0, 3);
+  }, [tasks]);
+
   if (isLoading) {
     return (
-      <PageContainer size="wide" centerContent>
-        <Spinner size="lg" text="Loading dashboard..." centered />
-      </PageContainer>
+      <div className="h-screen w-full flex items-center justify-center bg-[#0f172a]">
+        <Spinner size="lg" text="Loading your workspace..." centered className="text-primary" />
+      </div>
     );
   }
 
-  return (
-    <PageContainer size="wide">
-      <PageTitle 
-        icon={BarChart3}
-        subtitle="Welcome back! Here's an overview of your tasks and projects."
-        className="pt-8 pb-4"
-      >
-        Dashboard
-      </PageTitle>
+  const getGreeting = () => {
+    const hour = new Date().getHours();
+    if (hour < 12) return 'Good morning';
+    if (hour < 18) return 'Good afternoon';
+    return 'Good evening';
+  };
 
-      {/* Stats Overview */}
-      <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4 mb-8">
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Total Tasks</CardTitle>
-            <Target className="h-4 w-4 text-muted-foreground" aria-hidden="true" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-xl sm:text-2xl font-bold">{stats.totalTasks}</div>
-            <p className="text-xs text-muted-foreground">
-              {stats.completionRate}% completion rate
-            </p>
-          </CardContent>
-        </Card>
-        
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Completed</CardTitle>
-            <CheckCircle2 className="h-4 w-4 text-[var(--success)]" aria-hidden="true" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-xl sm:text-2xl font-bold text-[var(--success)]">{stats.completedTasks}</div>
-            <p className="text-xs text-muted-foreground">
-              Tasks finished
-            </p>
-          </CardContent>
-        </Card>
-        
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">In Progress</CardTitle>
-            <Clock className="h-4 w-4 text-[var(--primary)]" aria-hidden="true" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-xl sm:text-2xl font-bold text-[var(--primary)]">{stats.inProgressTasks}</div>
-            <p className="text-xs text-muted-foreground">
-              Currently working on
-            </p>
-          </CardContent>
-        </Card>
-        
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Projects</CardTitle>
-            <FolderOpen className="h-4 w-4 text-muted-foreground" aria-hidden="true" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-xl sm:text-2xl font-bold">{stats.totalProjects}</div>
-            <p className="text-xs text-muted-foreground">
-              Active projects
-            </p>
-          </CardContent>
-        </Card>
+  return (
+    <div className="min-h-screen bg-[#0f172a] text-slate-200 p-6 md:p-8 font-sans selection:bg-primary/30">
+      {/* Ambient Background Effects */}
+      <div className="fixed inset-0 z-0 pointer-events-none overflow-hidden">
+        <div className="absolute top-[-20%] left-[-10%] w-[50%] h-[50%] rounded-full bg-primary/20 blur-[120px] animate-pulse" />
+        <div className="absolute bottom-[-20%] right-[-10%] w-[50%] h-[50%] rounded-full bg-accent/20 blur-[120px] animate-pulse delay-1000" />
       </div>
 
-      {/* Progress Overview */}
-      {stats.totalTasks > 0 && (
-        <Card className="mb-8">
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <TrendingUp className="h-5 w-5" />
-              Overall Progress
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-4">
-              <div className="flex items-center justify-between">
-                <span className="text-sm font-medium">Completion Rate</span>
-                <span className="text-lg font-bold">{stats.completionRate}%</span>
+      <PageContainer size="wide" className="relative z-10">
+        {/* Header Section */}
+        <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-10 gap-4">
+          <div>
+            <h1 className="text-4xl md:text-5xl font-bold text-white mb-2 tracking-tight">
+              {getGreeting()}, <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary-light to-accent">Creator</span>
+            </h1>
+            <p className="text-slate-400 text-lg">Here's what's happening in your workspace today.</p>
+          </div>
+          <button 
+            onClick={() => navigate('/tasks/new')}
+            className="group flex items-center gap-2 px-6 py-3 bg-white text-slate-900 rounded-full font-semibold hover:bg-slate-200 transition-all shadow-[0_0_20px_rgba(255,255,255,0.3)] hover:shadow-[0_0_30px_rgba(255,255,255,0.5)]"
+          >
+            <Zap className="w-5 h-5 fill-current" />
+            <span>Quick Action</span>
+          </button>
+        </div>
+
+        {/* Bento Grid Layout */}
+        <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-6 mb-8">
+          {/* Main Stats - Spans 2 cols */}
+          <GlassCard className="md:col-span-2 lg:col-span-2 flex flex-col justify-between min-h-[200px]">
+            <div className="flex justify-between items-start">
+              <div>
+                <h3 className="text-slate-400 font-medium mb-1">Weekly Progress</h3>
+                <div className="text-4xl font-bold text-white">{stats.completionRate}%</div>
               </div>
-              <Progress value={stats.completionRate} className="h-3" />
-              <div className="grid grid-cols-3 gap-4 text-center">
-                <div>
-                  <div className="text-lg font-bold text-[var(--text-secondary)]">{stats.pendingTasks}</div>
-                  <div className="text-xs text-muted-foreground">Pending</div>
-                </div>
-                <div>
-                  <div className="text-lg font-bold text-[var(--primary)]">{stats.inProgressTasks}</div>
-                  <div className="text-xs text-muted-foreground">In Progress</div>
-                </div>
-                <div>
-                  <div className="text-lg font-bold text-[var(--success)]">{stats.completedTasks}</div>
-                  <div className="text-xs text-muted-foreground">Completed</div>
-                </div>
+              <div className="p-3 bg-primary/20 rounded-xl text-primary-light">
+                <BarChart3 className="w-8 h-8" />
               </div>
             </div>
-          </CardContent>
-        </Card>
-      )}
+            
+            <div className="mt-6">
+              <div className="flex justify-between text-sm mb-2 text-slate-400">
+                <span>Task Completion</span>
+                <span>{stats.completedTasks}/{stats.totalTasks} Tasks</span>
+              </div>
+              <div className="h-3 w-full bg-slate-800 rounded-full overflow-hidden">
+                <div 
+                  className="h-full bg-gradient-to-r from-primary to-accent transition-all duration-1000 ease-out"
+                  style={{ width: `${stats.completionRate}%` }}
+                />
+              </div>
+            </div>
+          </GlassCard>
 
-      <div className="grid gap-6 md:grid-cols-2">
-        {/* Recent Tasks */}
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between">
-            <CardTitle>Recent Tasks</CardTitle>
-            <Button 
-              variant="outline" 
-              size="sm"
-              onClick={() => navigate('/tasks')}
-            >
-              View All
-            </Button>
-          </CardHeader>
-          <CardContent>
-            {recentTasks.length === 0 ? (
-              <EmptyState
-                icon={AlertCircle}
-                title="No tasks yet"
-                description="Create your first task to get started!"
-                action={{
-                  label: "Create Task",
-                  onClick: () => navigate('/tasks'),
-                  icon: Plus
-                }}
-                iconSize="md"
-              />
-            ) : (
-              <ScrollArea className="h-[300px]">
-                <div className="space-y-3">
-                  {recentTasks.map((task) => (
-                    <div
-                      key={task.id}
-                      className="flex items-start justify-between p-3 bg-[var(--bg-secondary)] rounded-lg hover:bg-[var(--bg-tertiary)] transition-colors cursor-pointer"
-                      onClick={() => navigate('/tasks')}
-                    >
-                      <div className="flex-1 min-w-0">
-                        <h4 className="font-medium text-sm truncate">{task.title}</h4>
-                        {task.description && (
-                          <p className="text-xs text-muted-foreground mt-1 line-clamp-1">
-                            {task.description}
-                          </p>
-                        )}
-                        <div className="flex items-center gap-2 mt-2">
-                          <Badge variant="outline" className={`text-xs ${getTaskStatusColor(task.status)}`}>
-                            {task.status.replace('_', ' ')}
-                          </Badge>
-                          <Badge variant="outline" className={`text-xs ${getTaskPriorityColor(task.priority)}`}>
-                            {task.priority}
-                          </Badge>
-                        </div>
+          {/* Secondary Stats */}
+          <StatCard 
+            title="Active Projects" 
+            value={stats.totalProjects} 
+            icon={Layout} 
+            color="text-blue-400"
+            trend="+2 this week"
+          />
+          <StatCard 
+            title="Pending Tasks" 
+            value={stats.pendingTasks} 
+            icon={ListTodo} 
+            color="text-amber-400"
+          />
+        </div>
+
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          {/* Recent Activity - Spans 2 cols */}
+          <div className="lg:col-span-2 space-y-6">
+            <div className="flex items-center justify-between">
+              <h2 className="text-2xl font-bold text-white flex items-center gap-2">
+                <Clock className="w-6 h-6 text-primary-light" />
+                Recent Activity
+              </h2>
+              <button onClick={() => navigate('/tasks')} className="text-sm text-primary-light hover:text-white transition-colors">
+                View all
+              </button>
+            </div>
+
+            <div className="grid gap-4">
+              {recentTasks.length > 0 ? (
+                recentTasks.map((task) => (
+                  <GlassCard 
+                    key={task.id} 
+                    className="flex items-center justify-between p-4 hover:scale-[1.01] cursor-pointer group"
+                    onClick={() => navigate(`/tasks/${task.id}`)}
+                  >
+                    <div className="flex items-center gap-4">
+                      <div className={cn(
+                        "w-10 h-10 rounded-full flex items-center justify-center border border-white/10",
+                        task.status === 'COMPLETED' ? "bg-emerald-500/20 text-emerald-400" : "bg-slate-800 text-slate-400"
+                      )}>
+                        {task.status === 'COMPLETED' ? <CheckCircle2 className="w-5 h-5" /> : <Target className="w-5 h-5" />}
                       </div>
-                      <div className="flex flex-col items-end text-xs text-muted-foreground">
-                        <div className="flex items-center gap-1">
-                          <Calendar className="h-3 w-3" />
-                          <span>{getRelativeTime(task.created_at)}</span>
-                        </div>
-                        {task.due_date && (
-                          <div className="text-xs text-[var(--warning)] mt-1">
-                            Due: {new Date(task.due_date).toLocaleDateString()}
-                          </div>
-                        )}
+                      <div>
+                        <h4 className="font-medium text-slate-200 group-hover:text-white transition-colors">{task.title}</h4>
+                        <p className="text-sm text-slate-500">{task.project_id ? 'Project Task' : 'Inbox'} • {getRelativeTime(task.created_at)}</p>
                       </div>
                     </div>
-                  ))}
+                    <ArrowUpRight className="w-5 h-5 text-slate-600 group-hover:text-white transition-colors opacity-0 group-hover:opacity-100" />
+                  </GlassCard>
+                ))
+              ) : (
+                <GlassCard className="flex flex-col items-center justify-center py-12 text-center">
+                  <div className="w-16 h-16 bg-slate-800/50 rounded-full flex items-center justify-center mb-4">
+                    <ListTodo className="w-8 h-8 text-slate-600" />
+                  </div>
+                  <h3 className="text-lg font-medium text-slate-300">No recent activity</h3>
+                  <p className="text-slate-500 max-w-xs mx-auto mt-2">Start working on tasks to see your activity here.</p>
+                </GlassCard>
+              )}
+            </div>
+          </div>
+
+          {/* Upcoming / Quick View - Spans 1 col */}
+          <div className="space-y-6">
+            <h2 className="text-2xl font-bold text-white flex items-center gap-2">
+              <Calendar className="w-6 h-6 text-accent" />
+              Upcoming
+            </h2>
+            
+            <div className="space-y-4">
+              {upcomingTasks.length > 0 ? (
+                upcomingTasks.map((task) => (
+                  <GlassCard key={task.id} className="p-5 border-l-4 border-l-primary">
+                    <div className="flex justify-between items-start mb-2">
+                      <span className="text-xs font-bold text-primary-light uppercase tracking-wider">
+                        {task.due_date ? new Date(task.due_date).toLocaleDateString(undefined, { weekday: 'short', day: 'numeric' }) : 'No Date'}
+                      </span>
+                      {task.priority && (
+                        <span className={cn(
+                          "w-2 h-2 rounded-full",
+                          task.priority === 'HIGH' ? "bg-red-500 shadow-[0_0_8px_rgba(239,68,68,0.6)]" : 
+                          task.priority === 'MEDIUM' ? "bg-amber-500" : "bg-blue-500"
+                        )} />
+                      )}
+                    </div>
+                    <h4 className="font-medium text-slate-200 line-clamp-2 mb-3">{task.title}</h4>
+                    <button 
+                      onClick={() => navigate(`/tasks/${task.id}`)}
+                      className="text-xs font-medium text-slate-400 hover:text-white transition-colors flex items-center gap-1"
+                    >
+                      View Details <ArrowUpRight className="w-3 h-3" />
+                    </button>
+                  </GlassCard>
+                ))
+              ) : (
+                <GlassCard className="p-8 text-center">
+                  <p className="text-slate-400">No upcoming deadlines.</p>
+                  <button 
+                    onClick={() => navigate('/tasks/new')}
+                    className="mt-4 text-sm text-primary hover:text-primary-light font-medium"
+                  >
+                    + Add Task
+                  </button>
+                </GlassCard>
+              )}
+
+              {/* Mini Project List */}
+              <GlassCard className="mt-8 p-0 overflow-hidden">
+                <div className="p-4 border-b border-white/5 bg-white/5">
+                  <h3 className="font-semibold text-white">Quick Projects</h3>
                 </div>
-              </ScrollArea>
-            )}
-          </CardContent>
-        </Card>
-        
-        {/* Active Projects */}
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between">
-            <CardTitle>Active Projects</CardTitle>
-            <Button 
-              variant="outline" 
-              size="sm"
-              onClick={() => navigate('/projects')}
-            >
-              View All
-            </Button>
-          </CardHeader>
-          <CardContent>
-            {projects.length === 0 ? (
-              <EmptyState
-                icon={FolderOpen}
-                title="No projects yet"
-                description="Create your first project to organize your tasks!"
-                action={{
-                  label: "Create Project",
-                  onClick: () => navigate('/projects'),
-                  icon: Plus
-                }}
-                iconSize="md"
-              />
-            ) : (
-              <ScrollArea className="h-[300px]">
-                <div className="space-y-3">
-                  {projects.slice(0, 5).map((project) => {
-                    return (
-                      <div
+                <ScrollArea className="h-[200px]">
+                  <div className="p-2">
+                    {projects.slice(0, 5).map(project => (
+                      <div 
                         key={project.id}
-                        className="p-3 bg-[var(--bg-secondary)] rounded-lg hover:bg-[var(--bg-tertiary)] transition-colors cursor-pointer"
-                        onClick={() => navigate('/projects')}
+                        onClick={() => navigate(`/projects/${project.id}`)}
+                        className="flex items-center gap-3 p-3 rounded-lg hover:bg-white/5 cursor-pointer transition-colors"
                       >
-                        <div className="flex items-start justify-between mb-2">
-                          <h4 className="font-medium text-sm truncate">{project.name}</h4>
-                          <div className="flex items-center gap-1 text-xs text-muted-foreground">
-                            <User className="h-3 w-3" />
-                            <BarChart3 className="h-3 w-3" />
-                          </div>
-                        </div>
-                        {project.description && (
-                          <p className="text-xs text-muted-foreground mb-2 line-clamp-1">
-                            {project.description}
-                          </p>
-                        )}
-                        <div className="space-y-1">
-                            <div className="text-xs text-muted-foreground">
-                              View project details
-                            </div>
-                          </div>
+                        <div 
+                          className="w-3 h-3 rounded-full" 
+                          style={{ backgroundColor: project.color || '#6366f1' }}
+                        />
+                        <span className="text-sm text-slate-300 truncate">{project.name}</span>
                       </div>
-                    );
-                  })}
-                </div>
-              </ScrollArea>
-            )}
-          </CardContent>
-        </Card>
-      </div>
-    </PageContainer>
+                    ))}
+                  </div>
+                </ScrollArea>
+              </GlassCard>
+            </div>
+          </div>
+        </div>
+      </PageContainer>
+    </div>
   );
 };
 

@@ -10,12 +10,12 @@ const AppLayout: React.FC = () => {
   const { isOpen, close, open } = useCommandPalette();
 
   return (
-    <div className="h-screen flex overflow-hidden bg-background">
+    <div className="h-screen flex overflow-hidden bg-[#0f172a]">
       {/* Mobile sidebar overlay */}
       {sidebarOpen && (
         <div className="fixed inset-0 flex z-40 md:hidden">
           <div 
-            className="fixed inset-0 bg-[var(--text-tertiary)] bg-opacity-75" 
+            className="fixed inset-0 bg-slate-900/80 backdrop-blur-sm transition-opacity" 
             onClick={() => setSidebarOpen(false)} 
           />
           <div className="relative flex-1 flex flex-col max-w-[304px] w-full">
@@ -57,7 +57,7 @@ const AppLayout: React.FC = () => {
             onClick={() => {
               setSidebarOpen(true);
             }}
-            className="p-2 rounded-lg transition-all duration-200 text-[var(--text-tertiary)] hover:bg-[var(--bg-tertiary)] hover:bg-opacity-50 hover:scale-110 active:scale-95"
+            className="p-2 rounded-lg transition-all duration-200 text-slate-400 hover:text-white hover:bg-white/10 hover:scale-110 active:scale-95"
             title="Open sidebar"
           >
             <PanelLeftClose className="w-5 h-5" />
@@ -69,23 +69,23 @@ const AppLayout: React.FC = () => {
       <div className={`flex flex-col w-0 flex-1 overflow-hidden transition-all duration-500 ease-out ${
         !sidebarOpen ? 'md:ml-16' : ''
       }`}>
-        {/* Compact Header - 56px height, similar to Todoist */}
+        {/* Compact Header - Glassmorphism */}
         <header 
-          className="flex items-center justify-end px-4 gap-2 h-56px min-h-56px border-b border-border bg-background"
+          className="flex items-center justify-end px-4 gap-2 h-14 min-h-[3.5rem] border-b border-white/5 bg-[#0f172a]/50 backdrop-blur-md z-10"
         >
           {/* Mobile menu button - only on mobile */}
           <button
             type="button"
-            className="md:hidden flex items-center justify-center h-8 w-8 transition-all duration-150 mr-auto rounded-sm text-text-muted hover:bg-surface-hover hover:text-text-primary"
+            className="md:hidden flex items-center justify-center h-8 w-8 transition-all duration-150 mr-auto rounded-sm text-slate-400 hover:bg-white/10 hover:text-white"
             onClick={() => setSidebarOpen(true)}
           >
             <span className="sr-only">Open sidebar</span>
             <Menu className="h-5 w-5" />
           </button>
 
-          {/* Filter buttons - placeholder for now, can be customized per page */}
+          {/* Filter buttons */}
           <button 
-            className="flex items-center justify-center h-8 w-8 rounded transition-all duration-150 text-text-muted hover:bg-surface-hover"
+            className="flex items-center justify-center h-8 w-8 rounded transition-all duration-150 text-slate-400 hover:bg-white/10 hover:text-white"
             title="Filter by collaborator"
           >
             <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none">
@@ -94,7 +94,7 @@ const AppLayout: React.FC = () => {
           </button>
 
           <button 
-            className="flex items-center justify-center h-8 w-8 rounded transition-all duration-150 text-text-muted hover:bg-surface-hover"
+            className="flex items-center justify-center h-8 w-8 rounded transition-all duration-150 text-slate-400 hover:bg-white/10 hover:text-white"
             title="Completed tasks"
           >
             <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" viewBox="0 0 24 24">

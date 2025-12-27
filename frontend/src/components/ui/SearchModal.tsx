@@ -365,7 +365,7 @@ export function SearchModal({ isOpen, onClose }: SearchModalProps) {
           {/* No Results */}
           {query.trim() && filteredGroups.length === 0 && (
             <div className="py-12 text-center">
-              <p className="text-sm text-gray-500 dark:text-gray-400">No results found</p>
+              <p className="text-sm text-[var(--text-secondary)]">No results found</p>
             </div>
           )}
         </div>

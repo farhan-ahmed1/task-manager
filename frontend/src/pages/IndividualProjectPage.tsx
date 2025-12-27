@@ -130,10 +130,6 @@ const IndividualProjectPage: React.FC = () => {
           isOpen={operations.isSharingDialogOpen}
           onClose={operations.closeSharingDialog}
           project={operations.sharingProject}
-          onInviteUser={operations.handleInviteUser}
-          onRemoveMember={operations.handleRemoveMember}
-          isInviting={operations.isInvitingUser}
-          error={operations.sharingError}
         />
       )}
     </div>

@@ -23,7 +23,7 @@ const AddTaskPage: React.FC = () => {
         Add Task
       </PageTitle>
       
-      <div className="bg-white rounded-lg border border-[var(--border)] p-6">
+      <div className="bg-[var(--bg-secondary)] rounded-lg border border-[var(--glass-border)] p-6">
         <p className="text-[var(--text-secondary)]">
           Task creation form would go here. This is a placeholder page to demonstrate the navigation structure.
         </p>

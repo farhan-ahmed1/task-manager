@@ -1,6 +1,5 @@
 import React, { useMemo } from 'react';
 import { Calendar, Plus } from 'lucide-react';
-import { Button } from '@/components/ui/button';
 import { PageTitle } from '@/components/ui/page-title';
 import { PageSpinner } from '@/components/ui/spinner';
 import { EmptyState } from '@/components/ui/empty-state';

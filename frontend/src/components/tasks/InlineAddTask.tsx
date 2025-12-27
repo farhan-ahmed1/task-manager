@@ -440,7 +440,7 @@ const InlineAddTask: React.FC<InlineAddTaskProps> = ({
             {/* Priority Picker Dropdown */}
             {showPriorityPicker && (
               <div 
-                className="absolute left-0 w-48 bg-white border border-[var(--border)] rounded-lg shadow-lg z-50"
+                className="absolute left-0 w-48 bg-[var(--bg-secondary)] border border-[var(--glass-border)] rounded-lg shadow-lg z-50 backdrop-blur-xl"
                 style={
                   calculatePriorityPickerPosition() === 'top'
                     ? { bottom: '100%', marginBottom: '0.5rem' }
@@ -503,7 +503,7 @@ const InlineAddTask: React.FC<InlineAddTaskProps> = ({
             {/* Project Picker Dropdown */}
             {showProjectPicker && (
               <div 
-                className="absolute left-0 w-64 bg-white border border-[var(--border)] rounded-lg shadow-lg z-50 max-h-48 overflow-y-auto"
+                className="absolute left-0 w-64 bg-[var(--bg-secondary)] border border-[var(--glass-border)] rounded-lg shadow-lg z-50 max-h-48 overflow-y-auto backdrop-blur-xl"
                 style={
                   calculateProjectPickerPosition() === 'top'
                     ? { bottom: '100%', marginBottom: '0.5rem' }

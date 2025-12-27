@@ -5,20 +5,20 @@ import { cva, type VariantProps } from "class-variance-authority"
 import { cn } from "@/lib/utils"
 
 const buttonVariants = cva(
-  "inline-flex items-center justify-center gap-2 whitespace-nowrap text-sm font-medium transition-colors disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg:not([class*='size-'])]:size-4 shrink-0 [&_svg]:shrink-0 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-blue-500 rounded-lg",
+  "inline-flex items-center justify-center gap-2 whitespace-nowrap text-sm font-medium transition-colors disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg:not([class*='size-'])]:size-4 shrink-0 [&_svg]:shrink-0 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[var(--primary)] rounded-lg",
   {
     variants: {
       variant: {
-        default: "bg-gray-900 text-white hover:opacity-90",
-        primary: "bg-[#2563EB] text-white hover:bg-[#1E40AF] shadow-sm hover:shadow-md transition-all",
+        default: "bg-[var(--bg-tertiary)] text-[var(--text-primary)] hover:bg-[var(--surface-hover)] hover:opacity-90",
+        primary: "bg-[var(--primary)] text-white hover:bg-[var(--primary-dark)] shadow-sm hover:shadow-md transition-all",
         destructive:
-          "bg-red-600 text-white hover:opacity-90",
+          "bg-[var(--error)] text-white hover:opacity-90",
         outline:
-          "border border-[var(--border)] bg-white hover:opacity-60",
+          "border border-[var(--border)] bg-transparent text-[var(--text-primary)] hover:bg-[var(--surface-hover)] hover:opacity-80",
         secondary:
           "bg-[var(--bg-tertiary)] text-[var(--text-primary)] hover:opacity-80",
         ghost:
-          "hover:opacity-60 hover:bg-[var(--bg-secondary)]",
+          "hover:opacity-60 hover:bg-[var(--surface-hover)] text-[var(--text-primary)]",
         link: "text-[var(--primary)] underline-offset-4 hover:underline hover:opacity-80",
       },
       size: {

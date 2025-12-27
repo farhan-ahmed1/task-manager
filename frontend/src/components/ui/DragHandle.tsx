@@ -8,7 +8,7 @@ interface DragHandleProps {
 const DragHandle: React.FC<DragHandleProps> = ({ isDragging = false }) => {
   return (
     <button
-      className="drag-handle flex items-center justify-center w-6 h-6 transition-all duration-200 hover:bg-gray-100/80 rounded-md"
+      className="drag-handle flex items-center justify-center w-6 h-6 transition-all duration-200 hover:bg-[var(--surface-hover)] rounded-md"
       style={{
         color: 'var(--text-secondary)',
         cursor: isDragging ? 'grabbing' : 'grab'

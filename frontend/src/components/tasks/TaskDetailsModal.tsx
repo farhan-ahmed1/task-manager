@@ -155,7 +155,7 @@ const TaskDetailsModal: React.FC<TaskDetailsModalProps> = ({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-5xl max-h-[90vh] p-0 overflow-hidden">
         {/* Custom Header with Navigation */}
-        <div className="sticky top-0 bg-white border-b border-[var(--border)] px-6 py-4 flex items-center justify-between z-10">
+        <div className="sticky top-0 bg-[var(--bg-secondary)] border-b border-[var(--border)] px-6 py-4 flex items-center justify-between z-10">
           {/* Left: Breadcrumb */}
           <div className="flex items-center gap-2">
             <FolderOpen className="h-4 w-4 text-[var(--text-tertiary)]" />
@@ -232,8 +232,8 @@ const TaskDetailsModal: React.FC<TaskDetailsModalProps> = ({
                   onClick={handleCompleteToggle}
                   className={`mt-1 flex-shrink-0 w-6 h-6 rounded-full border-2 flex items-center justify-center transition-all duration-200 ${
                     task.status === 'COMPLETED'
-                      ? 'bg-green-500 border-green-500 text-white shadow-md'
-                      : 'border-[var(--border)] hover:border-green-400 hover:bg-green-50'
+                      ? 'bg-[var(--success)] border-[var(--success)] text-white shadow-md'
+                      : 'border-[var(--border)] hover:border-[var(--success)] hover:bg-[var(--success-light)]'
                   }`}
                   aria-label={task.status === 'COMPLETED' ? 'Mark as incomplete' : 'Mark as complete'}
                 >

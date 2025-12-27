@@ -92,7 +92,7 @@ export const TaskCardActions: React.FC<TaskCardActionsProps> = ({
             <span className="sr-only">Open menu</span>
           </Button>
         </DropdownMenuTrigger>
-        <DropdownMenuContent align="end" className="w-48 bg-white/95 backdrop-blur-sm border-[var(--border)]">
+        <DropdownMenuContent align="end" className="w-48 bg-[var(--bg-secondary)]/95 backdrop-blur-sm border-[var(--glass-border)]">
           <DropdownMenuItem onClick={(e: React.MouseEvent) => { e.stopPropagation(); onView(task); }} className="text-foreground hover:bg-muted cursor-pointer">
             <Eye className="w-4 h-4 mr-2 icon-enhanced" strokeWidth={2} aria-hidden="true" />
             View Details

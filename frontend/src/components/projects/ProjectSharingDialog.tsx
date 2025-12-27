@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -8,7 +8,6 @@ import { Alert } from '@/components/ui/alert';
 import { Badge } from '@/components/ui/badge';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { ButtonSpinner, Spinner } from '@/components/ui/spinner';
-// import { Separator } from '@/components/ui/separator'; // Component doesn't exist yet
 import { 
   AlertCircle, 
   Mail, 
@@ -24,6 +23,7 @@ import {
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
+import { useProjectMembers, useInviteUserToProject, useRemoveProjectMember } from '@/hooks/useProjects';
 import type { Project } from '@/types/api';
 
 // Types for project sharing
@@ -64,25 +64,24 @@ interface ProjectSharingDialogProps {
   isOpen: boolean;
   onClose: () => void;
   project: Project;
-  onInviteUser?: (email: string, role: 'ADMIN' | 'MEMBER' | 'VIEWER') => Promise<void>;
-  onRemoveMember?: (userId: string) => Promise<void>;
-  isInviting?: boolean;
-  error?: string | null;
 }
 
 const ProjectSharingDialog: React.FC<ProjectSharingDialogProps> = ({
   isOpen,
   onClose,
   project,
-  onInviteUser,
-  onRemoveMember,
-  isInviting = false,
-  error,
 }) => {
-  const [members, setMembers] = useState<ProjectMember[]>([]);
-  const [isLoadingMembers, setIsLoadingMembers] = useState(false);
-  const [membersError, setMembersError] = useState<string | null>(null);
   const [copySuccess, setCopySuccess] = useState(false);
+
+  // React Query hooks for data fetching and mutations
+  const { 
+    data: members = [], 
+    isLoading: isLoadingMembers,
+    error: membersError 
+  } = useProjectMembers(project.id);
+  
+  const inviteMutation = useInviteUserToProject();
+  const removeMemberMutation = useRemoveProjectMember();
 
   const {
     register,
@@ -100,56 +99,30 @@ const ProjectSharingDialog: React.FC<ProjectSharingDialogProps> = ({
 
   const selectedRole = watch('role');
 
-  const loadMembers = React.useCallback(async () => {
-    setIsLoadingMembers(true);
-    setMembersError(null);
-
-    try {
-      const response = await fetch(`http://localhost:3000/api/projects/${project.id}/members`, {
-        headers: {
-          'Authorization': `Bearer ${localStorage.getItem('authToken')}`,
-        },
-      });
-
-      if (!response.ok) {
-        throw new Error('Failed to load project members');
-      }
-
-      const data = await response.json();
-      setMembers(data.data || []);
-    } catch (err) {
-      setMembersError(err instanceof Error ? err.message : 'Failed to load members');
-    } finally {
-      setIsLoadingMembers(false);
-    }
-  }, [project.id]);
-
-  // Load project members when dialog opens
-  useEffect(() => {
-    if (isOpen && project) {
-      loadMembers();
-    }
-  }, [isOpen, project, loadMembers]);
-
   const onFormSubmit = async (data: InviteUserFormData) => {
-    if (onInviteUser) {
-      try {
-        await onInviteUser(data.email, data.role);
-        reset();
-        await loadMembers(); // Reload members after successful invite
-      } catch (err) {
-        // Error is handled by parent component
-      }
+    try {
+      await inviteMutation.mutateAsync({
+        projectId: project.id,
+        email: data.email,
+        role: data.role,
+      });
+      reset();
+    } catch (err) {
+      // Error is handled by React Query and shown in toast
+      console.error('Failed to invite user:', err);
     }
   };
 
   const handleRemoveMember = async (member: ProjectMember) => {
-    if (onRemoveMember && member.role !== 'OWNER') {
+    if (member.role !== 'OWNER') {
       try {
-        await onRemoveMember(member.user_id);
-        await loadMembers(); // Reload members after removal
+        await removeMemberMutation.mutateAsync({
+          projectId: project.id,
+          userId: member.user_id,
+        });
       } catch (err) {
-        // Error is handled by parent component
+        // Error is handled by React Query and shown in toast
+        console.error('Failed to remove member:', err);
       }
     }
   };
@@ -197,7 +170,7 @@ const ProjectSharingDialog: React.FC<ProjectSharingDialogProps> = ({
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-lg bg-white text-[var(--text-primary)]">
+      <DialogContent className="sm:max-w-lg">
         <DialogHeader>
           <DialogTitle className="text-[var(--text-primary)] flex items-center gap-2">
             <UserPlus className="h-5 w-5" />
@@ -210,12 +183,14 @@ const ProjectSharingDialog: React.FC<ProjectSharingDialogProps> = ({
 
         <div className="space-y-6">
           {/* Error Alert */}
-          {error && (
+          {(inviteMutation.error || removeMemberMutation.error) && (
             <Alert variant="destructive">
               <AlertCircle className="h-4 w-4" />
               <div className="ml-2">
                 <p className="text-sm font-medium">Error</p>
-                <p className="text-sm">{error}</p>
+                <p className="text-sm">
+                  {inviteMutation.error?.message || removeMemberMutation.error?.message}
+                </p>
               </div>
             </Alert>
           )}
@@ -234,11 +209,11 @@ const ProjectSharingDialog: React.FC<ProjectSharingDialogProps> = ({
                     id="email"
                     type="email"
                     placeholder="Enter email address..."
-                    className={`pl-10 bg-white border-[var(--border)] text-[var(--text-primary)] placeholder-[var(--text-muted)] ${
+                    className={`pl-10 bg-[var(--bg-tertiary)] border-[var(--border)] text-[var(--text-primary)] placeholder-[var(--text-muted)] ${
                       errors.email ? 'border-red-500' : ''
                     }`}
                     {...register('email')}
-                    disabled={isInviting}
+                    disabled={inviteMutation.isPending}
                   />
                 </div>
                 {errors.email && (
@@ -254,9 +229,9 @@ const ProjectSharingDialog: React.FC<ProjectSharingDialogProps> = ({
                 <Select
                   value={selectedRole}
                   onValueChange={(value: 'ADMIN' | 'MEMBER' | 'VIEWER') => setValue('role', value)}
-                  disabled={isInviting}
+                  disabled={inviteMutation.isPending}
                 >
-                  <SelectTrigger className="bg-white border-[var(--border)] text-[var(--text-primary)]">
+                  <SelectTrigger className="bg-[var(--bg-tertiary)] border-[var(--border)] text-[var(--text-primary)]">
                     <SelectValue placeholder="Select role" />
                   </SelectTrigger>
                   <SelectContent>
@@ -296,9 +271,9 @@ const ProjectSharingDialog: React.FC<ProjectSharingDialogProps> = ({
             <Button
               type="submit"
               className="w-full bg-[var(--text-primary)] text-white hover:bg-[var(--text-primary)]/90"
-              disabled={isInviting}
+              disabled={inviteMutation.isPending}
             >
-              {isInviting && <ButtonSpinner />}
+              {inviteMutation.isPending && <ButtonSpinner />}
               Send Invitation
             </Button>
           </form>
@@ -345,7 +320,9 @@ const ProjectSharingDialog: React.FC<ProjectSharingDialogProps> = ({
             ) : membersError ? (
               <Alert variant="destructive">
                 <AlertCircle className="h-4 w-4" />
-                <p className="text-sm">{membersError}</p>
+                <p className="text-sm">
+                  {membersError instanceof Error ? membersError.message : 'Failed to load members'}
+                </p>
               </Alert>
             ) : (
               <ScrollArea className="max-h-40">
@@ -379,9 +356,14 @@ const ProjectSharingDialog: React.FC<ProjectSharingDialogProps> = ({
                             variant="ghost"
                             size="sm"
                             onClick={() => handleRemoveMember(member)}
+                            disabled={removeMemberMutation.isPending}
                             className="h-6 w-6 p-0 text-error hover:text-error hover:bg-error-light"
                           >
-                            <Trash2 className="h-3 w-3" />
+                            {removeMemberMutation.isPending ? (
+                              <ButtonSpinner />
+                            ) : (
+                              <Trash2 className="h-3 w-3" />
+                            )}
                           </Button>
                         )}
                       </div>

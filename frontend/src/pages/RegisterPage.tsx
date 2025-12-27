@@ -119,7 +119,7 @@ const RegisterPage: React.FC = () => {
           <CardContent className="space-y-6 p-8">
             <form onSubmit={handleSubmit} className="space-y-6">
               {generalError && (
-                <div className="flex items-center gap-2 p-3 text-sm text-[var(--error)] bg-[var(--error-light)] border border-red-200 rounded-md">
+                <div className="flex items-center gap-2 p-3 text-sm text-[var(--error)] bg-[var(--error-light)] border border-[var(--error)]/20 rounded-md">
                   <AlertCircle className="w-4 h-4" />
                   {generalError}
                 </div>
@@ -135,7 +135,7 @@ const RegisterPage: React.FC = () => {
                   name="name"
                   type="text"
                   placeholder="Enter your full name"
-                  className={`h-12 text-base ${errors.name ? 'border-red-500 focus:border-red-500' : ''}`}
+                  className={`h-12 text-base ${errors.name ? 'border-[var(--error)] focus:border-[var(--error)]' : ''}`}
                   value={formData.name}
                   onChange={handleInputChange}
                   required
@@ -158,7 +158,7 @@ const RegisterPage: React.FC = () => {
                   name="email"
                   type="email"
                   placeholder="Enter your email address"
-                  className={`h-12 text-base ${errors.email ? 'border-red-500 focus:border-red-500' : ''}`}
+                  className={`h-12 text-base ${errors.email ? 'border-[var(--error)] focus:border-[var(--error)]' : ''}`}
                   value={formData.email}
                   onChange={handleInputChange}
                   required
@@ -181,7 +181,7 @@ const RegisterPage: React.FC = () => {
                   name="password"
                   type="password"
                   placeholder="Create a secure password (min 8 characters)"
-                  className={`h-12 text-base ${errors.password ? 'border-red-500 focus:border-red-500' : ''}`}
+                  className={`h-12 text-base ${errors.password ? 'border-[var(--error)] focus:border-[var(--error)]' : ''}`}
                   value={formData.password}
                   onChange={handleInputChange}
                   required
@@ -204,7 +204,7 @@ const RegisterPage: React.FC = () => {
                   name="confirmPassword"
                   type="password"
                   placeholder="Confirm your password"
-                  className={`h-12 text-base ${errors.confirmPassword ? 'border-red-500 focus:border-red-500' : ''}`}
+                  className={`h-12 text-base ${errors.confirmPassword ? 'border-[var(--error)] focus:border-[var(--error)]' : ''}`}
                   value={formData.confirmPassword}
                   onChange={handleInputChange}
                   required

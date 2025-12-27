@@ -175,7 +175,7 @@ const ProjectHeader: React.FC<ProjectHeaderProps> = ({
                 <select 
                   value={viewOptions.groupBy}
                   onChange={(e) => handleViewOptionsChange('groupBy', e.target.value)}
-                  className="w-full p-2 text-sm border border-[var(--border)] rounded-md bg-white"
+                  className="w-full p-2 text-sm border border-[var(--border)] rounded-md bg-[var(--bg-tertiary)] text-[var(--text-primary)]"
                 >
                   <option value="default">None (default)</option>
                   <option value="date">Date</option>
@@ -189,7 +189,7 @@ const ProjectHeader: React.FC<ProjectHeaderProps> = ({
                 <select 
                   value={viewOptions.sortBy}
                   onChange={(e) => handleViewOptionsChange('sortBy', e.target.value)}
-                  className="w-full p-2 text-sm border border-[var(--border)] rounded-md bg-white"
+                  className="w-full p-2 text-sm border border-[var(--border)] rounded-md bg-[var(--bg-tertiary)] text-[var(--text-primary)]"
                 >
                   <option value="manual">Manual (default)</option>
                   <option value="date">Date</option>
@@ -217,7 +217,7 @@ const ProjectHeader: React.FC<ProjectHeaderProps> = ({
                 <select 
                   value={viewOptions.dateFilter}
                   onChange={(e) => handleViewOptionsChange('dateFilter', e.target.value)}
-                  className="w-full p-2 text-sm border border-[var(--border)] rounded-md bg-white"
+                  className="w-full p-2 text-sm border border-[var(--border)] rounded-md bg-[var(--bg-tertiary)] text-[var(--text-primary)]"
                 >
                   <option value="all">All (default)</option>
                   <option value="today">Today</option>
@@ -231,7 +231,7 @@ const ProjectHeader: React.FC<ProjectHeaderProps> = ({
                 <select 
                   value={viewOptions.priorityFilter}
                   onChange={(e) => handleViewOptionsChange('priorityFilter', e.target.value)}
-                  className="w-full p-2 text-sm border border-[var(--border)] rounded-md bg-white"
+                  className="w-full p-2 text-sm border border-[var(--border)] rounded-md bg-[var(--bg-tertiary)] text-[var(--text-primary)]"
                 >
                   <option value="all">All (default)</option>
                   <option value="high">High</option>

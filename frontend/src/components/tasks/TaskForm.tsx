@@ -131,7 +131,7 @@ const TaskForm: React.FC<TaskFormProps> = ({
 
   return (
     <Dialog open={open} onOpenChange={handleClose}>
-      <DialogContent className="sm:max-w-[600px] bg-white">
+      <DialogContent className="sm:max-w-[600px]">
         <DialogHeader>
           <DialogTitle className="text-[var(--text-primary)]">
             {isEditMode ? 'Edit Task' : 'Create New Task'}
@@ -154,7 +154,7 @@ const TaskForm: React.FC<TaskFormProps> = ({
               id="title"
               placeholder="Enter task title..."
               {...register('title')}
-              className={`bg-white border-[var(--border)] text-[var(--text-primary)] placeholder-[var(--text-muted)] ${errors.title ? 'border-red-500' : ''}`}
+              className={`bg-[var(--bg-tertiary)] border-[var(--border)] text-[var(--text-primary)] placeholder-[var(--text-muted)] ${errors.title ? 'border-red-500' : ''}`}
             />
             {errors.title && (
               <p className="text-sm text-[var(--error)]">{errors.title.message}</p>
@@ -169,7 +169,7 @@ const TaskForm: React.FC<TaskFormProps> = ({
               placeholder="Enter task description..."
               rows={3}
               {...register('description')}
-              className={`bg-white border-[var(--border)] text-[var(--text-primary)] placeholder-[var(--text-muted)] ${errors.description ? 'border-red-500' : ''}`}
+              className={`bg-[var(--bg-tertiary)] border-[var(--border)] text-[var(--text-primary)] placeholder-[var(--text-muted)] ${errors.description ? 'border-red-500' : ''}`}
             />
             {errors.description && (
               <p className="text-sm text-[var(--error)]">{errors.description.message}</p>
@@ -188,12 +188,12 @@ const TaskForm: React.FC<TaskFormProps> = ({
                 onValueChange={(value: string) => setValue('project_id', value === 'none' ? '' : value)}
                 disabled={projectsLoading}
               >
-                <SelectTrigger className="bg-white border-[var(--border)] text-[var(--text-primary)]">
+                <SelectTrigger className="bg-[var(--bg-tertiary)] border-[var(--border)] text-[var(--text-primary)]">
                   <SelectValue 
                     placeholder={projectsLoading ? "Loading projects..." : "Select a project (optional)"} 
                   />
                 </SelectTrigger>
-                <SelectContent className="bg-white border-[var(--border)]">
+                <SelectContent className="bg-[var(--bg-secondary)] border-[var(--border)]">
                   <SelectItem value="none" className="text-[var(--text-primary)]">
                     <span className="text-[var(--text-secondary)]">No project</span>
                   </SelectItem>
@@ -219,10 +219,10 @@ const TaskForm: React.FC<TaskFormProps> = ({
                 value={status || 'PENDING'}
                 onValueChange={(value: 'PENDING' | 'IN_PROGRESS' | 'COMPLETED') => setValue('status', value)}
               >
-                <SelectTrigger className="bg-white border-[var(--border)] text-[var(--text-primary)]">
+                <SelectTrigger className="bg-[var(--bg-tertiary)] border-[var(--border)] text-[var(--text-primary)]">
                   <SelectValue placeholder="Select status" />
                 </SelectTrigger>
-                <SelectContent className="bg-white border-[var(--border)]">
+                <SelectContent className="bg-[var(--bg-secondary)] border-[var(--border)]">
                   <SelectItem value="PENDING" className="text-[var(--text-primary)]">Pending</SelectItem>
                   <SelectItem value="IN_PROGRESS" className="text-[var(--text-primary)]">In Progress</SelectItem>
                   <SelectItem value="COMPLETED" className="text-[var(--text-primary)]">Completed</SelectItem>
@@ -237,10 +237,10 @@ const TaskForm: React.FC<TaskFormProps> = ({
                 value={priority || 'MEDIUM'}
                 onValueChange={(value: 'LOW' | 'MEDIUM' | 'HIGH') => setValue('priority', value)}
               >
-                <SelectTrigger className="bg-white border-[var(--border)] text-[var(--text-primary)]">
+                <SelectTrigger className="bg-[var(--bg-tertiary)] border-[var(--border)] text-[var(--text-primary)]">
                   <SelectValue placeholder="Select priority" />
                 </SelectTrigger>
-                <SelectContent className="bg-white border-[var(--border)]">
+                <SelectContent className="bg-[var(--bg-secondary)] border-[var(--border)]">
                   <SelectItem value="LOW" className="text-[var(--text-primary)]">Low</SelectItem>
                   <SelectItem value="MEDIUM" className="text-[var(--text-primary)]">Medium</SelectItem>
                   <SelectItem value="HIGH" className="text-[var(--text-primary)]">High</SelectItem>
@@ -256,7 +256,7 @@ const TaskForm: React.FC<TaskFormProps> = ({
               id="due_date"
               type="date"
               {...register('due_date')}
-              className={`bg-white border-[var(--border)] text-[var(--text-primary)] ${errors.due_date ? 'border-red-500' : ''}`}
+              className={`bg-[var(--bg-tertiary)] border-[var(--border)] text-[var(--text-primary)] ${errors.due_date ? 'border-red-500' : ''}`}
             />
             {errors.due_date && (
               <p className="text-sm text-[var(--error)]">{errors.due_date.message}</p>

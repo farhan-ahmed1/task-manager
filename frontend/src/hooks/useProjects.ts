@@ -212,6 +212,13 @@ export function useInviteUserToProject() {
     onSuccess: (_, { projectId }) => {
       // Invalidate members list to show the new invitation
       queryClient.invalidateQueries({ queryKey: projectKeys.members(projectId) });
+      
+      // Show success notification
+      toast.success('Invitation sent successfully');
+    },
+    onError: (error) => {
+      // Show error notification
+      toast.error(error instanceof Error ? error.message : 'Failed to invite user');
     },
   });
 }
@@ -233,6 +240,13 @@ export function useRemoveProjectMember() {
     onSuccess: ({ projectId }) => {
       // Invalidate members list
       queryClient.invalidateQueries({ queryKey: projectKeys.members(projectId) });
+      
+      // Show success notification
+      toast.success('Member removed successfully');
+    },
+    onError: (error) => {
+      // Show error notification
+      toast.error(error instanceof Error ? error.message : 'Failed to remove member');
     },
   });
 }

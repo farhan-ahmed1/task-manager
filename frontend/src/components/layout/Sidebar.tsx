@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { useAuth } from '@/context/AuthContext';
-import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import AddTaskModal from '@/components/tasks/AddTaskModal';
 import { useProjects } from '@/hooks/useProjects';
@@ -14,7 +13,6 @@ import {
   Calendar, 
   CalendarDays, 
   CheckCircle2, 
-  MoreHorizontal,
   Hash,
   ChevronDown,
   ChevronRight,
@@ -129,42 +127,47 @@ const Sidebar: React.FC<SidebarProps> = ({ onClose, onToggle, onOpenSearch, clas
 
   return (
     <div className={cn(
-      "flex flex-col h-full sidebar-container",
+      "flex flex-col h-full border-r border-white/5 bg-slate-900/50 backdrop-blur-xl transition-all duration-300",
       className
     )}>
 
       {/* Workspace Header */}
       <div className="px-6 py-6">
         <div className="flex items-center justify-between">
-          <div>
-            <h2 className="text-body font-medium text-text-primary">
-              {user?.name?.split(' ')[0]}'s workspace
+          <div className="flex items-center gap-3">
+            <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-primary to-accent flex items-center justify-center text-white font-bold shadow-lg shadow-primary/20">
+              {getUserInitials().substring(0, 1)}
+            </div>
+            <h2 className="font-medium text-slate-200 tracking-tight">
+              {user?.name?.split(' ')[0]}'s Space
             </h2>
           </div>
           <button
             onClick={onToggle}
-            className="p-2 hover:bg-[var(--bg-tertiary)] rounded-md transition-colors"
+            className="p-2 text-slate-400 hover:text-white hover:bg-white/5 rounded-lg transition-all duration-200"
           >
             <span className="sr-only">Close sidebar</span>
-            <PanelLeftClose className="w-6 h-6" />
+            <PanelLeftClose className="w-5 h-5" />
           </button>
         </div>
       </div>
 
       {/* Main Navigation */}
-      <div className="flex-1 overflow-y-auto">
+      <div className="flex-1 overflow-y-auto scrollbar-thin scrollbar-thumb-white/10 scrollbar-track-transparent">
         <div className="p-4 pb-2">
           {/* Add Task Button */}
           <button 
-            className="sidebar-add-task w-full flex items-center px-4 py-3 text-sm font-medium cursor-pointer mb-8 rounded-lg border-0"
+            className="w-full flex items-center justify-center gap-2 px-4 py-3 text-sm font-semibold text-white bg-primary hover:bg-primary-dark rounded-xl transition-all duration-200 shadow-lg shadow-primary/20 hover:shadow-primary/40 group"
             onClick={() => setIsAddTaskModalOpen(true)}
           >
-            <Plus className="w-6 h-6 mr-3" />
-            Add task
+            <div className="p-1 bg-white/20 rounded-full group-hover:scale-110 transition-transform">
+              <Plus className="w-4 h-4" />
+            </div>
+            <span>New Task</span>
           </button>
         </div>
         
-        <nav className="px-6 space-y-1">
+        <nav className="px-4 space-y-1 mt-4">
           {mainNavigation.map((item) => {
             const Icon = item.icon;
             const isActive = item.href ? isCurrentPath(item.href) : false;
@@ -182,12 +185,12 @@ const Sidebar: React.FC<SidebarProps> = ({ onClose, onToggle, onOpenSearch, clas
                     }
                     onClose?.();
                   }}
-                  className="sidebar-nav-item w-full"
-                  data-active="false"
+                  className="w-full flex items-center gap-3 px-3 py-2.5 text-sm font-medium text-slate-400 hover:text-white hover:bg-white/5 rounded-lg transition-all duration-200 group"
                 >
-                  <div className="flex items-center">
-                    <Icon className="sidebar-nav-icon" />
-                    <span>{item.name}</span>
+                  <Icon className="w-5 h-5 text-slate-500 group-hover:text-primary transition-colors" />
+                  <span>{item.name}</span>
+                  <div className="ml-auto flex items-center gap-1">
+                    <span className="text-xs bg-white/5 px-1.5 py-0.5 rounded text-slate-500 border border-white/5">⌘K</span>
                   </div>
                 </button>
               );
@@ -198,16 +201,27 @@ const Sidebar: React.FC<SidebarProps> = ({ onClose, onToggle, onOpenSearch, clas
               <Link
                 key={item.name}
                 to={item.href!}
+                className={cn(
+                  "flex items-center gap-3 px-3 py-2.5 text-sm font-medium rounded-lg transition-all duration-200 group relative overflow-hidden",
+                  isActive 
+                    ? "text-white bg-white/10 shadow-inner" 
+                    : "text-slate-400 hover:text-white hover:bg-white/5"
+                )}
                 onClick={onClose}
-                className="sidebar-nav-item"
-                data-active={isActive}
               >
-                <div className="flex items-center">
-                  <Icon className="sidebar-nav-icon" />
-                  <span>{item.name}</span>
-                </div>
+                {isActive && (
+                  <div className="absolute left-0 top-0 bottom-0 w-1 bg-primary rounded-r-full" />
+                )}
+                <Icon className={cn(
+                  "w-5 h-5 transition-colors",
+                  isActive ? "text-primary" : "text-slate-500 group-hover:text-slate-300"
+                )} />
+                <span>{item.name}</span>
                 {item.count && (
-                  <span className="sidebar-nav-count">
+                  <span className={cn(
+                    "ml-auto text-xs px-2 py-0.5 rounded-full",
+                    isActive ? "bg-primary text-white" : "bg-white/5 text-slate-500"
+                  )}>
                     {item.count}
                   </span>
                 )}
@@ -216,35 +230,22 @@ const Sidebar: React.FC<SidebarProps> = ({ onClose, onToggle, onOpenSearch, clas
           })}
         </nav>
 
-        {/* More section */}
-        <div className="px-6 space-y-1">
-          <button 
-            className="sidebar-nav-item w-full"
-            data-active="false"
-          >
-            <div className="flex items-center">
-              <MoreHorizontal className="sidebar-nav-icon" />
-              <span>More</span>
-            </div>
-          </button>
-        </div>
-
         {/* Favorites section */}
         {favoriteProjects.length > 0 && (
-          <div className="px-2 py-2 mt-4 pt-4 sidebar-divider">
+          <div className="px-4 mt-8">
             <button
               onClick={() => setIsFavoritesExpanded(!isFavoritesExpanded)}
-              className="sidebar-section-header"
+              className="flex items-center justify-between w-full px-3 py-2 text-xs font-semibold text-slate-500 uppercase tracking-wider hover:text-slate-300 transition-colors"
             >
               <span>Favorites</span>
               {isFavoritesExpanded ? (
-                <ChevronDown className="w-3 h-3 transition-transform text-text-muted" />
+                <ChevronDown className="w-3 h-3" />
               ) : (
-                <ChevronRight className="w-3 h-3 transition-transform text-text-muted" />
+                <ChevronRight className="w-3 h-3" />
               )}
             </button>
             {isFavoritesExpanded && (
-              <div className="mt-2 space-y-1">
+              <div className="mt-1 space-y-0.5">
                 {favoriteProjects.map((project) => {
                   const isActive = location.pathname === getProjectPath(project.id);
                   return (
@@ -252,18 +253,15 @@ const Sidebar: React.FC<SidebarProps> = ({ onClose, onToggle, onOpenSearch, clas
                       key={project.id}
                       to={getProjectPath(project.id)}
                       onClick={onClose}
-                      className="sidebar-project-link"
-                      data-active={isActive}
+                      className={cn(
+                        "flex items-center gap-3 px-3 py-2 text-sm rounded-lg transition-all duration-200 group",
+                        isActive 
+                          ? "text-white bg-white/10" 
+                          : "text-slate-400 hover:text-white hover:bg-white/5"
+                      )}
                     >
-                      <div className="flex items-center">
-                        <div className="w-6 h-6 flex items-center justify-center mr-3 flex-shrink-0">
-                          <Hash className="sidebar-project-icon" />
-                        </div>
-                        <span className="truncate">{project.name}</span>
-                      </div>
-                      <span className="sidebar-project-count">
-                        1
-                      </span>
+                      <div className="w-2 h-2 rounded-full" style={{ backgroundColor: project.color || '#6366f1' }} />
+                      <span className="truncate">{project.name}</span>
                     </Link>
                   );
                 })}
@@ -273,24 +271,24 @@ const Sidebar: React.FC<SidebarProps> = ({ onClose, onToggle, onOpenSearch, clas
         )}
 
         {/* My Projects section */}
-        <div className="px-2 py-2 mt-4 pt-4 sidebar-divider">
+        <div className="px-4 mt-6">
           <button
             onClick={() => setIsProjectsExpanded(!isProjectsExpanded)}
-            className="sidebar-section-header"
+            className="flex items-center justify-between w-full px-3 py-2 text-xs font-semibold text-slate-500 uppercase tracking-wider hover:text-slate-300 transition-colors"
           >
             <span>My Projects</span>
             {isProjectsExpanded ? (
-              <ChevronDown className="w-3 h-3 transition-transform text-text-muted" />
+              <ChevronDown className="w-3 h-3" />
             ) : (
-              <ChevronRight className="w-3 h-3 transition-transform text-text-muted" />
+              <ChevronRight className="w-3 h-3" />
             )}
           </button>
           {isProjectsExpanded && (
-            <div className="mt-2 space-y-1">
+            <div className="mt-1 space-y-0.5">
               {isLoading ? (
-                <div className="px-4 py-2 text-sm ml-2 text-text-muted">Loading...</div>
+                <div className="px-3 py-2 text-sm text-slate-600">Loading...</div>
               ) : projects.length === 0 ? (
-                <div className="px-4 py-2 text-sm ml-2 text-text-muted">No projects yet</div>
+                <div className="px-3 py-2 text-sm text-slate-600">No projects yet</div>
               ) : (
                 projects.map((project) => {
                   const isActive = location.pathname === getProjectPath(project.id);
@@ -299,18 +297,15 @@ const Sidebar: React.FC<SidebarProps> = ({ onClose, onToggle, onOpenSearch, clas
                       key={project.id}
                       to={getProjectPath(project.id)}
                       onClick={onClose}
-                      className="sidebar-project-link"
-                      data-active={isActive}
+                      className={cn(
+                        "flex items-center gap-3 px-3 py-2 text-sm rounded-lg transition-all duration-200 group",
+                        isActive 
+                          ? "text-white bg-white/10" 
+                          : "text-slate-400 hover:text-white hover:bg-white/5"
+                      )}
                     >
-                      <div className="flex items-center">
-                        <div className="w-6 h-6 flex items-center justify-center mr-3 flex-shrink-0">
-                          <Hash className="sidebar-project-icon" />
-                        </div>
-                        <span className="truncate">{project.name}</span>
-                      </div>
-                      <span className="sidebar-project-count">
-                        19
-                      </span>
+                      <Hash className="w-4 h-4 text-slate-600 group-hover:text-slate-400 transition-colors" />
+                      <span className="truncate">{project.name}</span>
                     </Link>
                   );
                 })
@@ -321,27 +316,25 @@ const Sidebar: React.FC<SidebarProps> = ({ onClose, onToggle, onOpenSearch, clas
       </div>
 
       {/* User section at bottom */}
-      <div className="mt-auto p-3 sidebar-user-section">
-        <button className="sidebar-user-button">
+      <div className="p-4 border-t border-white/5 bg-black/20">
+        <button className="flex items-center gap-3 w-full p-2 rounded-xl hover:bg-white/5 transition-colors group">
           <div 
-            className="w-8 h-8 rounded-full flex items-center justify-center text-white font-medium text-sm" 
+            className="w-9 h-9 rounded-full flex items-center justify-center text-white font-medium text-sm shadow-lg" 
             style={{ 
               background: `linear-gradient(135deg, ${getRandomColor()}, ${getRandomColor()})` 
             }}
           >
             {getUserInitials()}
           </div>
-          <div className="flex-1 min-w-0">
-            <p className="text-sm font-medium truncate text-text-primary">
+          <div className="flex-1 min-w-0 text-left">
+            <p className="text-sm font-medium truncate text-slate-200 group-hover:text-white transition-colors">
               {user?.name || 'Admin User'}
             </p>
-            <p className="text-xs truncate text-text-secondary">
+            <p className="text-xs truncate text-slate-500 group-hover:text-slate-400 transition-colors">
               {user?.email || 'admin@taskmanager.com'}
             </p>
           </div>
-          <Button variant="ghost" size="sm" className="w-6 h-6 p-0 opacity-60 hover:opacity-100">
-            <ChevronDown className="w-4 h-4 text-[var(--text-tertiary)]" />
-          </Button>
+          <ChevronDown className="w-4 h-4 text-slate-600 group-hover:text-slate-400 transition-colors" />
         </button>
       </div>
 

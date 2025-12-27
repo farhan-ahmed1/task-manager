@@ -13,8 +13,9 @@ const DragOverlay: React.FC<DragOverlayProps> = ({ task }) => {
 
   return (
     <div 
-      className="flex items-center py-3 px-4 bg-white rounded-lg shadow-xl border-2"
+      className="flex items-center py-3 px-4 rounded-lg shadow-xl border-2"
       style={{ 
+        backgroundColor: 'var(--bg-secondary)',
         borderColor: 'var(--primary)',
         borderRadius: 'var(--radius-md)',
         transform: 'rotate(3deg)',

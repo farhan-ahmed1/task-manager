@@ -38,7 +38,7 @@ const TaskDetailDialog: React.FC<TaskDetailDialogProps> = ({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[600px] bg-white">
+      <DialogContent className="sm:max-w-[600px]">
         <DialogHeader>
           <DialogTitle className="text-xl font-semibold text-[var(--text-primary)]">
             {task.title}

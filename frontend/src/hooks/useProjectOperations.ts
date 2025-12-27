@@ -2,14 +2,16 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useCreateProject, useUpdateProject, useDeleteProject } from './useProjects';
 import { useCreateTask, useUpdateTask } from './useTasks';
-import { projectService } from '@/services/projects';
 import { handleError } from '@/utils/errorHandling';
 import type { Project, CreateProjectRequest, UpdateProjectRequest, Task, CreateTaskRequest } from '@/types/api';
 import type { CreateTaskFormData } from '@/validation/task';
 
 /**
  * Custom hook to manage all project-related operations
- * Encapsulates CRUD operations, sharing, and navigation logic
+ * Encapsulates CRUD operations, sharing dialog state, and navigation logic
+ * 
+ * Note: Sharing mutations (invite/remove) are handled directly in ProjectSharingDialog
+ * using React Query hooks (useInviteUserToProject, useRemoveProjectMember)
  */
 export function useProjectOperations() {
   const navigate = useNavigate();
@@ -40,11 +42,9 @@ export function useProjectOperations() {
   const [taskFormProjectId, setTaskFormProjectId] = useState<string | undefined>();
   const [taskFormError, setTaskFormError] = useState<string | null>(null);
 
-  // Sharing state
+  // Sharing dialog state (only UI state, mutations handled in dialog component)
   const [sharingProject, setSharingProject] = useState<Project | null>(null);
   const [isSharingDialogOpen, setIsSharingDialogOpen] = useState(false);
-  const [isInvitingUser, setIsInvitingUser] = useState(false);
-  const [sharingError, setSharingError] = useState<string | null>(null);
 
   // Project CRUD operations
   const handleCreateProject = async (data: CreateProjectRequest) => {
@@ -188,72 +188,15 @@ export function useProjectOperations() {
     setTaskFormError(null);
   };
 
-  // Sharing operations
+  // Sharing dialog operations
   const openSharingDialog = (project: Project) => {
     setSharingProject(project);
-    setSharingError(null);
     setIsSharingDialogOpen(true);
   };
 
   const closeSharingDialog = () => {
     setIsSharingDialogOpen(false);
     setSharingProject(null);
-    setSharingError(null);
-  };
-
-  const handleInviteUser = async (email: string, role: 'ADMIN' | 'MEMBER' | 'VIEWER') => {
-    if (!sharingProject) return;
-    setIsInvitingUser(true);
-    setSharingError(null);
-    try {
-      const result = await projectService.inviteUserToProject(
-        sharingProject.id, 
-        email, 
-        role
-      );
-      if (!result.success) {
-        const errorMsg = result.error.message;
-        setSharingError(errorMsg);
-        handleError(result.error, {
-          toastMessage: 'Failed to invite user',
-          context: { projectId: sharingProject.id, email, role }
-        });
-      }
-    } catch (error) {
-      const errorMsg = 'Failed to invite user';
-      setSharingError(errorMsg);
-      handleError(error, {
-        toastMessage: errorMsg,
-        context: { projectId: sharingProject.id, email, role }
-      });
-    } finally {
-      setIsInvitingUser(false);
-    }
-  };
-
-  const handleRemoveMember = async (userId: string) => {
-    if (!sharingProject) return;
-    try {
-      const result = await projectService.removeProjectMember(
-        sharingProject.id, 
-        userId
-      );
-      if (!result.success) {
-        const errorMsg = result.error.message;
-        setSharingError(errorMsg);
-        handleError(result.error, {
-          toastMessage: 'Failed to remove member',
-          context: { projectId: sharingProject.id, userId }
-        });
-      }
-    } catch (error) {
-      const errorMsg = 'Failed to remove member';
-      setSharingError(errorMsg);
-      handleError(error, {
-        toastMessage: errorMsg,
-        context: { projectId: sharingProject.id, userId }
-      });
-    }
   };
 
   // Navigation
@@ -296,17 +239,13 @@ export function useProjectOperations() {
     handleTaskFormSubmit,
     closeTaskForm,
     
-    // Sharing state
+    // Sharing dialog state (mutations handled in ProjectSharingDialog)
     sharingProject,
     isSharingDialogOpen,
-    isInvitingUser,
-    sharingError,
     
-    // Sharing actions
+    // Sharing dialog actions
     openSharingDialog,
     closeSharingDialog,
-    handleInviteUser,
-    handleRemoveMember,
     
     // Navigation
     navigateToProject,

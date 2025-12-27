@@ -113,13 +113,13 @@ const DatePickerModal: React.FC<DatePickerModalProps> = ({
   return (
     <div 
       ref={modalRef}
-      className="absolute left-0 w-80 bg-white rounded-xl border border-[var(--border)]"
+      className="absolute left-0 w-80 rounded-xl border border-[var(--glass-border)] backdrop-blur-xl"
       style={{ 
         zIndex: 99999,
         boxShadow: 'var(--shadow-card)',
         position: 'absolute',
         isolation: 'isolate',
-        backgroundColor: 'var(--surface)', // Solid white background - no transparency
+        backgroundColor: 'var(--bg-secondary)',
         ...(position === 'top' 
           ? { bottom: '100%', marginBottom: '0.5rem' }
           : { top: '100%', marginTop: '0.5rem' }
@@ -128,7 +128,7 @@ const DatePickerModal: React.FC<DatePickerModalProps> = ({
       onClick={(e) => e.stopPropagation()}
       onMouseDown={(e) => e.stopPropagation()}
     >
-      <div className="p-4 relative bg-white" style={{ zIndex: 100000 }}>
+      <div className="p-4 relative" style={{ zIndex: 100000, backgroundColor: 'var(--bg-secondary)', borderRadius: 'inherit' }}>
         {/* Quick Date Options */}
         <div className="space-y-1 mb-4">
           {getQuickDateOptions().map((option) => {
@@ -143,7 +143,7 @@ const DatePickerModal: React.FC<DatePickerModalProps> = ({
                     onClose();
                   }, 150);
                 }}
-                className="w-full flex items-center gap-3 px-3 py-2 text-sm rounded-lg transition-all duration-200 text-left cursor-pointer hover:bg-slate-50 active:bg-slate-100"
+                className="w-full flex items-center gap-3 px-3 py-2 text-sm rounded-lg transition-all duration-200 text-left cursor-pointer hover:bg-[var(--surface-hover)] active:bg-[var(--surface-active)]"
               >
                 <IconComponent 
                   className="w-4 h-4 flex-shrink-0" 
@@ -235,10 +235,10 @@ const DatePickerModal: React.FC<DatePickerModalProps> = ({
                 onClick={() => handleCalendarDateClick(day)}
                 className={`h-8 flex items-center justify-center text-sm rounded-lg transition-all duration-200 cursor-pointer ${
                   isSelected
-                    ? 'bg-blue-600 text-white font-semibold shadow-sm hover:bg-blue-700'
+                    ? 'bg-[var(--primary)] text-white font-semibold shadow-sm hover:bg-[var(--primary-dark)]'
                     : isToday
-                    ? 'bg-blue-50 font-semibold text-blue-700 ring-2 ring-blue-200 hover:bg-blue-100'
-                    : 'hover:bg-slate-50 text-foreground'
+                    ? 'bg-[var(--primary-subtle)] font-semibold text-[var(--primary-light)] ring-2 ring-[var(--primary-subtle)] hover:bg-[var(--surface-hover)]'
+                    : 'hover:bg-[var(--surface-hover)] text-[var(--text-primary)]'
                 }`}
               >
                 {day}
@@ -249,11 +249,11 @@ const DatePickerModal: React.FC<DatePickerModalProps> = ({
 
         {/* Time and Repeat buttons */}
         <div className="space-y-1 mt-4 pt-4 border-t border-[var(--border)]">
-          <button className="w-full flex items-center gap-2 px-3 py-2 text-sm font-medium text-[var(--text-secondary)] hover:bg-slate-50 active:bg-slate-100 rounded-lg transition-all duration-200 text-left cursor-pointer">
+          <button className="w-full flex items-center gap-2 px-3 py-2 text-sm font-medium text-[var(--text-secondary)] hover:bg-[var(--surface-hover)] active:bg-[var(--surface-active)] rounded-lg transition-all duration-200 text-left cursor-pointer">
             <Clock className="w-4 h-4" />
             <span>Time</span>
           </button>
-          <button className="w-full flex items-center gap-2 px-3 py-2 text-sm font-medium text-[var(--text-secondary)] hover:bg-slate-50 active:bg-slate-100 rounded-lg transition-all duration-200 text-left cursor-pointer">
+          <button className="w-full flex items-center gap-2 px-3 py-2 text-sm font-medium text-[var(--text-secondary)] hover:bg-[var(--surface-hover)] active:bg-[var(--surface-active)] rounded-lg transition-all duration-200 text-left cursor-pointer">
             <Repeat className="w-4 h-4" />
             <span>Repeat</span>
           </button>

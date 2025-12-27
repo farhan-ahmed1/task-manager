@@ -38,7 +38,7 @@ const ProjectFilters: React.FC<ProjectFiltersProps> = ({
   const currentSortLabel = sortOptions.find(opt => opt.value === sortBy)?.label || 'Created Date';
 
   return (
-    <div className="bg-white/80 backdrop-blur-sm rounded-2xl p-6 border border-[var(--border)] shadow-sm">
+    <div className="bg-[var(--bg-secondary)]/80 backdrop-blur-sm rounded-2xl p-6 border border-[var(--glass-border)] shadow-sm">
       <div className="flex flex-col lg:flex-row gap-4">
         {/* Search */}
         <div className="flex-1 relative">
@@ -47,7 +47,7 @@ const ProjectFilters: React.FC<ProjectFiltersProps> = ({
             placeholder="Search projects by name or description..."
             value={search}
             onChange={(e) => onSearchChange(e.target.value)}
-            className="pl-12 h-12 bg-[var(--bg-secondary)]/50 border-[var(--border)] text-[var(--text-primary)] placeholder-[var(--text-muted)] rounded-xl focus:bg-white focus:border-[var(--border-focus)] focus:ring-2 focus:ring-blue-100 transition-all"
+            className="pl-12 h-12 bg-[var(--bg-tertiary)]/50 border-[var(--border)] text-[var(--text-primary)] placeholder-[var(--text-muted)] rounded-xl focus:bg-[var(--surface-hover)] focus:border-[var(--border-focus)] focus:ring-2 focus:ring-[var(--primary-subtle)] transition-all"
           />
         </div>
 
@@ -58,14 +58,14 @@ const ProjectFilters: React.FC<ProjectFiltersProps> = ({
               <Button 
                 variant="outline" 
                 size="default" 
-                className="h-12 min-w-[140px] bg-[var(--bg-secondary)]/50 border-[var(--border)] text-[var(--text-primary)] hover:bg-white hover:border-[var(--border)] rounded-xl transition-all"
+                className="h-12 min-w-[140px] bg-[var(--bg-tertiary)]/50 border-[var(--border)] text-[var(--text-primary)] hover:bg-[var(--surface-hover)] hover:border-[var(--border)] rounded-xl transition-all"
               >
                 <SortAsc className="mr-2 h-4 w-4" />
                 {currentSortLabel}
                 {sortOrder === 'desc' ? ' ↓' : ' ↑'}
               </Button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="w-52 bg-white/95 backdrop-blur-sm border-[var(--border)] rounded-xl z-50">
+            <DropdownMenuContent align="end" className="w-52 bg-[var(--bg-secondary)]/95 backdrop-blur-sm border-[var(--glass-border)] rounded-xl z-50">
               {sortOptions.map((option) => (
                 <React.Fragment key={option.value}>
                   <DropdownMenuItem
