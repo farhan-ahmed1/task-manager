@@ -97,7 +97,7 @@ if (!rateLimitingDisabled) {
 app.get('/health', async (_req, res) => {
   try {
     const rateLimitStatus = await rateLimitHealthCheck();
-    
+
     // Check database connection
     let dbStatus = 'ok';
     let dbMessage = 'Connected';
@@ -156,8 +156,10 @@ if (process.env.NODE_ENV !== 'production') {
 
 const port = process.env.PORT ? Number(process.env.PORT) : 3000;
 
+let server: ReturnType<typeof app.listen> | null = null;
+
 if (process.env.NODE_ENV !== 'test') {
-  app.listen(port, () => {
+  server = app.listen(port, () => {
     // eslint-disable-next-line no-console
     console.log(`Server listening on port ${port}`);
   });
@@ -185,7 +187,6 @@ app.use((err: AppError, req: Request, res: Response, next: NextFunction) => {
             : err.name === 'DatabaseError'
               ? 500
               : err.status || 500;
-  
   const code = err.code || err.name || 'INTERNAL_ERROR';
   const message = err.message || 'An unexpected error occurred';
 
@@ -199,5 +200,36 @@ app.use((err: AppError, req: Request, res: Response, next: NextFunction) => {
     ...(process.env.NODE_ENV !== 'production' && { stack: err.stack }),
   });
 });
+
+// Graceful shutdown handler
+async function gracefulShutdown(signal: string): Promise<void> {
+  console.log(`\nReceived ${signal}, starting graceful shutdown...`);
+
+  // Stop accepting new connections
+  if (server) {
+    server.close(() => {
+      console.log('HTTP server closed');
+    });
+  }
+
+  try {
+    // Close database connections
+    const pool = await import('./db/pool');
+    await pool.default.end();
+    console.log('Database connections closed');
+
+    console.log('Graceful shutdown completed');
+    process.exit(0);
+  } catch (error) {
+    console.error('Error during graceful shutdown:', error);
+    process.exit(1);
+  }
+}
+
+// Handle termination signals
+if (process.env.NODE_ENV !== 'test') {
+  process.on('SIGTERM', () => gracefulShutdown('SIGTERM'));
+  process.on('SIGINT', () => gracefulShutdown('SIGINT'));
+}
 
 export default app;
