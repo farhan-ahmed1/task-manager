@@ -155,7 +155,7 @@ const TaskDetailsModal: React.FC<TaskDetailsModalProps> = ({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-5xl max-h-[90vh] p-0 overflow-hidden">
         {/* Custom Header with Navigation */}
-        <div className="sticky top-0 bg-white border-b border-gray-200 px-6 py-4 flex items-center justify-between z-10">
+        <div className="sticky top-0 bg-white border-b border-[var(--border)] px-6 py-4 flex items-center justify-between z-10">
           {/* Left: Breadcrumb */}
           <div className="flex items-center gap-2">
             <FolderOpen className="h-4 w-4 text-[var(--text-tertiary)]" />
@@ -209,7 +209,7 @@ const TaskDetailsModal: React.FC<TaskDetailsModalProps> = ({
                 </DropdownMenuItem>
                 <DropdownMenuItem 
                   onClick={() => onDelete(task)}
-                  className="text-red-600 focus:text-red-600"
+                  className="text-[var(--error)] focus:text-[var(--error)]"
                 >
                   Delete task
                 </DropdownMenuItem>
@@ -233,7 +233,7 @@ const TaskDetailsModal: React.FC<TaskDetailsModalProps> = ({
                   className={`mt-1 flex-shrink-0 w-6 h-6 rounded-full border-2 flex items-center justify-center transition-all duration-200 ${
                     task.status === 'COMPLETED'
                       ? 'bg-green-500 border-green-500 text-white shadow-md'
-                      : 'border-gray-300 hover:border-green-400 hover:bg-green-50'
+                      : 'border-[var(--border)] hover:border-green-400 hover:bg-green-50'
                   }`}
                   aria-label={task.status === 'COMPLETED' ? 'Mark as incomplete' : 'Mark as complete'}
                 >
@@ -254,14 +254,14 @@ const TaskDetailsModal: React.FC<TaskDetailsModalProps> = ({
                       }}
                       onKeyDown={handleKeyDownInEdit}
                       onBlur={handleSaveEdit}
-                      className="w-full text-2xl font-semibold text-gray-900 bg-transparent border-none outline-none resize-none overflow-hidden"
+                      className="w-full text-2xl font-semibold text-[var(--text-primary)] bg-transparent border-none outline-none resize-none overflow-hidden"
                       rows={1}
                       style={{ minHeight: '2.5rem' }}
                     />
                   ) : (
                     <button
                       onClick={handleTitleEdit}
-                      className="w-full text-left text-2xl font-semibold text-gray-900 hover:bg-gray-50 rounded p-2 -m-2 transition-colors"
+                      className="w-full text-left text-2xl font-semibold text-[var(--text-primary)] hover:bg-[var(--bg-secondary)] rounded p-2 -m-2 transition-colors"
                       aria-label="Activate to edit the task name"
                     >
                       {task.title}
@@ -283,13 +283,13 @@ const TaskDetailsModal: React.FC<TaskDetailsModalProps> = ({
                         onKeyDown={handleKeyDownInEdit}
                         onBlur={handleSaveEdit}
                         placeholder="Add description..."
-                        className="w-full text-base text-gray-700 bg-transparent border-none outline-none resize-none overflow-hidden"
+                        className="w-full text-base text-[var(--text-secondary)] bg-transparent border-none outline-none resize-none overflow-hidden"
                         rows={3}
                       />
                     ) : (
                       <button
                         onClick={handleDescriptionEdit}
-                        className="w-full text-left text-base text-gray-700 hover:bg-gray-50 rounded p-2 -m-2 transition-colors min-h-[4rem]"
+                        className="w-full text-left text-base text-[var(--text-secondary)] hover:bg-[var(--bg-secondary)] rounded p-2 -m-2 transition-colors min-h-[4rem]"
                         aria-label="Activate to edit the description"
                       >
                         {task.description || 'Add description...'}
@@ -302,18 +302,18 @@ const TaskDetailsModal: React.FC<TaskDetailsModalProps> = ({
           </main>
 
           {/* Sidebar Column */}
-          <aside className="bg-gray-50 p-6 border-l border-gray-200 overflow-y-auto">
+          <aside className="bg-[var(--bg-secondary)] p-6 border-l border-[var(--border)] overflow-y-auto">
             <div className="space-y-6">
               {/* Status */}
               <div>
-                <h3 className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2">
+                <h3 className="text-xs font-semibold text-[var(--text-muted)] uppercase tracking-wider mb-2">
                   Status
                 </h3>
                 <div className="flex items-center gap-2">
                   <div className={`px-3 py-1.5 rounded-full text-sm font-medium ${
                     task.status === 'COMPLETED' ? 'bg-green-100 text-green-700' :
-                    task.status === 'IN_PROGRESS' ? 'bg-blue-100 text-blue-700' :
-                    'bg-gray-100 text-gray-700'
+                    task.status === 'IN_PROGRESS' ? 'bg-[var(--primary-light)] text-blue-700' :
+                    'bg-[var(--bg-tertiary)] text-[var(--text-secondary)]'
                   }`}>
                     {task.status.replace('_', ' ')}
                   </div>
@@ -322,16 +322,16 @@ const TaskDetailsModal: React.FC<TaskDetailsModalProps> = ({
 
               {/* Priority */}
               <div>
-                <h3 className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2">
+                <h3 className="text-xs font-semibold text-[var(--text-muted)] uppercase tracking-wider mb-2">
                   Priority
                 </h3>
                 <div className="flex items-center gap-2">
                   <Flag className={`h-4 w-4 ${
-                    task.priority === 'HIGH' ? 'text-red-500' :
+                    task.priority === 'HIGH' ? 'text-[var(--error)]' :
                     task.priority === 'MEDIUM' ? 'text-orange-500' :
                     'text-green-500'
                   }`} />
-                  <span className="text-sm font-medium text-gray-900">
+                  <span className="text-sm font-medium text-[var(--text-primary)]">
                     {task.priority}
                   </span>
                 </div>
@@ -339,13 +339,13 @@ const TaskDetailsModal: React.FC<TaskDetailsModalProps> = ({
 
               {/* Due Date */}
               <div>
-                <h3 className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2">
+                <h3 className="text-xs font-semibold text-[var(--text-muted)] uppercase tracking-wider mb-2">
                   Due Date
                 </h3>
                 <div className="flex items-center gap-2">
-                  <Calendar className="h-4 w-4 text-gray-500" />
+                  <Calendar className="h-4 w-4 text-[var(--text-muted)]" />
                   <span className={`text-sm font-medium ${
-                    isOverdue ? 'text-red-600' : 'text-gray-900'
+                    isOverdue ? 'text-[var(--error)]' : 'text-[var(--text-primary)]'
                   }`}>
                     {task.due_date ? formatDate(task.due_date) : 'No due date'}
                   </span>
@@ -353,8 +353,8 @@ const TaskDetailsModal: React.FC<TaskDetailsModalProps> = ({
               </div>
 
               {/* Timestamps */}
-              <div className="pt-4 border-t border-gray-200">
-                <div className="text-xs text-gray-500 space-y-1">
+              <div className="pt-4 border-t border-[var(--border)]">
+                <div className="text-xs text-[var(--text-muted)] space-y-1">
                   <p>Created: {formatDate(task.created_at)}</p>
                   <p>Updated: {formatDate(task.updated_at)}</p>
                 </div>

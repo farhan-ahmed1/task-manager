@@ -190,7 +190,7 @@ const TaskList: React.FC = () => {
     return (
       <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50/30 to-slate-50">
         <div className="flex flex-col items-center justify-center py-20">
-          <div className="bg-white/80 backdrop-blur-sm rounded-2xl p-8 border border-slate-200/60 shadow-lg">
+          <div className="bg-white/80 backdrop-blur-sm rounded-2xl p-8 border border-[var(--border)]/60 shadow-lg">
             <Spinner size="lg" text="Loading your tasks..." />
           </div>
         </div>
@@ -219,7 +219,7 @@ const TaskList: React.FC = () => {
       )}
 
       {/* Header with Enhanced Stats */}
-      <div className="bg-gradient-to-br from-slate-50 to-blue-50 rounded-2xl p-6 border border-slate-200/60">
+      <div className="bg-gradient-to-br from-slate-50 to-blue-50 rounded-2xl p-6 border border-[var(--border)]/60">
         <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6">
           <div className="space-y-3">
             <div className="flex items-center gap-3">
@@ -236,25 +236,25 @@ const TaskList: React.FC = () => {
             
             {/* Enhanced Stats Cards */}
             <div className="flex flex-wrap gap-3">
-              <div className="bg-white/80 backdrop-blur-sm rounded-lg px-4 py-2 border border-slate-200/60 hover:shadow-md transition-all duration-200">
+              <div className="bg-white/80 backdrop-blur-sm rounded-lg px-4 py-2 border border-[var(--border)]/60 hover:shadow-md transition-all duration-200">
                 <div className="flex items-center gap-2">
                   <div className="h-2.5 w-2.5 rounded-full bg-slate-400"></div>
                   <span className="text-sm font-medium text-slate-700">{stats.total} Total</span>
                 </div>
               </div>
-              <div className="bg-white/80 backdrop-blur-sm rounded-lg px-4 py-2 border border-slate-200/60 hover:shadow-md transition-all duration-200">
+              <div className="bg-white/80 backdrop-blur-sm rounded-lg px-4 py-2 border border-[var(--border)]/60 hover:shadow-md transition-all duration-200">
                 <div className="flex items-center gap-2">
                   <div className="h-2.5 w-2.5 rounded-full bg-success"></div>
                   <span className="text-sm font-medium text-slate-700">{stats.completed} Completed</span>
                 </div>
               </div>
-              <div className="bg-white/80 backdrop-blur-sm rounded-lg px-4 py-2 border border-slate-200/60 hover:shadow-md transition-all duration-200">
+              <div className="bg-white/80 backdrop-blur-sm rounded-lg px-4 py-2 border border-[var(--border)]/60 hover:shadow-md transition-all duration-200">
                 <div className="flex items-center gap-2">
                   <div className="h-2.5 w-2.5 rounded-full bg-info"></div>
                   <span className="text-sm font-medium text-slate-700">{stats.inProgress} In Progress</span>
                 </div>
               </div>
-              <div className="bg-white/80 backdrop-blur-sm rounded-lg px-4 py-2 border border-slate-200/60 hover:shadow-md transition-all duration-200">
+              <div className="bg-white/80 backdrop-blur-sm rounded-lg px-4 py-2 border border-[var(--border)]/60 hover:shadow-md transition-all duration-200">
                 <div className="flex items-center gap-2">
                   <div className="h-2.5 w-2.5 rounded-full bg-warning"></div>
                   <span className="text-sm font-medium text-slate-700">{stats.pending} Pending</span>

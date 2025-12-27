@@ -121,7 +121,7 @@ const ProjectForm: React.FC<ProjectFormProps> = ({
               placeholder="Enter a descriptive project name..."
               {...register('name')}
               disabled={isSubmitting}
-              className={`bg-white/90 border-[var(--border)] text-[var(--text-primary)] placeholder-slate-400 rounded-lg transition-all duration-200 focus:bg-white focus:border-primary focus:ring-2 focus:ring-primary/20 ${
+              className={`bg-white/90 border-[var(--border)] text-[var(--text-primary)] placeholder-[var(--text-muted)] rounded-lg transition-all duration-200 focus:bg-white focus:border-primary focus:ring-2 focus:ring-primary/20 ${
                 errors.name ? 'border-error focus:border-error focus:ring-error/20' : ''
               }`}
             />

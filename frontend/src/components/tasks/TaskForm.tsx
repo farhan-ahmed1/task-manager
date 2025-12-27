@@ -148,8 +148,8 @@ const TaskForm: React.FC<TaskFormProps> = ({
         <form onSubmit={handleSubmit(handleFormSubmit)} className="space-y-6">
           {/* Title */}
           <div className="space-y-2">
-            <Label htmlFor="title" className="text-gray-700 font-medium">
-              Title <span className="text-red-500">*</span>
+            <Label htmlFor="title" className="text-[var(--text-secondary)] font-medium">
+              Title <span className="text-[var(--error)]">*</span>
             </Label>
             <Input
               id="title"
@@ -158,13 +158,13 @@ const TaskForm: React.FC<TaskFormProps> = ({
               className={`bg-white border-[var(--border)] text-[var(--text-primary)] placeholder-[var(--text-muted)] ${errors.title ? 'border-red-500' : ''}`}
             />
             {errors.title && (
-              <p className="text-sm text-red-500">{errors.title.message}</p>
+              <p className="text-sm text-[var(--error)]">{errors.title.message}</p>
             )}
           </div>
 
           {/* Description */}
           <div className="space-y-2">
-            <Label htmlFor="description" className="text-gray-700 font-medium">Description</Label>
+            <Label htmlFor="description" className="text-[var(--text-secondary)] font-medium">Description</Label>
             <Textarea
               id="description"
               placeholder="Enter task description..."
@@ -173,14 +173,14 @@ const TaskForm: React.FC<TaskFormProps> = ({
               className={`bg-white border-[var(--border)] text-[var(--text-primary)] placeholder-[var(--text-muted)] ${errors.description ? 'border-red-500' : ''}`}
             />
             {errors.description && (
-              <p className="text-sm text-red-500">{errors.description.message}</p>
+              <p className="text-sm text-[var(--error)]">{errors.description.message}</p>
             )}
           </div>
 
           {/* Project Selection */}
           {showProjectSelector && (
             <div className="space-y-2">
-              <Label htmlFor="project_id" className="text-gray-700 font-medium">
+              <Label htmlFor="project_id" className="text-[var(--text-secondary)] font-medium">
                 <FolderOpen className="h-4 w-4 inline mr-1" />
                 Project
               </Label>
@@ -206,7 +206,7 @@ const TaskForm: React.FC<TaskFormProps> = ({
                 </SelectContent>
               </Select>
               {errors.project_id && (
-                <p className="text-sm text-red-500">{errors.project_id.message}</p>
+                <p className="text-sm text-[var(--error)]">{errors.project_id.message}</p>
               )}
             </div>
           )}
@@ -215,7 +215,7 @@ const TaskForm: React.FC<TaskFormProps> = ({
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {/* Status */}
             <div className="space-y-2">
-              <Label htmlFor="status" className="text-gray-700 font-medium">Status</Label>
+              <Label htmlFor="status" className="text-[var(--text-secondary)] font-medium">Status</Label>
               <Select
                 value={status || 'PENDING'}
                 onValueChange={(value: 'PENDING' | 'IN_PROGRESS' | 'COMPLETED') => setValue('status', value)}
@@ -233,7 +233,7 @@ const TaskForm: React.FC<TaskFormProps> = ({
 
             {/* Priority */}
             <div className="space-y-2">
-              <Label htmlFor="priority" className="text-gray-700 font-medium">Priority</Label>
+              <Label htmlFor="priority" className="text-[var(--text-secondary)] font-medium">Priority</Label>
               <Select
                 value={priority || 'MEDIUM'}
                 onValueChange={(value: 'LOW' | 'MEDIUM' | 'HIGH') => setValue('priority', value)}
@@ -252,7 +252,7 @@ const TaskForm: React.FC<TaskFormProps> = ({
 
           {/* Due Date */}
           <div className="space-y-2">
-            <Label htmlFor="due_date" className="text-gray-700 font-medium">Due Date</Label>
+            <Label htmlFor="due_date" className="text-[var(--text-secondary)] font-medium">Due Date</Label>
             <Input
               id="due_date"
               type="date"
@@ -260,7 +260,7 @@ const TaskForm: React.FC<TaskFormProps> = ({
               className={`bg-white border-[var(--border)] text-[var(--text-primary)] ${errors.due_date ? 'border-red-500' : ''}`}
             />
             {errors.due_date && (
-              <p className="text-sm text-red-500">{errors.due_date.message}</p>
+              <p className="text-sm text-[var(--error)]">{errors.due_date.message}</p>
             )}
           </div>
 

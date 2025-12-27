@@ -13,12 +13,12 @@ const buttonVariants = cva(
         destructive:
           "bg-red-600 text-white hover:opacity-90",
         outline:
-          "border border-gray-200 bg-white hover:opacity-60",
+          "border border-[var(--border)] bg-white hover:opacity-60",
         secondary:
-          "bg-gray-100 text-gray-900 hover:opacity-80",
+          "bg-[var(--bg-tertiary)] text-[var(--text-primary)] hover:opacity-80",
         ghost:
-          "hover:opacity-60 hover:bg-gray-50",
-        link: "text-blue-600 underline-offset-4 hover:underline hover:opacity-80",
+          "hover:opacity-60 hover:bg-[var(--bg-secondary)]",
+        link: "text-[var(--primary)] underline-offset-4 hover:underline hover:opacity-80",
       },
       size: {
         default: "h-10 px-4 py-2",

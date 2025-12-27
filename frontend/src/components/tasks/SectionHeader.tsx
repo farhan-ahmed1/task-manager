@@ -74,7 +74,7 @@ const SectionHeader: React.FC<SectionHeaderProps> = ({
     <div 
       ref={setNodeRef}
       style={style}
-      className="flex items-center justify-between py-3 px-4 group/section border-b border-gray-100"
+      className="flex items-center justify-between py-3 px-4 group/section border-b border-[var(--border)]"
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >
@@ -98,7 +98,7 @@ const SectionHeader: React.FC<SectionHeaderProps> = ({
           variant="ghost"
           size="sm"
           onClick={() => onToggleCollapse(section.id)}
-          className="p-1 h-auto mr-2 hover:bg-gray-100 rounded"
+          className="p-1 h-auto mr-2 hover:bg-[var(--bg-tertiary)] rounded"
           aria-label={section.collapsed ? 'Expand section' : 'Collapse section'}
         >
           {section.collapsed ? (
@@ -152,7 +152,7 @@ const SectionHeader: React.FC<SectionHeaderProps> = ({
           variant="ghost"
           size="sm"
           onClick={() => onAddTask(section.id)}
-          className="p-1.5 h-auto hover:bg-gray-100 rounded"
+          className="p-1.5 h-auto hover:bg-[var(--bg-tertiary)] rounded"
           title="Add task to section"
         >
           <Plus className="w-3.5 h-3.5" style={{ color: 'var(--text-muted)' }} />
@@ -163,7 +163,7 @@ const SectionHeader: React.FC<SectionHeaderProps> = ({
             <Button
               variant="ghost"
               size="sm"
-              className="p-1.5 h-auto hover:bg-gray-100 rounded"
+              className="p-1.5 h-auto hover:bg-[var(--bg-tertiary)] rounded"
               title="Section options"
             >
               <MoreHorizontal className="w-3.5 h-3.5" style={{ color: 'var(--text-muted)' }} />
@@ -176,7 +176,7 @@ const SectionHeader: React.FC<SectionHeaderProps> = ({
             <DropdownMenuSeparator />
             <DropdownMenuItem 
               onClick={() => onDelete(section.id)}
-              className="text-red-600 focus:text-red-600"
+              className="text-[var(--error)] focus:text-[var(--error)]"
             >
               Delete section
             </DropdownMenuItem>

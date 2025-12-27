@@ -62,13 +62,13 @@ const AddSectionButton: React.FC<AddSectionButtonProps> = ({
             <button
               onClick={handleSubmit}
               disabled={!sectionName.trim()}
-              className="px-4 py-2 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 disabled:bg-gray-300 disabled:cursor-not-allowed rounded-md transition-colors"
+              className="px-4 py-2 text-sm font-medium text-white bg-[var(--primary)] hover:bg-[var(--primary-dark)] disabled:bg-[var(--bg-tertiary)] disabled:cursor-not-allowed rounded-md transition-colors"
             >
               Add section
             </button>
             <button
               onClick={handleCancel}
-              className="px-4 py-2 text-sm font-medium text-[var(--text-secondary)] hover:text-gray-800 hover:bg-[var(--bg-tertiary)] rounded-md transition-colors"
+              className="px-4 py-2 text-sm font-medium text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-tertiary)] rounded-md transition-colors"
             >
               Cancel
             </button>

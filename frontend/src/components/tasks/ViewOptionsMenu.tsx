@@ -65,7 +65,7 @@ const ViewOptionsMenu: React.FC<ViewOptionsMenuProps> = ({
         <Button
           variant="ghost"
           size="sm"
-          className="p-2 h-auto hover:bg-blue-50"
+          className="p-2 h-auto hover:bg-[var(--primary-light)]"
           title="View options"
           aria-haspopup="dialog"
           aria-expanded="false"
@@ -76,7 +76,7 @@ const ViewOptionsMenu: React.FC<ViewOptionsMenuProps> = ({
       <DropdownMenuContent align="end" className="w-64">
         {/* Layout */}
         <div className="px-2 py-1.5">
-          <div className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-2">
+          <div className="text-xs font-semibold text-[var(--text-muted)] uppercase tracking-wide mb-2">
             Layout
           </div>
           <div className="space-y-1">
@@ -103,7 +103,7 @@ const ViewOptionsMenu: React.FC<ViewOptionsMenuProps> = ({
 
         {/* Display Options */}
         <div className="px-2 py-1.5">
-          <div className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-2">
+          <div className="text-xs font-semibold text-[var(--text-muted)] uppercase tracking-wide mb-2">
             Display
           </div>
           <div className="space-y-1">

@@ -170,7 +170,7 @@ const InboxTaskItem: React.FC<InboxTaskItemProps> = ({
             e.stopPropagation();
             onEdit(task);
           }}
-          className="p-1 h-auto hover:bg-gray-100 transition-colors duration-200"
+          className="p-1 h-auto hover:bg-[var(--bg-tertiary)] transition-colors duration-200"
           style={{ borderRadius: '4px' }}
           title="Edit task"
         >
@@ -185,7 +185,7 @@ const InboxTaskItem: React.FC<InboxTaskItemProps> = ({
               e.stopPropagation();
               setShowDatePicker(true);
             }}
-            className="p-1 h-auto hover:bg-gray-100 transition-colors duration-200"
+            className="p-1 h-auto hover:bg-[var(--bg-tertiary)] transition-colors duration-200"
             style={{ borderRadius: '4px' }}
             title="Set date"
           >

@@ -225,11 +225,11 @@ const ProjectSharingDialog: React.FC<ProjectSharingDialogProps> = ({
             <div className="grid grid-cols-1 gap-4">
               {/* Email Input */}
               <div className="space-y-2">
-                <Label htmlFor="email" className="text-gray-700 font-medium">
+                <Label htmlFor="email" className="text-[var(--text-secondary)] font-medium">
                   Email Address
                 </Label>
                 <div className="relative">
-                  <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+                  <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-[var(--text-muted)]" />
                   <Input
                     id="email"
                     type="email"
@@ -248,7 +248,7 @@ const ProjectSharingDialog: React.FC<ProjectSharingDialogProps> = ({
 
               {/* Role Selection */}
               <div className="space-y-2">
-                <Label htmlFor="role" className="text-gray-700 font-medium">
+                <Label htmlFor="role" className="text-[var(--text-secondary)] font-medium">
                   Role
                 </Label>
                 <Select
@@ -307,18 +307,18 @@ const ProjectSharingDialog: React.FC<ProjectSharingDialogProps> = ({
 
           {/* Quick Share Link */}
           <div className="space-y-2">
-            <Label className="text-gray-700 font-medium">Quick Share</Label>
+            <Label className="text-[var(--text-secondary)] font-medium">Quick Share</Label>
             <div className="flex gap-2">
               <Input
                 value={`${window.location.origin}/projects/join/${project.id}`}
                 readOnly
-                className="bg-[var(--bg-secondary)] border-[var(--border)] text-gray-700 text-xs"
+                className="bg-[var(--bg-secondary)] border-[var(--border)] text-[var(--text-secondary)] text-xs"
               />
               <Button
                 variant="outline"
                 size="sm"
                 onClick={copyInviteLink}
-                className="border-[var(--border)] text-gray-700 hover:bg-[var(--bg-secondary)]"
+                className="border-[var(--border)] text-[var(--text-secondary)] hover:bg-[var(--bg-secondary)]"
               >
                 {copySuccess ? (
                   <Check className="h-4 w-4 text-success" />
@@ -336,7 +336,7 @@ const ProjectSharingDialog: React.FC<ProjectSharingDialogProps> = ({
 
           {/* Current Members */}
           <div className="space-y-3">
-            <Label className="text-gray-700 font-medium">Project Members</Label>
+            <Label className="text-[var(--text-secondary)] font-medium">Project Members</Label>
             
             {isLoadingMembers ? (
               <div className="flex items-center justify-center py-4">
