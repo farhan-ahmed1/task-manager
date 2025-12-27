@@ -103,17 +103,11 @@ app.get('/health', async (_req, res) => {
     const rateLimitStatus = await rateLimitHealthCheck();
 
     // Check database connection
-    let dbStatus = 'ok';
-    let dbMessage = 'Connected';
-    try {
-      const { default: pool } = await import('./db/pool');
-      await pool.query('SELECT 1');
-    } catch (dbError) {
-      dbStatus = 'error';
-      dbMessage = dbError instanceof Error ? dbError.message : 'Database connection failed';
-    }
+    const { checkDatabaseHealth } = await import('./db/connectionRetry');
+    const { default: pool } = await import('./db/pool');
+    const dbHealth = await checkDatabaseHealth(pool);
 
-    const isHealthy = dbStatus === 'ok' && rateLimitStatus.status === 'ok';
+    const isHealthy = dbHealth.status === 'ok' && rateLimitStatus.status === 'ok';
 
     res.status(isHealthy ? 200 : 503).json({
       status: isHealthy ? 'ok' : 'degraded',
@@ -121,10 +115,7 @@ app.get('/health', async (_req, res) => {
       version: process.env.npm_package_version || '1.0.0',
       environment: process.env.NODE_ENV || 'development',
       services: {
-        database: {
-          status: dbStatus,
-          message: dbMessage,
-        },
+        database: dbHealth,
         rateLimit: rateLimitStatus,
       },
     });
@@ -163,10 +154,30 @@ const port = process.env.PORT ? Number(process.env.PORT) : 3000;
 let server: ReturnType<typeof app.listen> | null = null;
 
 if (process.env.NODE_ENV !== 'test') {
-  server = app.listen(port, () => {
-    // eslint-disable-next-line no-console
-    console.log(`Server listening on port ${port}`);
-  });
+  // Initialize database connection with retry logic before starting server
+  (async () => {
+    try {
+      const { connectWithRetry } = await import('./db/connectionRetry');
+      const { default: pool } = await import('./db/pool');
+      
+      // Custom retry configuration from environment variables
+      const retryConfig = {
+        maxRetries: process.env.DB_MAX_RETRIES ? parseInt(process.env.DB_MAX_RETRIES, 10) : 5,
+        initialDelayMs: process.env.DB_RETRY_INITIAL_DELAY_MS ? parseInt(process.env.DB_RETRY_INITIAL_DELAY_MS, 10) : 1000,
+      };
+      
+      await connectWithRetry(pool, retryConfig);
+      
+      // Start server only after successful database connection
+      server = app.listen(port, () => {
+        // eslint-disable-next-line no-console
+        console.log(`Server listening on port ${port}`);
+      });
+    } catch (error) {
+      console.error('Failed to initialize application:', error);
+      process.exit(1);
+    }
+  })();
 }
 
 import { Request, Response, NextFunction } from 'express';
