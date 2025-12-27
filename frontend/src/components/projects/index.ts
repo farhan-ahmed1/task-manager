@@ -5,3 +5,6 @@ export { default as ProjectTaskView } from './ProjectTaskView';
 export { default as ProjectSharingDialog } from './ProjectSharingDialog';
 export { default as ProjectFilters } from './ProjectFilters';
 export { default as ProjectTasksLayout } from './ProjectTasksLayout';
+export { default as ProjectGrid } from './ProjectGrid';
+export { default as ProjectStatsView } from './ProjectStatsView';
+export { default as ProjectTasksView } from './ProjectTasksView';
