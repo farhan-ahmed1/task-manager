@@ -335,3 +335,201 @@ svg[class*="lucide"] {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
+
+/* ==========================================
+   Sidebar Navigation Styles - Modern Approach
+   ========================================== */
+
+/* Sidebar container */
+.sidebar-container {
+  background-color: #fafbff;
+  border-right: 1px solid var(--border-subtle);
+}
+
+/* Add Task Button */
+.sidebar-add-task {
+  background-color: rgba(59, 130, 246, 0.1);
+  color: var(--text-primary);
+  transition: background-color 0.15s ease;
+}
+
+.sidebar-add-task:hover {
+  background-color: rgba(59, 130, 246, 0.15);
+}
+
+/* Navigation Item Base */
+.sidebar-nav-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.5rem;
+  font-size: 0.875rem;
+  border-radius: 0.375rem;
+  transition: all 0.15s ease;
+  color: var(--text-secondary);
+  font-weight: 400;
+}
+
+/* Navigation Item - Normal State */
+.sidebar-nav-item[data-active="false"] {
+  background-color: transparent;
+}
+
+.sidebar-nav-item[data-active="false"]:hover {
+  background-color: rgba(0, 0, 0, 0.03);
+  color: var(--primary);
+}
+
+.sidebar-nav-item[data-active="false"]:hover .sidebar-nav-icon {
+  color: var(--primary);
+}
+
+/* Navigation Item - Active State */
+.sidebar-nav-item[data-active="true"] {
+  background-color: rgba(59, 130, 246, 0.08);
+  color: var(--text-primary);
+  font-weight: 500;
+}
+
+/* Navigation Icons */
+.sidebar-nav-icon {
+  width: 1.5rem;
+  height: 1.5rem;
+  margin-right: 0.75rem;
+  flex-shrink: 0;
+  transition: color 0.15s ease;
+  color: var(--text-muted);
+}
+
+.sidebar-nav-item[data-active="true"] .sidebar-nav-icon {
+  color: var(--primary);
+}
+
+/* Navigation Count Badge */
+.sidebar-nav-count {
+  font-size: 12px;
+  padding: 0.25rem 0.5rem;
+  color: var(--text-muted);
+  min-width: 1.5rem;
+  text-align: center;
+}
+
+.sidebar-nav-item[data-active="true"] .sidebar-nav-count {
+  color: var(--primary);
+}
+
+/* Section Headers (Favorites, My Projects) */
+.sidebar-section-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  padding: 0.75rem 1rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  border-radius: var(--radius-sm);
+  transition: all 0.15s ease;
+  color: var(--text-secondary);
+  background-color: transparent;
+}
+
+.sidebar-section-header:hover {
+  background-color: var(--surface-hover);
+  color: var(--text-primary);
+}
+
+/* Project Links */
+.sidebar-project-link {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.5rem 1rem;
+  font-size: 0.875rem;
+  border-radius: var(--radius-sm);
+  transition: all 0.15s ease;
+  margin-left: 0.5rem;
+}
+
+.sidebar-project-link[data-active="false"] {
+  background-color: transparent;
+  color: var(--text-secondary);
+  font-weight: 400;
+}
+
+.sidebar-project-link[data-active="false"]:hover {
+  background-color: rgba(0, 0, 0, 0.03);
+  color: var(--text-primary);
+  padding-left: 1.25rem;
+}
+
+.sidebar-project-link[data-active="true"] {
+  background-color: rgba(59, 130, 246, 0.08);
+  color: #2563eb;
+  font-weight: 500;
+}
+
+/* Project Link Icons */
+.sidebar-project-icon {
+  width: 1rem;
+  height: 1rem;
+  transition: color 0.15s ease;
+}
+
+.sidebar-project-link[data-active="false"] .sidebar-project-icon {
+  color: var(--text-secondary);
+}
+
+.sidebar-project-link[data-active="true"] .sidebar-project-icon {
+  color: var(--primary);
+}
+
+/* Project Count Badge */
+.sidebar-project-count {
+  font-size: 11px;
+  font-weight: 500;
+  min-width: 1.5rem;
+  text-align: center;
+}
+
+.sidebar-project-link[data-active="false"] .sidebar-project-count {
+  color: var(--text-muted);
+}
+
+.sidebar-project-link[data-active="true"] .sidebar-project-count {
+  color: #2563eb;
+}
+
+/* User Section */
+.sidebar-user-section {
+  border-top: 1px solid #DADCE0;
+}
+
+.sidebar-user-button {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.5rem;
+  border-radius: 0.5rem;
+  transition: background-color 0.15s ease;
+  background-color: transparent;
+  cursor: pointer;
+  width: 100%;
+}
+
+.sidebar-user-button:hover {
+  background-color: #F1F3F4;
+}
+
+/* Section Dividers */
+.sidebar-divider {
+  border-top: 1px solid #DADCE0;
+}
+
+/* Smooth transitions for all sidebar elements */
+.sidebar-nav-item,
+.sidebar-project-link,
+.sidebar-section-header,
+.sidebar-add-task,
+.sidebar-user-button {
+  will-change: background-color, color, padding-left;
+}

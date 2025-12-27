@@ -129,12 +129,9 @@ const Sidebar: React.FC<SidebarProps> = ({ onClose, onToggle, onOpenSearch, clas
 
   return (
     <div className={cn(
-      "flex flex-col h-full",
+      "flex flex-col h-full sidebar-container",
       className
-    )} style={{ 
-      backgroundColor: '#fafbff',
-      borderRight: '1px solid var(--border-subtle)'
-    }}>
+    )}>
 
       {/* Workspace Header */}
       <div className="px-6 py-6">
@@ -159,17 +156,7 @@ const Sidebar: React.FC<SidebarProps> = ({ onClose, onToggle, onOpenSearch, clas
         <div className="p-4 pb-2">
           {/* Add Task Button */}
           <button 
-            className="w-full flex items-center px-4 py-3 text-sm font-medium cursor-pointer transition-all duration-150 mb-8 rounded-lg border-0"
-            style={{
-              backgroundColor: 'rgba(59, 130, 246, 0.1)',
-              color: 'var(--text-primary)',
-            }}
-            onMouseEnter={(e) => {
-              e.currentTarget.style.backgroundColor = 'rgba(59, 130, 246, 0.15)';
-            }}
-            onMouseLeave={(e) => {
-              e.currentTarget.style.backgroundColor = 'rgba(59, 130, 246, 0.1)';
-            }}
+            className="sidebar-add-task w-full flex items-center px-4 py-3 text-sm font-medium cursor-pointer mb-8 rounded-lg border-0"
             onClick={() => setIsAddTaskModalOpen(true)}
           >
             <Plus className="w-6 h-6 mr-3" />
@@ -188,7 +175,6 @@ const Sidebar: React.FC<SidebarProps> = ({ onClose, onToggle, onOpenSearch, clas
                 <button
                   key={item.name}
                   onClick={() => {
-                    // Use the prop if provided, otherwise fall back to the hook
                     if (onOpenSearch) {
                       onOpenSearch();
                     } else {
@@ -196,17 +182,12 @@ const Sidebar: React.FC<SidebarProps> = ({ onClose, onToggle, onOpenSearch, clas
                     }
                     onClose?.();
                   }}
-                  className="w-full flex items-center justify-between py-2 px-2 text-sm group transition-all duration-150 rounded-md hover:bg-gray-100"
-                  style={{
-                    color: 'var(--text-secondary)',
-                    fontWeight: '400'
-                  }}
+                  className="sidebar-nav-item w-full"
+                  data-active="false"
                 >
                   <div className="flex items-center">
-                    <Icon className="w-6 h-6 mr-3 flex-shrink-0 transition-colors duration-150" style={{
-                      color: 'var(--text-muted)'
-                    }} />
-                    <span className="group-hover:text-[var(--text-primary)] transition-colors duration-150">{item.name}</span>
+                    <Icon className="sidebar-nav-icon" />
+                    <span>{item.name}</span>
                   </div>
                 </button>
               );
@@ -218,47 +199,15 @@ const Sidebar: React.FC<SidebarProps> = ({ onClose, onToggle, onOpenSearch, clas
                 key={item.name}
                 to={item.href!}
                 onClick={onClose}
-                className="flex items-center justify-between py-2 px-2 text-sm group transition-all duration-150 rounded-md"
-                style={{
-                  fontWeight: isActive ? '500' : '400',
-                  backgroundColor: isActive ? 'rgba(59, 130, 246, 0.08)' : 'transparent'
-                }}
-                onMouseEnter={(e) => {
-                  if (!isActive) {
-                    e.currentTarget.style.backgroundColor = 'rgba(0, 0, 0, 0.03)';
-                    e.currentTarget.style.color = 'var(--primary)';
-                    // Color the icon on hover
-                    const icon = e.currentTarget.querySelector('svg');
-                    if (icon) {
-                      (icon as SVGElement).style.color = 'var(--primary)';
-                    }
-                  }
-                }}
-                onMouseLeave={(e) => {
-                  if (!isActive) {
-                    e.currentTarget.style.backgroundColor = 'transparent';
-                    e.currentTarget.style.color = 'var(--text-secondary)';
-                    // Reset icon color
-                    const icon = e.currentTarget.querySelector('svg');
-                    if (icon) {
-                      (icon as SVGElement).style.color = 'var(--text-muted)';
-                    }
-                  }
-                }}
+                className="sidebar-nav-item"
+                data-active={isActive}
               >
-                <div className="flex items-center" style={{
-                  color: isActive ? 'var(--text-primary)' : 'var(--text-secondary)'
-                }}>
-                  <Icon className="w-6 h-6 mr-3 flex-shrink-0 transition-colors duration-150" style={{
-                    color: isActive ? 'var(--primary)' : 'var(--text-muted)'
-                  }} />
+                <div className="flex items-center">
+                  <Icon className="sidebar-nav-icon" />
                   <span>{item.name}</span>
                 </div>
                 {item.count && (
-                  <span className="text-xs px-2 py-1 text-center min-w-[1.5rem]" style={{
-                    color: 'var(--text-muted)',
-                    fontSize: '12px'
-                  }}>
+                  <span className="sidebar-nav-count">
                     {item.count}
                   </span>
                 )}
@@ -270,44 +219,22 @@ const Sidebar: React.FC<SidebarProps> = ({ onClose, onToggle, onOpenSearch, clas
         {/* More section */}
         <div className="px-6 space-y-1">
           <button 
-            className="flex items-center justify-between py-2 px-2 text-sm w-full transition-all duration-150 rounded-md group"
-            style={{
-              color: 'var(--text-secondary)',
-              backgroundColor: 'transparent'
-            }}
-            onMouseEnter={(e) => {
-              e.currentTarget.style.backgroundColor = 'rgba(0, 0, 0, 0.03)';
-            }}
-            onMouseLeave={(e) => {
-              e.currentTarget.style.backgroundColor = 'transparent';
-            }}
+            className="sidebar-nav-item w-full"
+            data-active="false"
           >
             <div className="flex items-center">
-              <MoreHorizontal className="w-6 h-6 mr-3 flex-shrink-0 text-text-muted" />
-              <span className="group-hover:text-[var(--text-primary)] transition-colors duration-150">More</span>
+              <MoreHorizontal className="sidebar-nav-icon" />
+              <span>More</span>
             </div>
           </button>
         </div>
 
         {/* Favorites section */}
         {favoriteProjects.length > 0 && (
-          <div className="px-2 py-2 mt-4 pt-4" style={{ borderTop: '1px solid #DADCE0' }}>
+          <div className="px-2 py-2 mt-4 pt-4 sidebar-divider">
             <button
               onClick={() => setIsFavoritesExpanded(!isFavoritesExpanded)}
-              className="flex items-center justify-between w-full px-4 py-3 text-sm font-medium transition-all duration-150"
-              style={{
-                borderRadius: 'var(--radius-sm)',
-                color: 'var(--text-secondary)',
-                backgroundColor: 'transparent'
-              }}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.backgroundColor = 'var(--surface-hover)';
-                e.currentTarget.style.color = 'var(--text-primary)';
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.backgroundColor = 'transparent';
-                e.currentTarget.style.color = 'var(--text-secondary)';
-              }}
+              className="sidebar-section-header"
             >
               <span>Favorites</span>
               {isFavoritesExpanded ? (
@@ -325,41 +252,16 @@ const Sidebar: React.FC<SidebarProps> = ({ onClose, onToggle, onOpenSearch, clas
                       key={project.id}
                       to={getProjectPath(project.id)}
                       onClick={onClose}
-                      className="flex items-center justify-between px-4 py-2 text-sm transition-all duration-150 group ml-2"
-                      style={{
-                        borderRadius: 'var(--radius-sm)',
-                        backgroundColor: isActive ? 'rgba(59, 130, 246, 0.08)' : 'transparent',
-                        color: isActive ? '#2563eb' : 'var(--text-secondary)',
-                        fontWeight: isActive ? '500' : '400'
-                      }}
-                      onMouseEnter={(e) => {
-                        if (!isActive) {
-                          e.currentTarget.style.backgroundColor = 'rgba(0, 0, 0, 0.03)';
-                          e.currentTarget.style.color = 'var(--text-primary)';
-                          e.currentTarget.style.paddingLeft = '20px';
-                        }
-                      }}
-                      onMouseLeave={(e) => {
-                        if (!isActive) {
-                          e.currentTarget.style.backgroundColor = 'transparent';
-                          e.currentTarget.style.color = 'var(--text-secondary)';
-                          e.currentTarget.style.paddingLeft = '16px';
-                        }
-                      }}
+                      className="sidebar-project-link"
+                      data-active={isActive}
                     >
                       <div className="flex items-center">
                         <div className="w-6 h-6 flex items-center justify-center mr-3 flex-shrink-0">
-                          <Hash className="w-4 h-4" style={{
-                            color: isActive ? 'var(--primary)' : 'var(--text-secondary)'
-                          }} />
+                          <Hash className="sidebar-project-icon" />
                         </div>
                         <span className="truncate">{project.name}</span>
                       </div>
-                      <span className="text-xs text-center min-w-[1.5rem]" style={{
-                        color: isActive ? '#2563eb' : 'var(--text-muted)',
-                        fontSize: '11px',
-                        fontWeight: '500'
-                      }}>
+                      <span className="sidebar-project-count">
                         1
                       </span>
                     </Link>
@@ -371,23 +273,10 @@ const Sidebar: React.FC<SidebarProps> = ({ onClose, onToggle, onOpenSearch, clas
         )}
 
         {/* My Projects section */}
-        <div className="px-2 py-2 mt-4 pt-4" style={{ borderTop: '1px solid #DADCE0' }}>
+        <div className="px-2 py-2 mt-4 pt-4 sidebar-divider">
           <button
             onClick={() => setIsProjectsExpanded(!isProjectsExpanded)}
-            className="flex items-center justify-between w-full px-4 py-3 text-sm font-medium transition-all duration-150"
-            style={{
-              borderRadius: 'var(--radius-sm)',
-              color: 'var(--text-secondary)',
-              backgroundColor: 'transparent'
-            }}
-            onMouseEnter={(e) => {
-              e.currentTarget.style.backgroundColor = 'var(--surface-hover)';
-              e.currentTarget.style.color = 'var(--text-primary)';
-            }}
-            onMouseLeave={(e) => {
-              e.currentTarget.style.backgroundColor = 'transparent';
-              e.currentTarget.style.color = 'var(--text-secondary)';
-            }}
+            className="sidebar-section-header"
           >
             <span>My Projects</span>
             {isProjectsExpanded ? (
@@ -410,41 +299,16 @@ const Sidebar: React.FC<SidebarProps> = ({ onClose, onToggle, onOpenSearch, clas
                       key={project.id}
                       to={getProjectPath(project.id)}
                       onClick={onClose}
-                      className="flex items-center justify-between px-4 py-2 text-sm transition-all duration-150 group ml-2"
-                      style={{
-                        borderRadius: 'var(--radius-sm)',
-                        backgroundColor: isActive ? 'rgba(59, 130, 246, 0.08)' : 'transparent',
-                        color: isActive ? '#2563eb' : 'var(--text-secondary)',
-                        fontWeight: isActive ? '500' : '400'
-                      }}
-                      onMouseEnter={(e) => {
-                        if (!isActive) {
-                          e.currentTarget.style.backgroundColor = 'rgba(0, 0, 0, 0.03)';
-                          e.currentTarget.style.color = 'var(--text-primary)';
-                          e.currentTarget.style.paddingLeft = '20px';
-                        }
-                      }}
-                      onMouseLeave={(e) => {
-                        if (!isActive) {
-                          e.currentTarget.style.backgroundColor = 'transparent';
-                          e.currentTarget.style.color = 'var(--text-secondary)';
-                          e.currentTarget.style.paddingLeft = '16px';
-                        }
-                      }}
+                      className="sidebar-project-link"
+                      data-active={isActive}
                     >
                       <div className="flex items-center">
                         <div className="w-6 h-6 flex items-center justify-center mr-3 flex-shrink-0">
-                          <Hash className="w-4 h-4" style={{
-                            color: isActive ? 'var(--primary)' : 'var(--text-secondary)'
-                          }} />
+                          <Hash className="sidebar-project-icon" />
                         </div>
                         <span className="truncate">{project.name}</span>
                       </div>
-                      <span className="text-xs text-center min-w-[1.5rem]" style={{
-                        color: isActive ? '#2563eb' : 'var(--text-muted)',
-                        fontSize: '11px',
-                        fontWeight: '500'
-                      }}>
+                      <span className="sidebar-project-count">
                         19
                       </span>
                     </Link>
@@ -457,19 +321,14 @@ const Sidebar: React.FC<SidebarProps> = ({ onClose, onToggle, onOpenSearch, clas
       </div>
 
       {/* User section at bottom */}
-      <div className="mt-auto p-3" style={{ borderTop: '1px solid #DADCE0' }}>
-        <div className="flex items-center space-x-3 p-2 rounded-lg transition-all duration-150 cursor-pointer" 
-             style={{ backgroundColor: 'transparent' }}
-             onMouseEnter={(e) => {
-               e.currentTarget.style.backgroundColor = '#F1F3F4';
-             }}
-             onMouseLeave={(e) => {
-               e.currentTarget.style.backgroundColor = 'transparent';
-             }}>
-          <div className="w-8 h-8 rounded-full flex items-center justify-center text-white font-medium text-sm" 
-               style={{ 
-                 background: `linear-gradient(135deg, ${getRandomColor()}, ${getRandomColor()})` 
-               }}>
+      <div className="mt-auto p-3 sidebar-user-section">
+        <button className="sidebar-user-button">
+          <div 
+            className="w-8 h-8 rounded-full flex items-center justify-center text-white font-medium text-sm" 
+            style={{ 
+              background: `linear-gradient(135deg, ${getRandomColor()}, ${getRandomColor()})` 
+            }}
+          >
             {getUserInitials()}
           </div>
           <div className="flex-1 min-w-0">
@@ -481,9 +340,9 @@ const Sidebar: React.FC<SidebarProps> = ({ onClose, onToggle, onOpenSearch, clas
             </p>
           </div>
           <Button variant="ghost" size="sm" className="w-6 h-6 p-0 opacity-60 hover:opacity-100">
-            <ChevronDown className="w-4 h-4" style={{ color: '#9AA0A6' }} />
+            <ChevronDown className="w-4 h-4 text-gray-500" />
           </Button>
-        </div>
+        </button>
       </div>
 
       {/* Add Task Modal */}
