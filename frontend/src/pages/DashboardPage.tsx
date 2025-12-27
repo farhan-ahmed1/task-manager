@@ -8,6 +8,7 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import { Spinner } from '@/components/ui/spinner';
 import { PageTitle } from '@/components/ui/page-title';
 import { EmptyState } from '@/components/ui/empty-state';
+import PageContainer from '@/components/ui/page-container';
 import { 
   Plus, 
   TrendingUp, 
@@ -68,14 +69,14 @@ const DashboardPage: React.FC = () => {
 
   if (isLoading) {
     return (
-      <div className="container mx-auto px-4 py-8">
+      <PageContainer size="wide" centerContent>
         <Spinner size="lg" text="Loading dashboard..." centered />
-      </div>
+      </PageContainer>
     );
   }
 
   return (
-    <div className="container mx-auto px-4">
+    <PageContainer size="wide">
       <PageTitle 
         icon={BarChart3}
         subtitle="Welcome back! Here's an overview of your tasks and projects."
@@ -305,7 +306,7 @@ const DashboardPage: React.FC = () => {
           </CardContent>
         </Card>
       </div>
-    </div>
+    </PageContainer>
   );
 };
 

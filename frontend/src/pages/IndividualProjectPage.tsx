@@ -7,6 +7,7 @@ import { useProject } from '@/hooks/useProjects';
 import { useProjectLayoutConfig } from '@/hooks/useLayoutConfig';
 import type { Project } from '@/types/api';
 import { Spinner } from '@/components/ui/spinner';
+import PageContainer from '@/components/ui/page-container';
 
 const IndividualProjectPage: React.FC = () => {
   const { projectId } = useParams<{ projectId: string }>();
@@ -31,15 +32,15 @@ const IndividualProjectPage: React.FC = () => {
 
   if (isLoading) {
     return (
-      <div className="max-w-5xl mx-auto p-6">
+      <PageContainer size="standard" centerContent>
         <Spinner size="lg" centered />
-      </div>
+      </PageContainer>
     );
   }
 
   if (error || !project) {
     return (
-      <div className="max-w-5xl mx-auto p-6">
+      <PageContainer size="standard">
         <div className="text-center py-16">
             <div className="flex items-center justify-center w-16 h-16 rounded-xl mb-4 bg-border-light mx-auto">
             <FolderOpen className="w-8 h-8 text-text-muted" />
@@ -57,7 +58,7 @@ const IndividualProjectPage: React.FC = () => {
             Back to Projects
           </button>
         </div>
-      </div>
+      </PageContainer>
     );
   }
 

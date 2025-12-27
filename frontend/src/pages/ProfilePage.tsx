@@ -4,6 +4,7 @@ import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
 import { PageTitle } from '@/components/ui/page-title';
+import PageContainer from '@/components/ui/page-container';
 import { User, Mail, Lock, Save, AlertCircle, CheckCircle, Shield } from 'lucide-react';
 import { useAuth } from '@/context/AuthContext';
 import { authService } from '@/services/auth';
@@ -182,7 +183,7 @@ const ProfilePage: React.FC = () => {
   };
 
   return (
-    <div className="container mx-auto px-4 max-w-4xl">
+    <PageContainer size="narrow" className="py-4">
       <PageTitle 
         icon={User}
         subtitle="Manage your account information and security settings"
@@ -424,7 +425,7 @@ const ProfilePage: React.FC = () => {
           </div>
         </CardContent>
       </Card>
-    </div>
+    </PageContainer>
   );
 };
 

@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Search as SearchIcon, Clock, Hash, CheckCircle2 } from 'lucide-react';
+import PageContainer from '@/components/ui/page-container';
 
 const SearchPage: React.FC = () => {
   const [searchQuery, setSearchQuery] = useState('');
@@ -18,7 +19,7 @@ const SearchPage: React.FC = () => {
   ] : [];
 
   return (
-    <div className="max-w-5xl mx-auto p-6">
+    <PageContainer size="standard" className="py-6">
       {/* Search Input */}
       <div className="mb-8">
         <div className="relative max-w-2xl">
@@ -155,7 +156,7 @@ const SearchPage: React.FC = () => {
           </div>
         </div>
       </div>
-    </div>
+    </PageContainer>
   );
 };
 

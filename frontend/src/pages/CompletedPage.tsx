@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button';
 import { PageTitle } from '@/components/ui/page-title';
 import { PageSpinner } from '@/components/ui/spinner';
 import { EmptyState } from '@/components/ui/empty-state';
+import PageContainer from '@/components/ui/page-container';
 import { useTasks } from '@/hooks/useTasks';
 import { useProjects } from '@/hooks/useProjects';
 import { useAuth } from '@/context/AuthContext';
@@ -67,15 +68,15 @@ const CompletedPage: React.FC = () => {
 
   if (isLoading) {
     return (
-      <div className="main-view-layout main-view-layout--narrow">
+      <PageContainer size="narrow" centerContent>
         <PageSpinner text="Loading activity..." />
-      </div>
+      </PageContainer>
     );
   }
 
   if (tasksError) {
     return (
-      <div className="main-view-layout main-view-layout--narrow">
+      <PageContainer size="narrow">
         <div className="flex items-center justify-center py-12">
           <div className="text-center">
             <p className="text-[var(--error)] mb-4">Failed to load completed tasks</p>
@@ -84,7 +85,7 @@ const CompletedPage: React.FC = () => {
             </Button>
           </div>
         </div>
-      </div>
+      </PageContainer>
     );
   }
 
@@ -92,7 +93,7 @@ const CompletedPage: React.FC = () => {
   const dates = sortedDates(groupedTasks);
 
   return (
-    <div className="main-view-layout main-view-layout--narrow">
+    <PageContainer size="narrow">
       {/* Page Title */}
       <div className="px-6">
         <PageTitle icon={CheckCircle}>Completed</PageTitle>
@@ -131,7 +132,7 @@ const CompletedPage: React.FC = () => {
           )}
         </div>
       </div>
-    </div>
+    </PageContainer>
   );
 };
 

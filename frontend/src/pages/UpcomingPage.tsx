@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button';
 import { PageTitle } from '@/components/ui/page-title';
 import { PageSpinner } from '@/components/ui/spinner';
 import { EmptyState } from '@/components/ui/empty-state';
+import PageContainer from '@/components/ui/page-container';
 import InboxTaskItem from '@/components/tasks/InboxTaskItem';
 import AddTaskModal from '@/components/tasks/AddTaskModal';
 import { useTasks, useCreateTask, useUpdateTask } from '@/hooks/useTasks';
@@ -73,14 +74,14 @@ const UpcomingPage: React.FC = () => {
 
   if (isLoading) {
     return (
-      <div className="max-w-4xl mx-auto px-6">
+      <PageContainer size="narrow" centerContent>
         <PageSpinner text="Loading upcoming tasks..." />
-      </div>
+      </PageContainer>
     );
   }
 
   return (
-    <div className="max-w-4xl mx-auto px-6">
+    <PageContainer size="narrow">
       {/* Page Title */}
       <PageTitle 
         icon={CalendarDays}
@@ -136,7 +137,7 @@ const UpcomingPage: React.FC = () => {
         onClose={() => setShowAddTaskModal(false)}
         onSubmit={handleCreateTask}
       />
-    </div>
+    </PageContainer>
   );
 };
 
