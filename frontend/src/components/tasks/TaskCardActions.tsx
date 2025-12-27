@@ -86,18 +86,19 @@ export const TaskCardActions: React.FC<TaskCardActionsProps> = ({
             variant="ghost" 
             size="icon" 
             className="h-9 w-9 opacity-60 group-hover:opacity-100 transition-all duration-200 hover:bg-muted rounded-lg flex-shrink-0 icon-button"
+            aria-label="Task options menu"
           >
-            <MoreVertical className="w-5 h-5 text-muted-foreground icon-enhanced dropdown-icon" strokeWidth={2} />
+            <MoreVertical className="w-5 h-5 text-muted-foreground icon-enhanced dropdown-icon" strokeWidth={2} aria-hidden="true" />
             <span className="sr-only">Open menu</span>
           </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end" className="w-48 bg-white/95 backdrop-blur-sm border-[var(--border)]">
           <DropdownMenuItem onClick={(e: React.MouseEvent) => { e.stopPropagation(); onView(task); }} className="text-foreground hover:bg-muted cursor-pointer">
-            <Eye className="w-4 h-4 mr-2 icon-enhanced" strokeWidth={2} />
+            <Eye className="w-4 h-4 mr-2 icon-enhanced" strokeWidth={2} aria-hidden="true" />
             View Details
           </DropdownMenuItem>
           <DropdownMenuItem onClick={(e: React.MouseEvent) => { e.stopPropagation(); onEdit(task); }} className="text-foreground hover:bg-muted cursor-pointer">
-            <Edit className="w-4 h-4 mr-2 icon-enhanced" strokeWidth={2} />
+            <Edit className="w-4 h-4 mr-2 icon-enhanced" strokeWidth={2} aria-hidden="true" />
             Edit Task
           </DropdownMenuItem>
           <DropdownMenuSeparator />

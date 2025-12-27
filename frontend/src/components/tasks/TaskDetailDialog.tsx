@@ -64,7 +64,7 @@ const TaskDetailDialog: React.FC<TaskDetailDialogProps> = ({
 
             {isOverdue && (
               <Badge variant="destructive" className="bg-red-100 text-red-800 border-red-200">
-                <AlertCircle className="h-3 w-3 mr-1" />
+                <AlertCircle className="h-3 w-3 mr-1" aria-hidden="true" />
                 Overdue
               </Badge>
             )}
@@ -83,7 +83,7 @@ const TaskDetailDialog: React.FC<TaskDetailDialogProps> = ({
             {/* Due Date */}
             {task.due_date && (
               <div className="flex items-start gap-3">
-                <Calendar className={`h-5 w-5 mt-0.5 ${isOverdue ? 'text-red-500' : 'text-gray-400'}`} />
+                <Calendar className={`h-5 w-5 mt-0.5 ${isOverdue ? 'text-red-500' : 'text-gray-400'}`} aria-hidden="true" />
                 <div>
                   <p className="text-sm font-medium text-gray-700">Due Date</p>
                   <p className={`text-sm ${isOverdue ? 'text-red-600 font-medium' : 'text-gray-600'}`}>
@@ -95,7 +95,7 @@ const TaskDetailDialog: React.FC<TaskDetailDialogProps> = ({
 
             {/* Created Date */}
             <div className="flex items-start gap-3">
-              <Clock className="h-5 w-5 mt-0.5 text-gray-400" />
+              <Clock className="h-5 w-5 mt-0.5 text-gray-400" aria-hidden="true" />
               <div>
                 <p className="text-sm font-medium text-gray-700">Created</p>
                 <p className="text-sm text-gray-600">
@@ -106,7 +106,7 @@ const TaskDetailDialog: React.FC<TaskDetailDialogProps> = ({
 
             {/* Last Updated */}
             <div className="flex items-start gap-3">
-              <Clock className="h-5 w-5 mt-0.5 text-gray-400" />
+              <Clock className="h-5 w-5 mt-0.5 text-gray-400" aria-hidden="true" />
               <div>
                 <p className="text-sm font-medium text-gray-700">Last Updated</p>
                 <p className="text-sm text-gray-600">
@@ -118,7 +118,7 @@ const TaskDetailDialog: React.FC<TaskDetailDialogProps> = ({
             {/* Project ID (if applicable) */}
             {task.project_id && (
               <div className="flex items-start gap-3">
-                <User className="h-5 w-5 mt-0.5 text-gray-400" />
+                <User className="h-5 w-5 mt-0.5 text-gray-400" aria-hidden="true" />
                 <div>
                   <p className="text-sm font-medium text-gray-700">Project</p>
                   <p className="text-sm text-gray-600 font-mono">

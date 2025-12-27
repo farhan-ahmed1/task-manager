@@ -90,7 +90,7 @@ const DashboardPage: React.FC = () => {
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Total Tasks</CardTitle>
-            <Target className="h-4 w-4 text-muted-foreground" />
+            <Target className="h-4 w-4 text-muted-foreground" aria-hidden="true" />
           </CardHeader>
           <CardContent>
             <div className="text-xl sm:text-2xl font-bold">{stats.totalTasks}</div>
@@ -103,7 +103,7 @@ const DashboardPage: React.FC = () => {
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Completed</CardTitle>
-            <CheckCircle2 className="h-4 w-4 text-[var(--success)]" />
+            <CheckCircle2 className="h-4 w-4 text-[var(--success)]" aria-hidden="true" />
           </CardHeader>
           <CardContent>
             <div className="text-xl sm:text-2xl font-bold text-[var(--success)]">{stats.completedTasks}</div>
@@ -116,7 +116,7 @@ const DashboardPage: React.FC = () => {
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">In Progress</CardTitle>
-            <Clock className="h-4 w-4 text-[var(--primary)]" />
+            <Clock className="h-4 w-4 text-[var(--primary)]" aria-hidden="true" />
           </CardHeader>
           <CardContent>
             <div className="text-xl sm:text-2xl font-bold text-[var(--primary)]">{stats.inProgressTasks}</div>
@@ -129,7 +129,7 @@ const DashboardPage: React.FC = () => {
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Projects</CardTitle>
-            <FolderOpen className="h-4 w-4 text-muted-foreground" />
+            <FolderOpen className="h-4 w-4 text-muted-foreground" aria-hidden="true" />
           </CardHeader>
           <CardContent>
             <div className="text-xl sm:text-2xl font-bold">{stats.totalProjects}</div>

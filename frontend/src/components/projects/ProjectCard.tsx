@@ -170,20 +170,21 @@ const ProjectCard: React.FC<ProjectCardProps> = ({
                   variant="ghost" 
                   size="icon" 
                   className="h-9 w-9 opacity-60 sm:opacity-60 md:group-hover:opacity-100 transition-all duration-200 hover:bg-muted rounded-lg flex-shrink-0 icon-button"
+                  aria-label="Project options menu"
                 >
-                  <MoreHorizontal className="w-5 h-5 text-muted-foreground icon-enhanced dropdown-icon" strokeWidth={2} />
+                  <MoreHorizontal className="w-5 h-5 text-muted-foreground icon-enhanced dropdown-icon" strokeWidth={2} aria-hidden="true" />
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" className="w-48 bg-white/95 backdrop-blur-sm border-[var(--border)] rounded-xl">
                 {onViewTasks && (
                   <DropdownMenuItem onClick={() => onViewTasks(project)} className="text-foreground hover:bg-muted rounded-lg cursor-pointer">
-                    <FolderOpen className="w-4 h-4 mr-2 icon-enhanced" strokeWidth={2} />
+                    <FolderOpen className="w-4 h-4 mr-2 icon-enhanced" strokeWidth={2} aria-hidden="true" />
                     View Tasks
                   </DropdownMenuItem>
                 )}
                 {onViewStats && (
                   <DropdownMenuItem onClick={() => onViewStats(project)} className="text-foreground hover:bg-muted rounded-lg cursor-pointer">
-                    <BarChart3 className="w-4 h-4 mr-2 icon-enhanced" strokeWidth={2} />
+                    <BarChart3 className="w-4 h-4 mr-2 icon-enhanced" strokeWidth={2} aria-hidden="true" />
                     View Analytics
                   </DropdownMenuItem>
                 )}
